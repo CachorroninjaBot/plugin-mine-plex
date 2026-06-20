@@ -1,0 +1,50 @@
+name: HaizServerCore
+version: ${version}
+main: com.haiz.servercore.HaizServerCore
+api-version: "1.20"
+author: Haiz
+description: Core analytics, Discord logging, metrics and smart alerts for Paper/Spigot servers.
+folia-supported: false
+
+commands:
+  haizcore:
+    description: Main administrative command for HaizServerCore.
+    usage: /haizcore
+    aliases: [hcore, hsc]
+    permission: haizcore.admin
+  haizactivity:
+    description: Sistema de estatisticas e atividade do Haiz.
+    usage: /haizactivity
+    aliases: [hactivity, activity]
+    permission: haiz.activity.use
+
+permissions:
+  haizcore.admin:
+    description: Full access to HaizServerCore.
+    default: op
+    children:
+      haizcore.reload: true
+      haizcore.metrics: true
+      haizcore.report: true
+      haizcore.discord.test: true
+  haizcore.reload:
+    description: Allows reloading config.yml and messages.yml.
+    default: op
+  haizcore.metrics:
+    description: Allows viewing server and player metrics.
+    default: op
+  haizcore.report:
+    description: Allows generating reports manually.
+    default: op
+  haizcore.discord.test:
+    description: Allows sending Discord test embeds.
+    default: op
+  haiz.activity.use:
+    description: Permite usar comandos basicos do Haiz Activity.
+    default: true
+  haiz.activity.admin:
+    description: Permite recarregar e enviar relatorios do Haiz Activity.
+    default: op
+  haiz.activity.player:
+    description: Permite consultar estatisticas de jogadores.
+    default: true

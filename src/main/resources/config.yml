@@ -1,0 +1,154 @@
+discord:
+  enabled: true
+  token: "COLOQUE_O_TOKEN_AQUI"
+  guild-id: ""
+  channels:
+    server-logs: ""
+    command-logs: ""
+    join-leave-logs: ""
+    console-logs: ""
+    metrics-reports: ""
+    alerts: ""
+  activity:
+    enabled: true
+    text: "Monitorando o servidor"
+  reconnect:
+    enabled: true
+    max-attempts: 5
+  queue:
+    send-delay-millis: 750
+    max-buffer-size: 250
+
+storage:
+  type: "sqlite"
+  sqlite:
+    file: "haizservercore.db"
+  mysql:
+    enabled: false
+    host: "localhost"
+    port: 3306
+    database: "haizservercore"
+    username: "root"
+    password: ""
+
+logs:
+  join-leave:
+    enabled: true
+    returning-after-days: 14
+  commands:
+    enabled: true
+    hide-sensitive-arguments: true
+    sensitive-commands:
+      - login
+      - register
+      - changepassword
+      - senha
+      - auth
+    dangerous-console-commands:
+      - stop
+      - restart
+      - op
+      - deop
+      - whitelist
+  console:
+    commands-enabled: true
+    output-capture-enabled: false
+  chat:
+    enabled: true
+  deaths:
+    enabled: true
+  advancements:
+    enabled: true
+  world-change:
+    enabled: true
+  kick:
+    enabled: true
+  blocks:
+    enabled: true
+  movement:
+    enabled: true
+
+metrics:
+  enabled: true
+  snapshot-interval-seconds: 60
+  save-interval-seconds: 300
+  afk-detection:
+    enabled: true
+    minutes-without-move: 10
+  reports:
+    daily:
+      enabled: true
+      time: "23:59"
+    weekly:
+      enabled: true
+      day: "SUNDAY"
+      time: "23:59"
+
+alerts:
+  enabled: true
+  low-tps:
+    enabled: true
+    threshold: 17.0
+    cooldown-seconds: 300
+  mass-join:
+    enabled: true
+    amount: 8
+    within-seconds: 60
+  mass-leave:
+    enabled: true
+    amount: 8
+    within-seconds: 60
+  command-spam:
+    enabled: true
+    amount: 10
+    within-seconds: 30
+  new-record-online:
+    enabled: true
+
+activity:
+  enabled: true
+
+  storage:
+    type: "sqlite"
+    file: "activity.db"
+    autosave-minutes: 5
+
+  tracking:
+    join-quit: true
+    playtime: true
+    commands: true
+    deaths: true
+    kills: true
+    blocks-broken: true
+    blocks-placed: true
+    mobs-killed: true
+    advancements: true
+    distance-walked: true
+    online-snapshots: true
+    snapshot-minutes: 5
+
+  discord:
+    enabled: false
+    webhook-url: "COLOQUE_AQUI"
+    daily-report:
+      enabled: true
+      time: "23:59"
+    weekly-report:
+      enabled: true
+      day: "SUNDAY"
+      time: "23:59"
+    alerts:
+      enabled: true
+      low-activity: true
+      inactive-hours-threshold: 3
+      daily-peak: true
+      new-player: false
+
+  rankings:
+    daily-limit: 10
+    weekly-limit: 10
+
+  privacy:
+    ignore-vanished-players: true
+    ignore-op-commands: false
+    hide-command-arguments: true

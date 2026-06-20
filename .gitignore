@@ -1,0 +1,8 @@
+.gradle/
+build/
+out/
+*.iml
+*.db
+*.db-shm
+*.db-wal
+.idea/

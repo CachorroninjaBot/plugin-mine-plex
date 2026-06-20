@@ -1,0 +1,46 @@
+plugins {
+    id "java"
+    id "com.gradleup.shadow" version "8.3.5"
+}
+
+group = "com.haiz"
+version = "1.0.0"
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+    options.release = 21
+}
+
+dependencies {
+    compileOnly "io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT"
+    compileOnly "org.apache.logging.log4j:log4j-core:2.22.1"
+
+    implementation("net.dv8tion:JDA:5.0.0") {
+        exclude module: "opus-java"
+    }
+    implementation "org.xerial:sqlite-jdbc:3.46.1.3"
+}
+
+tasks.processResources {
+    filteringCharset = "UTF-8"
+    filesMatching("plugin.yml") {
+        expand(version: project.version)
+    }
+}
+
+shadowJar {
+    archiveClassifier.set("")
+    mergeServiceFiles()
+    relocate "net.dv8tion.jda", "com.haiz.servercore.libs.jda"
+    relocate "org.sqlite", "com.haiz.servercore.libs.sqlite"
+}
+
+tasks.build {
+    dependsOn tasks.shadowJar
+}
