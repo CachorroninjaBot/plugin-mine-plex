@@ -11,6 +11,8 @@ import com.haiz.servercore.logs.ConsoleOutputAppender;
 import com.haiz.servercore.logs.LogManager;
 import com.haiz.servercore.metrics.MetricsManager;
 import com.haiz.servercore.storage.DatabaseManager;
+import com.haiz.servercore.vip.VipModule;
+
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -24,6 +26,18 @@ public final class HaizServerCore extends JavaPlugin {
     private LogManager logManager;
     private ConsoleOutputAppender consoleOutputAppender;
     private HaizActivityModule activityModule;
+    private VipModule vipModule;
+
+    // em onEnable(), APÓS discordBotManager.start():
+    this.vipModule=new VipModule(this);this.vipModule.start();
+
+    // em onDisable(), ANTES de discordBotManager.stop():
+    if(vipModule!=null)vipModule.stop();
+
+    // em reloadEverything():
+    if(vipModule!=null)vipModule.reload();
+
+    // getter:
 
     @Override
     public void onEnable() {
@@ -95,6 +109,8 @@ public final class HaizServerCore extends JavaPlugin {
         }
         getLogger().info("HaizServerCore desabilitado.");
     }
+
+    public VipModule vip() { return vipModule; }
 
     public void reloadEverything() {
         reloadConfig();

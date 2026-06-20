@@ -28,7 +28,8 @@ public final class HaizCoreCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
+            @NotNull String[] args) {
         if (args.length == 0) {
             help(sender);
             return true;
@@ -60,6 +61,11 @@ public final class HaizCoreCommand implements CommandExecutor, TabCompleter {
             }
             case "metrics" -> metrics(sender, args);
             case "report" -> report(sender, args);
+            case "sendvips" -> {
+                if (!has(sender, "haizcore.vip.send"))
+                    return true;
+                plugin.vip().sendShopMessage(sender);
+            }
             case "top" -> top(sender, args);
             default -> sender.sendMessage(plugin.messages().get("unknown-command"));
         }
@@ -131,15 +137,17 @@ public final class HaizCoreCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
+            @NotNull String label, @NotNull String[] args) {
         if (args.length == 1) {
-            return filter(args[0], List.of("reload", "status", "testdiscord", "metrics", "report", "top"));
+            return filter(args[0], List.of("sendvips", "reload", "status", "testdiscord", "metrics", "report", "top"));
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("metrics")) {
             return filter(args[1], List.of("player"));
         }
         if (args.length == 3 && args[0].equalsIgnoreCase("metrics") && args[1].equalsIgnoreCase("player")) {
-            return filter(args[2], Arrays.stream(Bukkit.getOfflinePlayers()).map(OfflinePlayer::getName).filter(java.util.Objects::nonNull).toList());
+            return filter(args[2], Arrays.stream(Bukkit.getOfflinePlayers()).map(OfflinePlayer::getName)
+                    .filter(java.util.Objects::nonNull).toList());
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("report")) {
             return filter(args[1], List.of("daily", "weekly"));

@@ -1,16 +1,16 @@
 package com.haiz.servercore.discord;
 
+import java.util.EnumSet;
+import java.util.concurrent.CompletableFuture;
+
 import com.haiz.servercore.HaizServerCore;
+
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-
-import java.util.EnumSet;
-import java.util.concurrent.CompletableFuture;
 
 public final class DiscordBotManager {
     private final HaizServerCore plugin;
@@ -32,7 +32,8 @@ public final class DiscordBotManager {
         String token = plugin.config().discordToken();
         if (!isUsableToken(token)) {
             state = State.DISABLED;
-            plugin.getLogger().warning("Token Discord vazio/placeholder. Modulo Discord desativado sem parar o plugin.");
+            plugin.getLogger()
+                    .warning("Token Discord vazio/placeholder. Modulo Discord desativado sem parar o plugin.");
             return;
         }
         state = State.STARTING;
@@ -54,7 +55,8 @@ public final class DiscordBotManager {
                 validateChannels(built);
             } catch (Exception exception) {
                 state = State.ERROR;
-                plugin.getLogger().warning("Discord falhou ao iniciar. Token nao sera exibido. Erro: " + exception.getMessage());
+                plugin.getLogger()
+                        .warning("Discord falhou ao iniciar. Token nao sera exibido. Erro: " + exception.getMessage());
             }
         });
     }
@@ -74,8 +76,14 @@ public final class DiscordBotManager {
         state = State.DISABLED;
     }
 
+    // já existe isOnline(), adicione:
+    public JDA jda() {
+        return jda;
+    }
+
     public boolean isOnline() {
         return state == State.ONLINE && jda != null;
+
     }
 
     public String getStateLabel() {
@@ -100,7 +108,8 @@ public final class DiscordBotManager {
         }
         Guild guild = jda.getGuildById(guildId);
         if (guild == null) {
-            plugin.getLogger().warning("Guild Discord nao encontrada para guild-id=" + guildId + ". Slash commands globais serao usados.");
+            plugin.getLogger().warning(
+                    "Guild Discord nao encontrada para guild-id=" + guildId + ". Slash commands globais serao usados.");
             jda.updateCommands().addCommands(DiscordCommandListener.commandData()).queue();
             return;
         }
@@ -110,7 +119,8 @@ public final class DiscordBotManager {
     }
 
     private void validateChannels(JDA jda) {
-        for (String key : new String[]{"server-logs", "command-logs", "join-leave-logs", "console-logs", "metrics-reports", "alerts"}) {
+        for (String key : new String[] { "server-logs", "command-logs", "join-leave-logs", "console-logs",
+                "metrics-reports", "alerts" }) {
             String channelId = plugin.config().channelId(key);
             if (channelId != null && !channelId.isBlank() && jda.getTextChannelById(channelId) == null) {
                 plugin.getLogger().warning("Canal Discord configurado nao foi encontrado: " + key + "=" + channelId);

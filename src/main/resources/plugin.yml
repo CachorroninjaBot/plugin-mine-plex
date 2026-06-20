@@ -17,8 +17,18 @@ commands:
     usage: /haizactivity
     aliases: [hactivity, activity]
     permission: haiz.activity.use
+  linkar:
+    description: Vincula sua conta Minecraft ao Discord para comprar VIPs.
+    usage: /linkar <código>
+    permission: haiz.vip.link
 
 permissions:
+  haizcore.vip.send:
+    description: Permite enviar a mensagem de loja de VIPs no Discord.
+    default: op
+  haiz.vip.link:
+    description: Permite usar /linkar para vincular conta ao Discord.
+    default: true
   haizcore.admin:
     description: Full access to HaizServerCore.
     default: op

@@ -23,7 +23,8 @@ public final class DatabaseManager {
             plugin.getLogger().info("SQLite inicializado com sucesso.");
         } catch (Exception exception) {
             available = false;
-            plugin.getLogger().severe("SQLite falhou ao iniciar. O plugin continuara sem persistencia: " + exception.getMessage());
+            plugin.getLogger().severe(
+                    "SQLite falhou ao iniciar. O plugin continuara sem persistencia: " + exception.getMessage());
         }
     }
 
@@ -38,6 +39,10 @@ public final class DatabaseManager {
 
     public String getStateLabel() {
         return available ? "online" : "offline";
+    }
+
+    public SQLiteDatabase sqliteDatabase() {
+        return sqliteDatabase;
     }
 
     public PlayerStatsRepository players() {
