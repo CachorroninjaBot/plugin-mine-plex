@@ -179,11 +179,15 @@ public final class VipDiscordListener extends ListenerAdapter {
 
     private void handleCancel(ButtonInteractionEvent event) {
         module.purchaseManager().cancelPurchase(event.getUser().getId());
-        event.reply(VipEmbedFactory.purchaseCancelled()).setEphemeral(true).queue();
+        event.deferReply(true).queue(hook -> {
+            hook.sendMessage(VipEmbedFactory.purchaseCancelled()).queue();
+        });
     }
 
     private void handleBack(ButtonInteractionEvent event) {
-        event.reply(VipEmbedFactory.shopMessage(module.vipConfig())).setEphemeral(true).queue();
+        event.deferReply(true).queue(hook -> {
+            hook.sendMessage(VipEmbedFactory.shopMessage(module.vipConfig())).queue();
+        });
     }
 
     // ── Utilitários ───────────────────────────────────────────────────────────
