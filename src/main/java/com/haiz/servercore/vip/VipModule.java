@@ -1,9 +1,11 @@
 package com.haiz.servercore.vip;
 
 import com.haiz.servercore.HaizServerCore;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 
 /**
@@ -33,8 +35,10 @@ public final class VipModule {
         this.purchaseManager = new PurchaseManager(plugin, mobCoins, linkStorage, vipConfig);
 
         registerMinecraftCommands();
-        registerDiscordListener();
-        registerDiscordSlashCommand();
+        
+        // Como o Discord inicia de forma assíncrona, agendamos o registro do listener
+        // para quando o JDA estiver pronto.
+        scheduleDiscordSetup();
 
         running = true;
         plugin.getLogger().info("[VipShop] Módulo de loja de VIPs iniciado.");
@@ -50,6 +54,16 @@ public final class VipModule {
     public void reload() {
         stop();
         start();
+    }
+
+    private void scheduleDiscordSetup() {
+        Bukkit.getScheduler().runTaskTimer(plugin, task -> {
+            if (plugin.discord().isOnline()) {
+                registerDiscordListener();
+                registerDiscordSlashCommand();
+                task.cancel();
+            }
+        }, 20L, 40L); // Checa a cada 2 segundos se o Discord está online
     }
 
     // ── Comando Minecraft: /haizcore sendvips ────────────────────────────────
@@ -93,6 +107,9 @@ public final class VipModule {
 
     private void registerDiscordListener() {
         if (!plugin.discord().isOnline()) return;
+        if (discordListener != null) {
+            plugin.discord().jda().removeEventListener(discordListener);
+        }
         discordListener = new VipDiscordListener(this);
         plugin.discord().jda().addEventListener(discordListener);
     }
@@ -105,8 +122,13 @@ public final class VipModule {
                 .addOption(OptionType.STRING, "nick", "Seu nick no servidor Minecraft", true);
 
         if (guildId != null && !guildId.isBlank()) {
-            var guild = jda.getGuildById(guildId);
-            if (guild != null) guild.upsertCommand(cmd).queue();
+            Guild guild = jda.getGuildById(guildId);
+            if (guild != null) {
+                guild.upsertCommand(cmd).queue();
+            } else {
+                plugin.getLogger().warning("[VipShop] Guild ID " + guildId + " não encontrada. Registrando comando globalmente.");
+                jda.upsertCommand(cmd).queue();
+            }
         } else {
             jda.upsertCommand(cmd).queue();
         }
