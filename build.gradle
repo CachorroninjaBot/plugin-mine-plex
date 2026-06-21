@@ -12,9 +12,16 @@ java {
     }
 }
 
+repositories {
+    mavenCentral()
+    maven {
+        name = "papermc"
+        url = "https://repo.papermc.io/repository/maven-public/"
+    }
+}
+
 tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
-    options.release = 21
 }
 
 dependencies {

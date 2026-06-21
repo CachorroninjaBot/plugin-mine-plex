@@ -51,8 +51,11 @@ public final class HaizServerCore extends JavaPlugin {
         this.logManager.register();
         this.activityModule.start();
         this.discordBotManager.start();
+        
+        // Inicialização do Módulo VIP após o Discord
         this.vipModule = new VipModule(this);
         this.vipModule.start();
+
         this.discordLogService.joinLeave(DiscordEmbedFactory.serverStarted(getServer().getOnlinePlayers().size()));
 
         if (configManager.isConsoleOutputCaptureEnabled()) {
@@ -74,6 +77,9 @@ public final class HaizServerCore extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (vipModule != null) {
+            vipModule.stop();
+        }
         if (consoleOutputAppender != null) {
             consoleOutputAppender.stopCapture();
         }
@@ -122,6 +128,7 @@ public final class HaizServerCore extends JavaPlugin {
         metricsManager.reload();
         logManager.reload();
         activityModule.reload();
+        
         if (vipModule != null) {
             vipModule.reload();
         }
