@@ -161,34 +161,45 @@ public final class UpdateManager {
             }
 
             Path currentJar = pluginsDir.resolve("HaizServerCore.jar");
+            Path serverRoot = pluginsDir.getParent() != null ? pluginsDir.getParent() : Path.of(System.getProperty("user.dir"));
 
             Path updateScript = pluginsDir.resolve("haizcore-update.bat");
-            Path serverRoot = pluginsDir.getParent() != null ? pluginsDir.getParent() : Path.of(System.getProperty("user.dir"));
             String scriptContent = """
                     @echo off
+                    echo ========================================
+                    echo  HaizServerCore Auto-Update
+                    echo ========================================
+                    echo.
                     echo Aguardando servidor parar...
                     :check_loop
-                    timeout /t 2 /nobreak >nul
+                    timeout /t 3 /nobreak >nul
                     tasklist /FI "IMAGENAME eq java.exe" 2>nul | find /I "java.exe" >nul
                     if %errorlevel%==0 goto check_loop
+                    echo.
                     echo Servidor parado. Aplicando update...
+                    timeout /t 1 /nobreak >nul
                     copy /Y "%s" "%s"
-                    del /Q "%s"
-                    del /Q "%s"
-                    echo Update concluido! Iniciando servidor...
-                    cd /d "%s"
-                    start "" run.bat
+                    if %errorlevel%==0 (
+                        echo Update aplicado com sucesso!
+                        del /Q "%s"
+                    ) else (
+                        echo ERRO: Falha ao copiar arquivo.
+                    )
+                    echo.
+                    echo ========================================
+                    echo  Atualizacao concluida!
+                    echo  Reinicie o servidor manualmente.
+                    echo ========================================
+                    pause
                     """.formatted(
                     newPath.toAbsolutePath(), currentJar.toAbsolutePath(),
-                    newPath.toAbsolutePath(), pendingMarker.toAbsolutePath(),
-                    serverRoot.toAbsolutePath());
+                    pendingMarker.toAbsolutePath());
             Files.writeString(updateScript, scriptContent);
 
-            log.info("[Updater] Update preparado! Reiniciando servidor...");
+            log.info("[Updater] Script de update criado: " + updateScript);
+            log.info("[Updater] Execute o script APOS o servidor parar, ou reinicie manualmente.");
+
             Runtime.getRuntime().exec("cmd /c start \"\" \"" + updateScript.toAbsolutePath() + "\"");
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                Bukkit.spigot().restart();
-            }, 20L * 2);
 
             return true;
         } catch (Exception e) {
