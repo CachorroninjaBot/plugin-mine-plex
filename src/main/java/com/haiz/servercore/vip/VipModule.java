@@ -36,12 +36,13 @@ public final class VipModule {
         this.vipStorage    = new VipStorage(plugin, plugin.sqliteDatabase());
         this.purchaseManager = new PurchaseManager(plugin, mobCoins, linkStorage, vipConfig, vipStorage);
 
+        this.autoRepairManager = new AutoRepairManager(plugin, vipStorage, vipConfig);
+
         registerMinecraftCommands();
 
         this.renewalTask = new VipRenewalTask(plugin, vipStorage, mobCoins, vipConfig, purchaseManager::invalidateVipCache);
         this.renewalTask.start();
 
-        this.autoRepairManager = new AutoRepairManager(plugin, vipStorage, vipConfig);
         this.autoRepairManager.register();
 
         scheduleDiscordSetup();
