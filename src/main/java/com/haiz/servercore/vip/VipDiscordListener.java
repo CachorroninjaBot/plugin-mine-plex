@@ -140,6 +140,8 @@ public final class VipDiscordListener extends ListenerAdapter {
             handleBack(event);
         } else if (id.equals("haiz:vip:toggle-renew")) {
             handleToggleRenew(event);
+        } else if (id.equals("haiz:vip:toggle-repair")) {
+            handleToggleRepair(event);
         }
     }
 
@@ -240,6 +242,48 @@ public final class VipDiscordListener extends ListenerAdapter {
             String mcName = module.linkManager().mcNameByDiscordId(discordId).orElse("?");
 
             sendV2Reply(hook, VipEmbedFactory.vipConfigV2(mcName, sub, autoRenew, balance));
+        });
+    }
+
+    private void handleToggleRepair(ButtonInteractionEvent event) {
+        event.deferReply(true).queue(hook -> {
+            String discordId = event.getUser().getId();
+            Optional<UUID> uuidOpt = module.linkManager().uuidByDiscordId(discordId);
+
+            if (uuidOpt.isEmpty()) {
+                sendV2Reply(hook, VipEmbedFactory.linkRequiredV2());
+                return;
+            }
+
+            UUID uuid = uuidOpt.get();
+
+            if (!module.autoRepairManager().isEnabled()) {
+                sendV2Reply(hook, simpleV2(0xE74C3C, "❌ Auto-repair desativado",
+                        "Auto-repair está desativado no servidor."));
+                return;
+            }
+
+            if (module.autoRepairManager().isApplyToAll()) {
+                sendV2Reply(hook, simpleV2(0x2ECC71, "🔧 Auto-repair ativo",
+                        "Auto-repair está ativo para todos os jogadores."));
+                return;
+            }
+
+            VipStorage.VipSubscription sub = module.vipStorage().getActiveSubscription(uuid).orElse(null);
+            if (sub == null) {
+                sendV2Reply(hook, simpleV2(0xE74C3C, "❌ Sem VIP ativo",
+                        "Você não possui um VIP ativo para configurar auto-repair."));
+                return;
+            }
+
+            boolean newValue = module.vipStorage().toggleAutoRepair(uuid);
+            boolean autoRepair = module.vipStorage().getAutoRepair(uuid);
+
+            String status = autoRepair ? "🟢 **Ativado**" : "🔴 **Desativado**";
+            sendV2Reply(hook, simpleV2(autoRepair ? 0x2ECC71 : 0xE74C3C,
+                    "🔧 Auto-repair " + (autoRepair ? "ativado" : "desativado"),
+                    "Auto-repair: " + status + "\n"
+                    + "Quando seu item estiver quase quebrando, ele será reparado automaticamente."));
         });
     }
 

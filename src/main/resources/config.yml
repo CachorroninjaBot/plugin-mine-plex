@@ -89,20 +89,64 @@ storage:
 auto-repair:
   enabled: true
   apply-to-all: false
-  tiers:
-    - "Vip"
-    - "Elite"
+  use-economy: true
+  durability-multiplier: 0.5
+  cooldown-hand: 5
+  cooldown-all: 10
+  play-sound: true
+  send-message: true
+  message-hand: "§8[§bHaizCore§8] §aItem na mão reparado!"
+  message-all: "§8[§bHaizCore§8] §aTodos os itens reparados!"
+  message-cooldown: "§8[§bHaizCore§8] §cAguarde §f%time% §cpara reparar novamente."
+  message-insufficient-funds: "§8[§bHaizCore§8] §cVocê precisa de §f$%cost% §cpara reparar."
+  free-tiers:
     - "Ultra"
     - "Famoso"
     - "Midia"
-  durability-threshold: 5
-  cooldown-seconds: 10
-  play-sound: true
-  send-message: true
-  message: "§8[§bHaizCore§8] §a§l%item% §areparado automaticamente!"
   blacklisted-materials:
     - "ELYTRA"
     - "SHIELD"
+  material-costs:
+    WOODEN_SWORD: 5.0
+    WOODEN_PICKAXE: 5.0
+    WOODEN_AXE: 5.0
+    WOODEN_SHOVEL: 3.0
+    STONE_SWORD: 10.0
+    STONE_PICKAXE: 10.0
+    STONE_AXE: 10.0
+    STONE_SHOVEL: 5.0
+    IRON_SWORD: 20.0
+    IRON_PICKAXE: 20.0
+    IRON_AXE: 20.0
+    IRON_SHOVEL: 10.0
+    GOLDEN_SWORD: 15.0
+    GOLDEN_PICKAXE: 15.0
+    GOLDEN_AXE: 15.0
+    GOLDEN_SHOVEL: 8.0
+    DIAMOND_SWORD: 50.0
+    DIAMOND_PICKAXE: 50.0
+    DIAMOND_AXE: 50.0
+    DIAMOND_SHOVEL: 25.0
+    DIAMOND_HELMET: 75.0
+    DIAMOND_CHESTPLATE: 100.0
+    DIAMOND_LEGGINGS: 85.0
+    DIAMOND_BOOTS: 65.0
+    NETHERITE_SWORD: 80.0
+    NETHERITE_PICKAXE: 80.0
+    NETHERITE_AXE: 80.0
+    NETHERITE_SHOVEL: 40.0
+    NETHERITE_HELMET: 120.0
+    NETHERITE_CHESTPLATE: 150.0
+    NETHERITE_LEGGINGS: 130.0
+    NETHERITE_BOOTS: 100.0
+    TRIDENT: 100.0
+    BOW: 30.0
+    CROSSBOW: 40.0
+    SHEARS: 10.0
+    FLINT_AND_STEEL: 15.0
+    FISHING_ROD: 10.0
+    CARROT_ON_A_STICK: 10.0
+    WARRED_FISHING_ROD: 10.0
   custom-thresholds:
     DIAMOND_PICKAXE: 3
     DIAMOND_AXE: 3

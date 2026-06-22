@@ -428,7 +428,12 @@ public final class VipEmbedFactory {
                     "haiz:vip:toggle-renew",
                     autoRenew ? "Desativar Renovação" : "Ativar Renovação");
 
-            children.add(V2MessageBuilder.actionRow(renewButton));
+            DataObject repairButton = V2MessageBuilder.button(
+                    1,
+                    "haiz:vip:toggle-repair",
+                    "🔧 Auto-Repair");
+
+            children.add(V2MessageBuilder.actionRow(renewButton, repairButton));
         });
         return builder.build();
     }

@@ -138,24 +138,24 @@ public final class VipSettingsCommand implements CommandExecutor, TabCompleter {
         VipStorage storage = module.vipStorage();
 
         CompletableFuture.supplyAsync(() -> {
-            VipStorage.VipSubscription sub = storage.getActiveSubscription(uuid).orElse(null);
-            if (sub == null) {
-                return "NO_VIP";
-            }
             if (!module.autoRepairManager().isEnabled()) {
                 return "DISABLED";
             }
-            if (!module.autoRepairManager().isEligibleTier(sub.tier())) {
-                return "NOT_ELIGIBLE";
+            if (module.autoRepairManager().isApplyToAll()) {
+                return "ALL";
+            }
+            VipStorage.VipSubscription sub = storage.getActiveSubscription(uuid).orElse(null);
+            if (sub == null) {
+                return "NO_VIP";
             }
             boolean newValue = storage.toggleAutoRepair(uuid);
             return newValue ? "ON" : "OFF";
         }).thenAccept(result -> {
             Runnable send = () -> {
                 switch (result) {
-                    case "NO_VIP" -> player.sendMessage("§8[§bHaizCore§8] §cVocê não possui um VIP ativo.");
                     case "DISABLED" -> player.sendMessage("§8[§bHaizCore§8] §cAuto-reparo está desativado no servidor.");
-                    case "NOT_ELIGIBLE" -> player.sendMessage("§8[§bHaizCore§8] §cSeu tier de VIP não possui auto-reparo.");
+                    case "ALL" -> player.sendMessage("§8[§bHaizCore§8] §aAuto-reparo está ativo para todos os jogadores.");
+                    case "NO_VIP" -> player.sendMessage("§8[§bHaizCore§8] §cVocê não possui um VIP ativo.");
                     case "ON" -> {
                         player.sendMessage("§8[§bHaizCore§8] §aAuto-reparo §lativado§a!");
                         player.sendMessage("§7Suas ferramentas serão reparadas automaticamente.");

@@ -20,6 +20,11 @@ commands:
     description: Gerencia as configurações do seu VIP.
     usage: /vipconfig
     permission: haiz.vip.config
+  repair:
+    description: Repara itens no inventário.
+    usage: /repair [hand|all]
+    aliases: [reparar]
+    permission: haizcore.repair
 
 permissions:
   haizcore.admin:
@@ -34,3 +39,9 @@ permissions:
   haiz.vip.config:
     description: Permite usar /vipconfig para gerenciar configurações do VIP.
     default: true
+  haizcore.repair:
+    description: Permite usar /repair para reparar itens.
+    default: true
+  haizcore.repair.bypass:
+    description: Bypass de custo e cooldown no repair.
+    default: op

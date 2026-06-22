@@ -149,6 +149,13 @@ public final class VipModule {
             vipconfig.setExecutor(settingsExecutor);
             vipconfig.setTabCompleter(settingsExecutor);
         }
+
+        RepairCommand repairExecutor = new RepairCommand(autoRepairManager);
+        PluginCommand repair = plugin.getCommand("repair");
+        if (repair != null) {
+            repair.setExecutor(repairExecutor);
+            repair.setTabCompleter(repairExecutor);
+        }
     }
 
     private void registerDiscordListener() {
