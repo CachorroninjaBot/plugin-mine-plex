@@ -163,7 +163,7 @@ public final class UpdateManager {
             Path currentJar = pluginsDir.resolve("HaizServerCore.jar");
 
             Path updateScript = pluginsDir.resolve("haizcore-update.bat");
-            Path serverRoot = pluginsDir.getParent();
+            Path serverRoot = pluginsDir.getParent() != null ? pluginsDir.getParent() : Path.of(System.getProperty("user.dir"));
             String scriptContent = """
                     @echo off
                     echo Aguardando servidor parar...
@@ -194,6 +194,43 @@ public final class UpdateManager {
         } catch (Exception e) {
             log.warning("[Updater] Falha ao aplicar update: " + e.getMessage());
             return false;
+        }
+    }
+
+    /**
+     * Merge do config.yml: adiciona novas chaves do default sem substituir valores existentes do usuário.
+     * Chamado no onEnable() para garantir que o config.yml tenha todas as chaves da versão atual.
+     */
+    public void mergeConfig() {
+        try {
+            plugin.saveDefaultConfig();
+            plugin.reloadConfig();
+
+            java.io.InputStream defaultStream = plugin.getResource("config.yml");
+            if (defaultStream == null) return;
+
+            org.bukkit.configuration.file.FileConfiguration defaultConfig =
+                    org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(
+                            new java.io.InputStreamReader(defaultStream, java.nio.charset.StandardCharsets.UTF_8));
+
+            org.bukkit.configuration.file.FileConfiguration currentConfig = plugin.getConfig();
+            boolean changed = false;
+
+            for (String key : defaultConfig.getKeys(true)) {
+                if (!currentConfig.contains(key)) {
+                    currentConfig.set(key, defaultConfig.get(key));
+                    changed = true;
+                    log.info("[Updater] Config: chave adicionada: " + key);
+                }
+            }
+
+            if (changed) {
+                plugin.saveConfig();
+                plugin.reloadConfig();
+                log.info("[Updater] config.yml atualizado com novas chaves.");
+            }
+        } catch (Exception e) {
+            log.warning("[Updater] Falha ao merge config.yml: " + e.getMessage());
         }
     }
 

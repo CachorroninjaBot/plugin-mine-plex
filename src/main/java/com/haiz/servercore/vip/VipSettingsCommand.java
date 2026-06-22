@@ -42,7 +42,8 @@ public final class VipSettingsCommand implements CommandExecutor, TabCompleter {
         switch (sub) {
             case "status" -> showStatus(player);
             case "autoresnovar", "autores", "auto", "renovar" -> toggleAutoRenew(player);
-            default -> player.sendMessage("§8[§bHaizCore§8] §cSubcomandos: §fstatus, autoresnovar");
+            case "autoreparo", "repair", "reparo" -> toggleAutoRepair(player);
+            default -> player.sendMessage("§8[§bHaizCore§8] §cSubcomandos: §fstatus, autoresnovar, autoreparo");
         }
         return true;
     }
@@ -81,6 +82,12 @@ public final class VipSettingsCommand implements CommandExecutor, TabCompleter {
                         player.sendMessage("");
                         player.sendMessage("  §7Renovação automática: " + (autoRenew ? "§aAtivada" : "§cDesativada"));
                         player.sendMessage("  §7Use §f/vipconfig autoresnovar §7para alterar.");
+
+                        boolean autoRepair = storage.getAutoRepair(uuid);
+                        player.sendMessage("");
+                        player.sendMessage("  §7Auto-reparo: " + (autoRepair ? "§aAtivado" : "§cDesativado"));
+                        player.sendMessage("  §7Use §f/vipconfig autoreparo §7para alterar.");
+
                         player.sendMessage("§8§l━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
                         player.sendMessage("");
                     };
@@ -126,10 +133,51 @@ public final class VipSettingsCommand implements CommandExecutor, TabCompleter {
         });
     }
 
+    private void toggleAutoRepair(Player player) {
+        UUID uuid = player.getUniqueId();
+        VipStorage storage = module.vipStorage();
+
+        CompletableFuture.supplyAsync(() -> {
+            VipStorage.VipSubscription sub = storage.getActiveSubscription(uuid).orElse(null);
+            if (sub == null) {
+                return "NO_VIP";
+            }
+            if (!module.autoRepairManager().isEnabled()) {
+                return "DISABLED";
+            }
+            if (!module.autoRepairManager().isEligibleTier(sub.tier())) {
+                return "NOT_ELIGIBLE";
+            }
+            boolean newValue = storage.toggleAutoRepair(uuid);
+            return newValue ? "ON" : "OFF";
+        }).thenAccept(result -> {
+            Runnable send = () -> {
+                switch (result) {
+                    case "NO_VIP" -> player.sendMessage("§8[§bHaizCore§8] §cVocê não possui um VIP ativo.");
+                    case "DISABLED" -> player.sendMessage("§8[§bHaizCore§8] §cAuto-reparo está desativado no servidor.");
+                    case "NOT_ELIGIBLE" -> player.sendMessage("§8[§bHaizCore§8] §cSeu tier de VIP não possui auto-reparo.");
+                    case "ON" -> {
+                        player.sendMessage("§8[§bHaizCore§8] §aAuto-reparo §lativado§a!");
+                        player.sendMessage("§7Suas ferramentas serão reparadas automaticamente.");
+                    }
+                    case "OFF" -> {
+                        player.sendMessage("§8[§bHaizCore§8] §eAuto-reparo §ldesativado§e.");
+                        player.sendMessage("§7Suas ferramentas não serão reparadas automaticamente.");
+                    }
+                }
+            };
+            if (org.bukkit.Bukkit.isPrimaryThread()) {
+                send.run();
+            } else {
+                org.bukkit.Bukkit.getScheduler().runTask(module.plugin(), send);
+            }
+        });
+    }
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return Arrays.asList("status", "autoresnovar").stream()
+            return Arrays.asList("status", "autoresnovar", "autoreparo").stream()
                     .filter(s -> s.startsWith(args[0].toLowerCase(Locale.ROOT)))
                     .toList();
         }

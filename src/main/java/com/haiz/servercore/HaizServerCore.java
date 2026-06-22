@@ -24,6 +24,15 @@ public final class HaizServerCore extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
 
+        this.updateManager = new UpdateManager(this,
+                getConfig().getString("updater.github-owner", "HaizMC"),
+                getConfig().getString("updater.github-repo", "HaizServerCore"),
+                getConfig().getInt("updater.check-interval-minutes", 30));
+
+        if (updateManager.applyPendingUpdate()) return;
+
+        updateManager.mergeConfig();
+
         this.configManager = new ConfigManager(this);
         this.configManager.reload();
 
@@ -39,10 +48,6 @@ public final class HaizServerCore extends JavaPlugin {
         this.vipModule = new VipModule(this);
         this.vipModule.start();
 
-        this.updateManager = new UpdateManager(this,
-                getConfig().getString("updater.github-owner", "HaizMC"),
-                getConfig().getString("updater.github-repo", "HaizServerCore"),
-                getConfig().getInt("updater.check-interval-minutes", 30));
         this.updateManager.start();
 
         PluginCommand command = getCommand("haizcore");

@@ -21,6 +21,7 @@ public final class VipModule {
     private PurchaseManager purchaseManager;
     private VipDiscordListener discordListener;
     private VipRenewalTask renewalTask;
+    private AutoRepairManager autoRepairManager;
     private boolean running;
 
     public VipModule(HaizServerCore plugin) {
@@ -40,6 +41,9 @@ public final class VipModule {
         this.renewalTask = new VipRenewalTask(plugin, vipStorage, mobCoins, vipConfig, purchaseManager::invalidateVipCache);
         this.renewalTask.start();
 
+        this.autoRepairManager = new AutoRepairManager(plugin, vipStorage, vipConfig);
+        this.autoRepairManager.register();
+
         scheduleDiscordSetup();
 
         running = true;
@@ -47,12 +51,16 @@ public final class VipModule {
     }
 
     public void stop() {
+        if (autoRepairManager != null) {
+            autoRepairManager.unregister();
+        }
         if (renewalTask != null) {
             renewalTask.stop();
         }
         if (discordListener != null && plugin.discord().jda() != null) {
             plugin.discord().jda().removeEventListener(discordListener);
         }
+        autoRepairManager = null;
         discordListener = null;
         renewalTask = null;
         purchaseManager = null;
@@ -134,6 +142,13 @@ public final class VipModule {
             linkar.setExecutor(executor);
             linkar.setTabCompleter(executor);
         }
+
+        VipSettingsCommand settingsExecutor = new VipSettingsCommand(this);
+        PluginCommand vipconfig = plugin.getCommand("vipconfig");
+        if (vipconfig != null) {
+            vipconfig.setExecutor(settingsExecutor);
+            vipconfig.setTabCompleter(settingsExecutor);
+        }
     }
 
     private void registerDiscordListener() {
@@ -183,5 +198,6 @@ public final class VipModule {
     public MobCoinsHook mobCoins()          { return mobCoins; }
     public VipStorage vipStorage()          { return vipStorage; }
     public PurchaseManager purchaseManager(){ return purchaseManager; }
+    public AutoRepairManager autoRepairManager() { return autoRepairManager; }
     public boolean isRunning()              { return running; }
 }

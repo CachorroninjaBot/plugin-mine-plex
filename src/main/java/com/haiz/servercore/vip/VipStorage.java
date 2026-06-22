@@ -34,8 +34,9 @@ public final class VipStorage {
         exec("CREATE INDEX IF NOT EXISTS idx_vip_expires ON vip_subscriptions(expires_at)");
         exec("""
                 CREATE TABLE IF NOT EXISTS vip_settings (
-                  uuid       TEXT PRIMARY KEY,
-                  auto_renew INTEGER NOT NULL DEFAULT 0
+                  uuid        TEXT PRIMARY KEY,
+                  auto_renew  INTEGER NOT NULL DEFAULT 0,
+                  auto_repair INTEGER NOT NULL DEFAULT 0
                 )
                 """);
     }
@@ -123,6 +124,32 @@ public final class VipStorage {
     public synchronized boolean toggleAutoRenew(UUID uuid) {
         boolean current = getAutoRenew(uuid);
         setAutoRenew(uuid, !current);
+        return !current;
+    }
+
+    // ── Auto Repair ──────────────────────────────────────────────────────
+
+    public synchronized boolean getAutoRepair(UUID uuid) {
+        try (PreparedStatement ps = db.connection().prepareStatement(
+                "SELECT auto_repair FROM vip_settings WHERE uuid=?")) {
+            ps.setString(1, uuid.toString());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt("auto_repair") == 1;
+            }
+        } catch (SQLException e) { warn(e); }
+        return false;
+    }
+
+    public synchronized void setAutoRepair(UUID uuid, boolean enabled) {
+        exec("""
+                INSERT INTO vip_settings(uuid,auto_repair) VALUES(?,?)
+                ON CONFLICT(uuid) DO UPDATE SET auto_repair=excluded.auto_repair
+                """, uuid.toString(), enabled ? 1 : 0);
+    }
+
+    public synchronized boolean toggleAutoRepair(UUID uuid) {
+        boolean current = getAutoRepair(uuid);
+        setAutoRepair(uuid, !current);
         return !current;
     }
 

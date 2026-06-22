@@ -86,6 +86,30 @@ storage:
   sqlite:
     file: "haizservercore.db"
 
+auto-repair:
+  enabled: true
+  tiers:
+    - "Vip"
+    - "Elite"
+    - "Ultra"
+    - "Famoso"
+    - "Midia"
+  durability-threshold: 5
+  cooldown-seconds: 10
+  play-sound: true
+  send-message: true
+  message: "§8[§bHaizCore§8] §a§l%item% §areparado automaticamente!"
+  blacklisted-materials:
+    - "ELYTRA"
+    - "SHIELD"
+  custom-thresholds:
+    DIAMOND_PICKAXE: 3
+    DIAMOND_AXE: 3
+    DIAMOND_SWORD: 3
+    NETHERITE_PICKAXE: 3
+    NETHERITE_AXE: 3
+    NETHERITE_SWORD: 3
+
 updater:
   github-owner: "HaizMC"
   github-repo: "HaizServerCore"

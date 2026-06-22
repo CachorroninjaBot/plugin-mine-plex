@@ -16,6 +16,10 @@ commands:
     description: Vincula sua conta Minecraft ao Discord para comprar VIPs.
     usage: /linkar <código>
     permission: haiz.vip.link
+  vipconfig:
+    description: Gerencia as configurações do seu VIP.
+    usage: /vipconfig
+    permission: haiz.vip.config
 
 permissions:
   haizcore.admin:
@@ -26,4 +30,7 @@ permissions:
     default: op
   haiz.vip.link:
     description: Permite usar /linkar para vincular conta ao Discord.
+    default: true
+  haiz.vip.config:
+    description: Permite usar /vipconfig para gerenciar configurações do VIP.
     default: true
