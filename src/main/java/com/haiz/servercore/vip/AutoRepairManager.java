@@ -29,6 +29,7 @@ public final class AutoRepairManager implements Listener {
     private final VipStorage vipStorage;
     private final VipConfig vipConfig;
     private boolean enabled;
+    private boolean applyToAll;
     private int durabilityThreshold;
     private int cooldownSeconds;
     private boolean playSound;
@@ -54,6 +55,7 @@ public final class AutoRepairManager implements Listener {
         }
 
         enabled = section.getBoolean("enabled", true);
+        applyToAll = section.getBoolean("apply-to-all", false);
         durabilityThreshold = Math.max(1, section.getInt("durability-threshold", 5));
         cooldownSeconds = Math.max(0, section.getInt("cooldown-seconds", 10));
         playSound = section.getBoolean("play-sound", true);
@@ -103,12 +105,14 @@ public final class AutoRepairManager implements Listener {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
 
-        VipStorage.VipSubscription sub = vipStorage.getActiveSubscription(uuid).orElse(null);
-        if (sub == null) return;
+        if (!applyToAll) {
+            VipStorage.VipSubscription sub = vipStorage.getActiveSubscription(uuid).orElse(null);
+            if (sub == null) return;
 
-        if (!isEligibleTier(sub.tier())) return;
+            if (!isEligibleTier(sub.tier())) return;
 
-        if (!vipStorage.getAutoRepair(uuid)) return;
+            if (!vipStorage.getAutoRepair(uuid)) return;
+        }
 
         ItemStack item = event.getItem();
         if (item == null || item.getType().isAir()) return;

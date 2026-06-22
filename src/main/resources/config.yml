@@ -88,6 +88,7 @@ storage:
 
 auto-repair:
   enabled: true
+  apply-to-all: false
   tiers:
     - "Vip"
     - "Elite"
