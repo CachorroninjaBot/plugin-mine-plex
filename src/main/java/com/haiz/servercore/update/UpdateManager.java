@@ -143,7 +143,9 @@ public final class UpdateManager {
     }
 
     /**
-     * Aplica update pendente se existir. Chamado durante reload.
+     * Aplica update pendente se existir. Chamado no onEnable() antes de inicializar módulos.
+     * O .jar não pode ser substituído enquanto o JVM está rodando (travado no Windows),
+     * então usamos um script batch que executa a substituição após o servidor parar.
      */
     public boolean applyPendingUpdate() {
         try {
@@ -162,15 +164,34 @@ public final class UpdateManager {
             Path backup = pluginsDir.resolve("HaizServerCore.jar.backup");
 
             Files.copy(currentJar, backup, StandardCopyOption.REPLACE_EXISTING);
-            Files.copy(newPath, currentJar, StandardCopyOption.REPLACE_EXISTING);
 
-            Files.deleteIfExists(newPath);
-            Files.deleteIfExists(pendingMarker);
+            Path updateScript = pluginsDir.resolve("haizcore-update.bat");
+            Path serverRoot = pluginsDir.getParent();
+            String scriptContent = """
+                    @echo off
+                    echo Aguardando servidor parar...
+                    :check_loop
+                    timeout /t 2 /nobreak >nul
+                    tasklist /FI "IMAGENAME eq java.exe" 2>nul | find /I "java.exe" >nul
+                    if %errorlevel%==0 goto check_loop
+                    echo Servidor parado. Aplicando update...
+                    copy /Y "%s" "%s"
+                    del /Q "%s"
+                    del /Q "%s"
+                    echo Update concluido! Iniciando servidor...
+                    cd /d "%s"
+                    start "" run.bat
+                    """.formatted(
+                    newPath.toAbsolutePath(), currentJar.toAbsolutePath(),
+                    newPath.toAbsolutePath(), pendingMarker.toAbsolutePath(),
+                    serverRoot.toAbsolutePath());
+            Files.writeString(updateScript, scriptContent);
 
-            log.info("[Updater] Update aplicado! Reiniciando servidor...");
+            log.info("[Updater] Update preparado! Reiniciando servidor...");
+            Runtime.getRuntime().exec("cmd /c start \"\" \"" + updateScript.toAbsolutePath() + "\"");
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 Bukkit.spigot().restart();
-            }, 20L * 3);
+            }, 20L * 2);
 
             return true;
         } catch (Exception e) {
