@@ -27,14 +27,18 @@ public final class PurchaseManager {
     public record PendingPurchase(String discordId, UUID uuid, String mcName,
                                    VipConfig.VipTier tier, long expiresAt) {}
 
+    private record VipCacheEntry(String tier, long expiresAt) {}
+
     private final JavaPlugin plugin;
     private final MobCoinsHook mobCoins;
     private final LinkStorage linkStorage;
     private final VipConfig vipConfig;
     private final VipStorage vipStorage;
     private final Map<String, PendingPurchase> pending = new ConcurrentHashMap<>();
+    private final Map<UUID, VipCacheEntry> vipCache = new ConcurrentHashMap<>();
 
     private static final List<String> VIP_GROUP_IDS = List.of("vip", "elite", "ultra", "midia", "famoso");
+    private static final long CACHE_TTL_SECONDS = 300;
 
     public PurchaseManager(JavaPlugin plugin, MobCoinsHook mobCoins,
                            LinkStorage linkStorage, VipConfig vipConfig, VipStorage vipStorage) {
@@ -119,6 +123,8 @@ public final class PurchaseManager {
 
         linkStorage.logPurchase(p.discordId(), p.uuid(), p.mcName(), p.tier().id(), p.tier().price());
 
+        invalidateVipCache(p.uuid());
+
         if (currentTier.isPresent()) {
             return PurchaseResult.SUCCESS_UPGRADE;
         }
@@ -126,10 +132,29 @@ public final class PurchaseManager {
     }
 
     /**
-     * Verifica o tier VIP atual do jogador consultando o VipStorage.
+     * Verifica o tier VIP atual do jogador usando cache em memória.
      */
     public Optional<String> getCurrentVipTier(UUID uuid) {
-        return vipStorage.getActiveSubscription(uuid).map(VipStorage.VipSubscription::tier);
+        long now = now();
+        VipCacheEntry cached = vipCache.get(uuid);
+        if (cached != null && cached.expiresAt() > now) {
+            return Optional.of(cached.tier());
+        }
+
+        Optional<String> tier = vipStorage.getActiveSubscription(uuid).map(VipStorage.VipSubscription::tier);
+        if (tier.isPresent()) {
+            vipCache.put(uuid, new VipCacheEntry(tier.get(), now + CACHE_TTL_SECONDS));
+        } else {
+            vipCache.remove(uuid);
+        }
+        return tier;
+    }
+
+    /**
+     * Invalida o cache de VIP para um jogador específico.
+     */
+    public void invalidateVipCache(UUID uuid) {
+        vipCache.remove(uuid);
     }
 
     /**

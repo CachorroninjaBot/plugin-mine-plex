@@ -35,6 +35,7 @@ public final class LinkStorage {
                   linked_at  INTEGER NOT NULL
                 )
                 """);
+        exec("CREATE INDEX IF NOT EXISTS idx_links_uuid ON discord_links(uuid)");
         exec("""
                 CREATE TABLE IF NOT EXISTS link_codes (
                   code        TEXT PRIMARY KEY,
@@ -44,6 +45,8 @@ public final class LinkStorage {
                   expires_at  INTEGER NOT NULL
                 )
                 """);
+        exec("CREATE INDEX IF NOT EXISTS idx_codes_uuid ON link_codes(uuid)");
+        exec("CREATE INDEX IF NOT EXISTS idx_codes_expires ON link_codes(expires_at)");
         exec("""
                 CREATE TABLE IF NOT EXISTS vip_purchases (
                   id          INTEGER PRIMARY KEY AUTOINCREMENT,

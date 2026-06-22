@@ -161,9 +161,6 @@ public final class UpdateManager {
             }
 
             Path currentJar = pluginsDir.resolve("HaizServerCore.jar");
-            Path backup = pluginsDir.resolve("HaizServerCore.jar.backup");
-
-            Files.copy(currentJar, backup, StandardCopyOption.REPLACE_EXISTING);
 
             Path updateScript = pluginsDir.resolve("haizcore-update.bat");
             Path serverRoot = pluginsDir.getParent();

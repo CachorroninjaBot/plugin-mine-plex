@@ -31,6 +31,9 @@ public final class SQLiteDatabase {
         try (Statement statement = connection.createStatement()) {
             statement.execute("PRAGMA journal_mode=WAL");
             statement.execute("PRAGMA foreign_keys=ON");
+            statement.execute("PRAGMA synchronous=NORMAL");
+            statement.execute("PRAGMA cache_size=-64000");
+            statement.execute("PRAGMA temp_store=MEMORY");
         }
     }
 

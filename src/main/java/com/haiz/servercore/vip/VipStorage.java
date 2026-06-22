@@ -31,6 +31,7 @@ public final class VipStorage {
                   expires_at   INTEGER NOT NULL
                 )
                 """);
+        exec("CREATE INDEX IF NOT EXISTS idx_vip_expires ON vip_subscriptions(expires_at)");
         exec("""
                 CREATE TABLE IF NOT EXISTS vip_settings (
                   uuid       TEXT PRIMARY KEY,

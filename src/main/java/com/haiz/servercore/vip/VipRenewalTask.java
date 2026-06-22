@@ -20,14 +20,16 @@ public final class VipRenewalTask {
     private final VipStorage vipStorage;
     private final MobCoinsHook mobCoins;
     private final VipConfig vipConfig;
+    private final java.util.function.Consumer<UUID> cacheInvalidator;
     private int taskId = -1;
 
-    public VipRenewalTask(JavaPlugin plugin, VipStorage vipStorage, MobCoinsHook mobCoins, VipConfig vipConfig) {
+    public VipRenewalTask(JavaPlugin plugin, VipStorage vipStorage, MobCoinsHook mobCoins, VipConfig vipConfig, java.util.function.Consumer<UUID> cacheInvalidator) {
         this.plugin = plugin;
         this.log = plugin.getLogger();
         this.vipStorage = vipStorage;
         this.mobCoins = mobCoins;
         this.vipConfig = vipConfig;
+        this.cacheInvalidator = cacheInvalidator;
     }
 
     public void start() {
@@ -70,6 +72,7 @@ public final class VipRenewalTask {
 
         revokeVip(uuid, tier);
         vipStorage.removeSubscription(uuid);
+        cacheInvalidator.accept(uuid);
         notifyPlayer(uuid, "§cSeu VIP §f" + tier + " §cexpirou e foi removido.");
 
         log.info("[VipShop] VIP expirado: " + uuid + " (tier: " + tier + ")");

@@ -37,7 +37,7 @@ public final class VipModule {
 
         registerMinecraftCommands();
 
-        this.renewalTask = new VipRenewalTask(plugin, vipStorage, mobCoins, vipConfig);
+        this.renewalTask = new VipRenewalTask(plugin, vipStorage, mobCoins, vipConfig, purchaseManager::invalidateVipCache);
         this.renewalTask.start();
 
         scheduleDiscordSetup();
