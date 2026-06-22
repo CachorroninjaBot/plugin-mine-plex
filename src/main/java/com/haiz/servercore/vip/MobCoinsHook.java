@@ -9,88 +9,171 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-/**
- * Hook para o plugin MobCoins via reflexão.
- *
- * Compatível com a maioria das versões do MobCoins (EpicSpawners / SaberFactions / standalone).
- * A API real varia conforme o fork; ajuste os nomes dos métodos se necessário.
- *
- * Se preferir integração via comando (/mobcoins take <nick> <valor>),
- * comente o bloco "API path" e descomente o bloco "Command fallback".
- */
 public final class MobCoinsHook {
 
+    private final JavaPlugin plugin;
     private final Logger log;
-    private Object api; // instância da MobCoinsAPI
-    private boolean available;
+    private Object api;
+    private boolean apiAvailable;
+    private boolean commandFallback;
 
     public MobCoinsHook(JavaPlugin plugin) {
+        this.plugin = plugin;
         this.log = plugin.getLogger();
         init();
     }
 
     private void init() {
-        Plugin mc = Bukkit.getPluginManager().getPlugin("MobCoins");
+        Plugin mc = Bukkit.getPluginManager().getPlugin("IridiumMobCoins");
+        if (mc == null) {
+            mc = Bukkit.getPluginManager().getPlugin("MobCoins");
+        }
         if (mc == null) {
             log.warning("[VipShop] Plugin MobCoins não encontrado. Compras desativadas.");
             return;
         }
+
         try {
-            // ── API path (ajuste o pacote/classe conforme seu fork) ──────────────
-            Class<?> apiClass = Class.forName("me.gypopo.mobcoins.api.MobCoinsAPI");
+            Class<?> apiClass = Class.forName("com.iridium.iridiummobcoins.IridiumMobCoins");
             Method getInstance = apiClass.getMethod("getInstance");
             this.api = getInstance.invoke(null);
-            this.available = true;
-            log.info("[VipShop] MobCoins API conectada.");
+            this.apiAvailable = true;
+            log.info("[VipShop] IridiumMobCoins API conectada.");
         } catch (Exception e) {
-            log.warning("[VipShop] Falha ao conectar MobCoinsAPI: " + e.getMessage()
-                    + ". Usando fallback por comando.");
-            this.available = true; // fallback por comando ainda funciona
+            try {
+                Class<?> apiClass = Class.forName("me.gypopo.mobcoins.api.MobCoinsAPI");
+                Method getInstance = apiClass.getMethod("getInstance");
+                this.api = getInstance.invoke(null);
+                this.apiAvailable = true;
+                log.info("[VipShop] MobCoins API conectada.");
+            } catch (Exception e2) {
+                log.warning("[VipShop] Falha ao conectar API MobCoins: " + e2.getMessage()
+                        + ". Usando fallback por comando.");
+                this.apiAvailable = false;
+                this.commandFallback = true;
+            }
         }
     }
 
-    /** Retorna o saldo de MobCoins do jogador (0 se indisponível). */
     public double getBalance(UUID uuid) {
-        if (!available) return 0;
+        if (!isAvailable()) return -1;
         OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-        if (api != null) {
+
+        if (apiAvailable && api != null) {
             try {
-                Method m = api.getClass().getMethod("getMobCoins", OfflinePlayer.class);
-                Object result = m.invoke(api, player);
-                if (result instanceof Number n) return n.doubleValue();
+                Class<?> apiClass = api.getClass();
+
+                if (apiClass.getName().contains("iridium")) {
+                    Method getDb = apiClass.getMethod("getDatabaseManager");
+                    Object dbManager = getDb.invoke(api);
+                    Method getUser = dbManager.getClass().getMethod("getUser", UUID.class);
+                    Object user = getUser.invoke(dbManager, uuid);
+                    if (user != null) {
+                        Method getMobcoins = user.getClass().getMethod("getMobcoins");
+                        Object result = getMobcoins.invoke(user);
+                        if (result instanceof Number n) {
+                            double balance = n.doubleValue();
+                            log.info("[VipShop] Saldo de " + player.getName() + ": " + balance + " MC");
+                            return balance;
+                        }
+                    } else {
+                        log.info("[VipShop] Jogador " + player.getName() + " não encontrado no IridiumMobCoins. Retornando 0.");
+                        return 0;
+                    }
+                } else {
+                    Method m = apiClass.getMethod("getMobCoins", OfflinePlayer.class);
+                    Object result = m.invoke(api, player);
+                    if (result instanceof Number n) return n.doubleValue();
+                }
             } catch (Exception e) {
-                log.warning("[VipShop] getBalance falhou: " + e.getMessage());
+                log.warning("[VipShop] getBalance falhou para " + player.getName() + ": " + e.getMessage());
             }
         }
-        // Fallback: não consegue consultar via API, retorna -1 para indicar "desconhecido"
         return -1;
     }
 
-    /**
-     * Debita o valor do jogador.
-     * @return true se debitado com sucesso
-     */
     public boolean withdraw(UUID uuid, double amount) {
-        if (!available) return false;
+        if (!isAvailable()) return false;
         OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
 
-        // ── API path ─────────────────────────────────────────────────────────
-        if (api != null) {
+        if (apiAvailable && api != null) {
             try {
-                Method take = api.getClass().getMethod("takeMobCoins", OfflinePlayer.class, double.class);
-                take.invoke(api, player, amount);
-                return true;
+                Class<?> apiClass = api.getClass();
+
+                if (apiClass.getName().contains("iridium")) {
+                    Method getDb = apiClass.getMethod("getDatabaseManager");
+                    Object dbManager = getDb.invoke(api);
+                    Method getUser = dbManager.getClass().getMethod("getUser", UUID.class);
+                    Object user = getUser.invoke(dbManager, uuid);
+                    if (user != null) {
+                        Method getMobcoins = user.getClass().getMethod("getMobcoins");
+                        int current = (int) getMobcoins.invoke(user);
+                        int newBalance = current - (int) amount;
+                        if (newBalance < 0) return false;
+                        Method setMobcoins = user.getClass().getMethod("setMobcoins", int.class);
+                        setMobcoins.invoke(user, newBalance);
+                        return true;
+                    }
+                } else {
+                    Method take = apiClass.getMethod("takeMobCoins", OfflinePlayer.class, double.class);
+                    take.invoke(api, player, amount);
+                    return true;
+                }
             } catch (Exception e) {
                 log.warning("[VipShop] withdraw via API falhou: " + e.getMessage() + ". Tentando comando.");
             }
         }
 
-        // ── Command fallback ─────────────────────────────────────────────────
-        // Substitua "mobcoins take" pelo comando correto do seu plugin
-        String cmd = "mobcoins take " + player.getName() + " " + (long) amount;
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
-        return true;
+        if (commandFallback) {
+            String cmd = "mobcoins remove " + player.getName() + " " + (int) amount;
+            Bukkit.getScheduler().runTask(plugin, () ->
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd)
+            );
+            return true;
+        }
+        return false;
     }
 
-    public boolean isAvailable() { return available; }
+    public boolean deposit(UUID uuid, double amount) {
+        if (!isAvailable()) return false;
+        OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+
+        if (apiAvailable && api != null) {
+            try {
+                Class<?> apiClass = api.getClass();
+
+                if (apiClass.getName().contains("iridium")) {
+                    Method getDb = apiClass.getMethod("getDatabaseManager");
+                    Object dbManager = getDb.invoke(api);
+                    Method getUser = dbManager.getClass().getMethod("getUser", UUID.class);
+                    Object user = getUser.invoke(dbManager, uuid);
+                    if (user != null) {
+                        Method getMobcoins = user.getClass().getMethod("getMobcoins");
+                        int current = (int) getMobcoins.invoke(user);
+                        int newBalance = current + (int) amount;
+                        Method setMobcoins = user.getClass().getMethod("setMobcoins", int.class);
+                        setMobcoins.invoke(user, newBalance);
+                        return true;
+                    }
+                } else {
+                    Method give = apiClass.getMethod("giveMobCoins", OfflinePlayer.class, double.class);
+                    give.invoke(api, player, amount);
+                    return true;
+                }
+            } catch (Exception e) {
+                log.warning("[VipShop] deposit via API falhou: " + e.getMessage() + ". Tentando comando.");
+            }
+        }
+
+        if (commandFallback) {
+            String cmd = "mobcoins add " + player.getName() + " " + (int) amount;
+            Bukkit.getScheduler().runTask(plugin, () ->
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd)
+            );
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isAvailable() { return apiAvailable || commandFallback; }
 }

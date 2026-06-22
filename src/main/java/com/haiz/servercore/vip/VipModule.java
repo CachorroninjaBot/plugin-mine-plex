@@ -8,10 +8,8 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 
-/**
- * Módulo principal do sistema de loja de VIPs.
- * Inicializado em HaizServerCore.onEnable() após o DiscordBotManager.
- */
+import java.util.List;
+
 public final class VipModule {
 
     private final HaizServerCore plugin;
@@ -19,8 +17,10 @@ public final class VipModule {
     private LinkStorage linkStorage;
     private LinkManager linkManager;
     private MobCoinsHook mobCoins;
+    private VipStorage vipStorage;
     private PurchaseManager purchaseManager;
     private VipDiscordListener discordListener;
+    private VipRenewalTask renewalTask;
     private boolean running;
 
     public VipModule(HaizServerCore plugin) {
@@ -29,15 +29,17 @@ public final class VipModule {
 
     public void start() {
         this.vipConfig     = new VipConfig(plugin.getConfig());
-        this.linkStorage   = new LinkStorage(plugin, plugin.database().sqliteDatabase());
+        this.linkStorage   = new LinkStorage(plugin, plugin.sqliteDatabase());
         this.linkManager   = new LinkManager(plugin, linkStorage, vipConfig);
         this.mobCoins      = new MobCoinsHook(plugin);
-        this.purchaseManager = new PurchaseManager(plugin, mobCoins, linkStorage, vipConfig);
+        this.vipStorage    = new VipStorage(plugin, plugin.sqliteDatabase());
+        this.purchaseManager = new PurchaseManager(plugin, mobCoins, linkStorage, vipConfig, vipStorage);
 
         registerMinecraftCommands();
-        
-        // Como o Discord inicia de forma assíncrona, agendamos o registro do listener
-        // para quando o JDA estiver pronto.
+
+        this.renewalTask = new VipRenewalTask(plugin, vipStorage, mobCoins, vipConfig);
+        this.renewalTask.start();
+
         scheduleDiscordSetup();
 
         running = true;
@@ -45,9 +47,20 @@ public final class VipModule {
     }
 
     public void stop() {
+        if (renewalTask != null) {
+            renewalTask.stop();
+        }
         if (discordListener != null && plugin.discord().jda() != null) {
             plugin.discord().jda().removeEventListener(discordListener);
         }
+        discordListener = null;
+        renewalTask = null;
+        purchaseManager = null;
+        linkManager = null;
+        linkStorage = null;
+        mobCoins = null;
+        vipStorage = null;
+        vipConfig = null;
         running = false;
     }
 
@@ -60,18 +73,12 @@ public final class VipModule {
         Bukkit.getScheduler().runTaskTimer(plugin, task -> {
             if (plugin.discord().isOnline()) {
                 registerDiscordListener();
-                registerDiscordSlashCommand();
+                registerDiscordSlashCommands();
                 task.cancel();
             }
-        }, 20L, 40L); // Checa a cada 2 segundos se o Discord está online
+        }, 20L, 40L);
     }
 
-    // ── Comando Minecraft: /haizcore sendvips ────────────────────────────────
-
-    /**
-     * Envia o embed de loja para o canal configurado.
-     * Chamado por HaizCoreCommand quando o staff digita /haizcore sendvips.
-     */
     public void sendShopMessage(org.bukkit.command.CommandSender sender) {
         if (!running) { sender.sendMessage("§cMódulo VIP não está ativo."); return; }
         if (!plugin.discord().isOnline()) {
@@ -88,10 +95,34 @@ public final class VipModule {
             sender.sendMessage("§cCanal §f" + channelId + " §cnão encontrado no Discord.");
             return;
         }
-        channel.sendMessage(VipEmbedFactory.shopMessage(vipConfig)).queue(
-                msg -> sender.sendMessage("§aMensagem de VIPs enviada com sucesso!"),
-                err -> sender.sendMessage("§cFalha ao enviar: " + err.getMessage())
-        );
+
+        try {
+            net.dv8tion.jda.api.utils.data.DataObject v2msg = VipEmbedFactory.shopMessageV2(vipConfig);
+            V2Messenger.send(channel, v2msg).thenAccept(status -> {
+                if (status >= 200 && status < 300) {
+                    sender.sendMessage("§aMensagem de VIPs enviada com sucesso! (Components v2)");
+                } else {
+                    plugin.getLogger().warning("[VipShop] V2 retornou HTTP " + status + ", tentando legacy...");
+                    channel.sendMessage(VipEmbedFactory.shopMessage(vipConfig)).queue(
+                            msg -> sender.sendMessage("§aMensagem de VIPs enviada com sucesso! (legacy)"),
+                            err -> sender.sendMessage("§cFalha ao enviar: " + err.getMessage())
+                    );
+                }
+            }).exceptionally(err -> {
+                plugin.getLogger().warning("[VipShop] Falha ao enviar V2, tentando legacy: " + err.getMessage());
+                channel.sendMessage(VipEmbedFactory.shopMessage(vipConfig)).queue(
+                        msg -> sender.sendMessage("§aMensagem de VIPs enviada com sucesso! (legacy)"),
+                        err2 -> sender.sendMessage("§cFalha ao enviar: " + err2.getMessage())
+                );
+                return null;
+            });
+        } catch (Exception e) {
+            plugin.getLogger().warning("[VipShop] Erro ao construir V2: " + e.getMessage());
+            channel.sendMessage(VipEmbedFactory.shopMessage(vipConfig)).queue(
+                    msg -> sender.sendMessage("§aMensagem de VIPs enviada com sucesso! (legacy)"),
+                    err -> sender.sendMessage("§cFalha ao enviar: " + err.getMessage())
+            );
+        }
     }
 
     // ── Internos ─────────────────────────────────────────────────────────────
@@ -114,24 +145,34 @@ public final class VipModule {
         plugin.discord().jda().addEventListener(discordListener);
     }
 
-    private void registerDiscordSlashCommand() {
+    private void registerDiscordSlashCommands() {
         if (!plugin.discord().isOnline()) return;
-        var jda   = plugin.discord().jda();
+        var jda = plugin.discord().jda();
         String guildId = plugin.config().guildId();
-        var cmd = Commands.slash("verificar", "Vincule sua conta Minecraft ao Discord")
+
+        var verificar = Commands.slash("verificar", "Vincule sua conta Minecraft ao Discord")
                 .addOption(OptionType.STRING, "nick", "Seu nick no servidor Minecraft", true);
+
+        var vipconfig = Commands.slash("vipconfig", "Veja as configurações do seu VIP");
+
+        List<net.dv8tion.jda.api.interactions.commands.build.SlashCommandData> commands = List.of(verificar, vipconfig);
 
         if (guildId != null && !guildId.isBlank()) {
             Guild guild = jda.getGuildById(guildId);
             if (guild != null) {
-                guild.upsertCommand(cmd).queue();
-            } else {
-                plugin.getLogger().warning("[VipShop] Guild ID " + guildId + " não encontrada. Registrando comando globalmente.");
-                jda.upsertCommand(cmd).queue();
+                guild.updateCommands().addCommands(commands).queue(
+                    success -> plugin.getLogger().info("[VipShop] Comandos registrados na guild: " + guild.getName() + " (/verificar, /vipconfig)"),
+                    error -> plugin.getLogger().warning("[VipShop] Falha ao registrar comandos: " + error.getMessage())
+                );
+                return;
             }
-        } else {
-            jda.upsertCommand(cmd).queue();
+            plugin.getLogger().warning("[VipShop] Guild ID " + guildId + " não encontrada. Registrando globalmente.");
         }
+
+        jda.updateCommands().addCommands(commands).queue(
+            success -> plugin.getLogger().info("[VipShop] Comandos registrados globalmente (/verificar, /vipconfig)"),
+            error -> plugin.getLogger().warning("[VipShop] Falha ao registrar comandos: " + error.getMessage())
+        );
     }
 
     // ── Getters ──────────────────────────────────────────────────────────────
@@ -140,6 +181,7 @@ public final class VipModule {
     public VipConfig vipConfig()            { return vipConfig; }
     public LinkManager linkManager()        { return linkManager; }
     public MobCoinsHook mobCoins()          { return mobCoins; }
+    public VipStorage vipStorage()          { return vipStorage; }
     public PurchaseManager purchaseManager(){ return purchaseManager; }
     public boolean isRunning()              { return running; }
 }

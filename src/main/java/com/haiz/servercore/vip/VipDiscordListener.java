@@ -5,30 +5,18 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.utils.data.DataObject;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Listener JDA para o sistema de loja de VIPs.
- *
- * Botões "Comprar" dos embeds originais (custom_id legados):
- *   comprar_vip | comprar_elite | comprar_ultra | comprar_famoso | comprar_midia
- *
- * Botões internos do fluxo de compra:
- *   haiz:vip:buy:<tierId>   → inicia confirmação
- *   haiz:vip:confirm        → executa compra
- *   haiz:vip:cancel         → cancela
- *   haiz:vip:back           → volta ao menu
- *
- * Dropdown:
- *   haiz:vip:select
- *
- * Slash command:
- *   /verificar <nick>
+ * Usa Components v2 para todas as mensagens da loja.
  */
 public final class VipDiscordListener extends ListenerAdapter {
 
@@ -42,8 +30,13 @@ public final class VipDiscordListener extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-        if (!event.getName().equals("verificar")) return;
+        switch (event.getName()) {
+            case "verificar" -> handleVerificar(event);
+            case "vipconfig" -> handleVipConfig(event);
+        }
+    }
 
+    private void handleVerificar(SlashCommandInteractionEvent event) {
         String nick = event.getOption("nick") != null
                 ? event.getOption("nick").getAsString().trim()
                 : null;
@@ -58,17 +51,42 @@ public final class VipDiscordListener extends ListenerAdapter {
 
             if (module.linkManager().isLinked(discordId)) {
                 String mc = module.linkManager().mcNameByDiscordId(discordId).orElse("desconhecido");
-                hook.sendMessage("✅ Sua conta já está vinculada a **" + mc + "**.").queue();
+                sendV2Reply(hook,
+                        simpleV2(0x2ECC71, "✅ Já vinculado",
+                                "Sua conta já está vinculada a **" + mc + "**."));
                 return;
             }
 
             Optional<String> code = module.linkManager().initiateLink(discordId, nick);
             if (code.isEmpty()) {
-                hook.sendMessage(VipEmbedFactory.playerOffline(nick)).queue();
+                sendV2Reply(hook, VipEmbedFactory.playerOfflineV2(nick));
                 return;
             }
 
-            hook.sendMessage(VipEmbedFactory.codeSent(nick, module.vipConfig().linkCodeExpirySeconds())).queue();
+            sendV2Reply(hook,
+                    VipEmbedFactory.codeSentV2(nick, module.vipConfig().linkCodeExpirySeconds()));
+        });
+    }
+
+    private void handleVipConfig(SlashCommandInteractionEvent event) {
+        event.deferReply(true).queue(hook -> {
+            String discordId = event.getUser().getId();
+            Optional<UUID> uuidOpt = module.linkManager().uuidByDiscordId(discordId);
+
+            if (uuidOpt.isEmpty()) {
+                sendV2Reply(hook, VipEmbedFactory.linkRequiredV2());
+                return;
+            }
+
+            UUID uuid = uuidOpt.get();
+            Optional<String> mcNameOpt = module.linkManager().mcNameByDiscordId(discordId);
+            String mcName = mcNameOpt.orElse("desconhecido");
+
+            VipStorage.VipSubscription sub = module.vipStorage().getActiveSubscription(uuid).orElse(null);
+            boolean autoRenew = module.vipStorage().getAutoRenew(uuid);
+            double balance = module.mobCoins().getBalance(uuid);
+
+            sendV2Reply(hook, VipEmbedFactory.vipConfigV2(mcName, sub, autoRenew, balance));
         });
     }
 
@@ -83,15 +101,19 @@ public final class VipDiscordListener extends ListenerAdapter {
 
         event.deferReply(true).queue(hook -> {
             Optional<VipConfig.VipTier> tier = module.vipConfig().find(tierId);
-            if (tier.isEmpty()) { hook.sendMessage("❌ VIP não encontrado.").queue(); return; }
-
-            if (!module.linkManager().isLinked(discordId)) {
-                hook.sendMessage(VipEmbedFactory.linkRequired()).queue();
+            if (tier.isEmpty()) {
+                sendV2Reply(hook, simpleV2(0xE74C3C, "❌ VIP não encontrado", "Selecione um VIP válido no menu."));
                 return;
             }
 
-            // Mostra embed fiel ao JSON original + botão Comprar
-            hook.sendMessage(VipEmbedFactory.tierDetail(tier.get())).queue();
+            if (!module.linkManager().isLinked(discordId)) {
+                sendV2Reply(hook, VipEmbedFactory.linkRequiredV2());
+                return;
+            }
+
+            // Envia detalhe do tier via Components v2
+            DataObject v2msg = VipEmbedFactory.tierDetailV2(tier.get());
+            sendV2Reply(hook, v2msg);
         });
     }
 
@@ -101,15 +123,13 @@ public final class VipDiscordListener extends ListenerAdapter {
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         String id = event.getComponentId();
 
-        // Botões legados dos embeds originais: comprar_vip, comprar_elite, etc.
         if (id.startsWith("comprar_")) {
-            String rawTier = id.substring("comprar_".length()); // "vip", "elite", ...
-            String tierId  = normalizeTierId(rawTier);
+            String rawTier = id.substring("comprar_".length());
+            String tierId = normalizeTierId(rawTier);
             handleBuyRequest(event, tierId);
             return;
         }
 
-        // Botões internos do fluxo
         if (id.startsWith("haiz:vip:buy:")) {
             handleBuyRequest(event, id.substring("haiz:vip:buy:".length()));
         } else if (id.equals("haiz:vip:confirm")) {
@@ -118,6 +138,8 @@ public final class VipDiscordListener extends ListenerAdapter {
             handleCancel(event);
         } else if (id.equals("haiz:vip:back")) {
             handleBack(event);
+        } else if (id.equals("haiz:vip:toggle-renew")) {
+            handleToggleRenew(event);
         }
     }
 
@@ -126,9 +148,8 @@ public final class VipDiscordListener extends ListenerAdapter {
     private void handleBuyRequest(ButtonInteractionEvent event, String tierId) {
         String discordId = event.getUser().getId();
         event.deferReply(true).queue(hook -> {
-            // Se não está vinculado, pede verificação primeiro
             if (!module.linkManager().isLinked(discordId)) {
-                hook.sendMessage(VipEmbedFactory.linkRequired()).queue();
+                sendV2Reply(hook, VipEmbedFactory.linkRequiredV2());
                 return;
             }
 
@@ -136,16 +157,16 @@ public final class VipDiscordListener extends ListenerAdapter {
             if (opt.isEmpty()) { hook.sendMessage("❌ VIP inválido.").queue(); return; }
             VipConfig.VipTier tier = opt.get();
 
-            Optional<UUID>   uuidOpt   = module.linkManager().uuidByDiscordId(discordId);
+            Optional<UUID> uuidOpt = module.linkManager().uuidByDiscordId(discordId);
             Optional<String> mcNameOpt = module.linkManager().mcNameByDiscordId(discordId);
             if (uuidOpt.isEmpty()) {
-                hook.sendMessage(VipEmbedFactory.linkRequired()).queue();
+                sendV2Reply(hook, VipEmbedFactory.linkRequiredV2());
                 return;
             }
 
             double balance = module.mobCoins().getBalance(uuidOpt.get());
             module.purchaseManager().startPurchase(discordId, uuidOpt.get(), mcNameOpt.orElse("?"), tier);
-            hook.sendMessage(VipEmbedFactory.purchaseConfirm(tier, mcNameOpt.orElse("?"), balance)).queue();
+            sendV2Reply(hook, VipEmbedFactory.purchaseConfirmV2(tier, mcNameOpt.orElse("?"), balance));
         });
     }
 
@@ -154,25 +175,27 @@ public final class VipDiscordListener extends ListenerAdapter {
         event.deferReply(true).queue(hook -> {
             PurchaseManager.PendingPurchase p = module.purchaseManager().getPending(discordId);
             if (p == null) {
-                hook.sendMessage(VipEmbedFactory.purchaseExpired()).queue();
+                sendV2Reply(hook, VipEmbedFactory.purchaseExpiredV2());
                 return;
             }
 
             PurchaseManager.PurchaseResult result = module.purchaseManager().executePurchase(discordId);
 
             switch (result) {
-                case SUCCESS -> {
-                    hook.sendMessage(VipEmbedFactory.purchaseSuccess(p.tier())).queue();
+                case SUCCESS, SUCCESS_UPGRADE -> {
+                    sendV2Reply(hook, VipEmbedFactory.purchaseSuccessV2(p.tier()));
                     sendPurchaseLog(event.getUser().getAsTag(), p);
                     notifyMinecraft(p);
                 }
+                case SAME_TIER -> sendV2Reply(hook, VipEmbedFactory.errorV2(
+                        "Você já possui este plano VIP ativo."));
                 case INSUFFICIENT_FUNDS -> {
                     double bal = module.mobCoins().getBalance(p.uuid());
-                    hook.sendMessage(VipEmbedFactory.insufficientFunds(p.tier(), bal)).queue();
+                    sendV2Reply(hook, VipEmbedFactory.insufficientFundsV2(p.tier(), bal));
                 }
-                case EXPIRED -> hook.sendMessage(VipEmbedFactory.purchaseExpired()).queue();
-                default      -> hook.sendMessage(VipEmbedFactory.error(
-                        "Erro ao processar a compra. Contate um administrador.")).queue();
+                case EXPIRED -> sendV2Reply(hook, VipEmbedFactory.purchaseExpiredV2());
+                default -> sendV2Reply(hook, VipEmbedFactory.errorV2(
+                        "Erro ao processar a compra. Contate um administrador."));
             }
         });
     }
@@ -180,26 +203,82 @@ public final class VipDiscordListener extends ListenerAdapter {
     private void handleCancel(ButtonInteractionEvent event) {
         module.purchaseManager().cancelPurchase(event.getUser().getId());
         event.deferReply(true).queue(hook -> {
-            hook.sendMessage(VipEmbedFactory.purchaseCancelled()).queue();
+            sendV2Reply(hook, VipEmbedFactory.purchaseCancelledV2());
         });
     }
 
     private void handleBack(ButtonInteractionEvent event) {
         event.deferReply(true).queue(hook -> {
-            hook.sendMessage(VipEmbedFactory.shopMessage(module.vipConfig())).queue();
+            DataObject v2msg = VipEmbedFactory.shopMessageV2(module.vipConfig());
+            sendV2Reply(hook, v2msg);
         });
+    }
+
+    // ── Envio V2 ─────────────────────────────────────────────────────────────
+
+    private void handleToggleRenew(ButtonInteractionEvent event) {
+        event.deferReply(true).queue(hook -> {
+            String discordId = event.getUser().getId();
+            Optional<UUID> uuidOpt = module.linkManager().uuidByDiscordId(discordId);
+
+            if (uuidOpt.isEmpty()) {
+                sendV2Reply(hook, VipEmbedFactory.linkRequiredV2());
+                return;
+            }
+
+            UUID uuid = uuidOpt.get();
+            VipStorage.VipSubscription sub = module.vipStorage().getActiveSubscription(uuid).orElse(null);
+            if (sub == null) {
+                sendV2Reply(hook, simpleV2(0xE74C3C, "❌ Sem VIP ativo",
+                        "Você não possui um VIP ativo para configurar renovação."));
+                return;
+            }
+
+            boolean newAutoRenew = module.vipStorage().toggleAutoRenew(uuid);
+            boolean autoRenew = module.vipStorage().getAutoRenew(uuid);
+            double balance = module.mobCoins().getBalance(uuid);
+            String mcName = module.linkManager().mcNameByDiscordId(discordId).orElse("?");
+
+            sendV2Reply(hook, VipEmbedFactory.vipConfigV2(mcName, sub, autoRenew, balance));
+        });
+    }
+
+    /**
+     * Envia uma mensagem Components v2 como resposta a uma interação via REST API raw.
+     */
+    private void sendV2Reply(net.dv8tion.jda.api.interactions.InteractionHook hook, DataObject v2msg) {
+        try {
+            V2Messenger.replyInteraction(hook.getJDA(), hook.getInteraction().getToken(), v2msg)
+                    .thenAccept(status -> {
+                        if (status < 200 || status >= 300) {
+                            module.plugin().getLogger().warning("[VipShop] V2 reply retornou HTTP " + status);
+                            hook.sendMessage("⚠️ Erro ao carregar. Tente novamente.").queue();
+                        }
+                    })
+                    .exceptionally(e -> {
+                        module.plugin().getLogger().warning("[VipShop] Falha ao enviar V2: " + e.getMessage());
+                        hook.sendMessage("⚠️ Erro ao carregar. Tente novamente.").queue();
+                        return null;
+                    });
+        } catch (Exception e) {
+            module.plugin().getLogger().warning("[VipShop] Falha ao enviar V2: " + e.getMessage());
+            hook.sendMessage("⚠️ Erro ao carregar. Tente novamente.").queue();
+        }
     }
 
     // ── Utilitários ───────────────────────────────────────────────────────────
 
-    /**
-     * Normaliza o sufixo do custom_id legado para o ID usado no VipConfig.
-     * comprar_vip → Vip | comprar_midia → Midia | comprar_famoso → Famoso
-     */
+    private DataObject simpleV2(int color, String title, String description) {
+        V2MessageBuilder builder = V2MessageBuilder.create();
+        builder.addContainer(color, children -> {
+            children.add(DataObject.empty().put("type", 10).put("content",
+                    "## " + title + "\n" + description));
+        });
+        return builder.build();
+    }
+
     private String normalizeTierId(String raw) {
         if (raw == null || raw.isBlank()) return raw;
-        // Capitaliza primeira letra, mantém o resto em minúsculo
-        // "vip" → "Vip", "midia" → "Midia", "famoso" → "Famoso"
         String lower = raw.toLowerCase(Locale.ROOT);
         return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
     }
@@ -211,9 +290,7 @@ public final class VipDiscordListener extends ListenerAdapter {
         if (jda == null) return;
         TextChannel ch = jda.getTextChannelById(logChannelId);
         if (ch != null) {
-            ch.sendMessageEmbeds(
-                    VipEmbedFactory.purchaseLog(discordTag, p.mcName(), p.tier(), p.tier().price())
-            ).queue();
+            V2Messenger.send(ch, VipEmbedFactory.purchaseLogV2(discordTag, p.mcName(), p.tier(), p.tier().price()));
         }
     }
 

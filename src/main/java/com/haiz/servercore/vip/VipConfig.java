@@ -45,7 +45,7 @@ public final class VipConfig {
                     t.getString("emoji-name", key.toLowerCase(Locale.ROOT)),
                     t.getString("description", ""),
                     t.getStringList("perks"),
-                    t.getString("grant-command", "lp user %player% parent set " + key.toLowerCase(Locale.ROOT))
+                    t.getString("grant-command", "lp user %player% parent add " + key.toLowerCase(Locale.ROOT))
             ));
         }
     }

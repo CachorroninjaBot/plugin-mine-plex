@@ -1,35 +1,26 @@
 package com.haiz.servercore.commands;
 
 import com.haiz.servercore.HaizServerCore;
-import com.haiz.servercore.discord.DiscordEmbedFactory;
+import com.haiz.servercore.update.UpdateManager;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 public final class HaizCoreCommand implements CommandExecutor, TabCompleter {
     private final HaizServerCore plugin;
-    private final ReloadCommand reloadCommand;
-    private final StatsCommand statsCommand;
 
     public HaizCoreCommand(HaizServerCore plugin) {
         this.plugin = plugin;
-        this.reloadCommand = new ReloadCommand(plugin);
-        this.statsCommand = new StatsCommand(plugin);
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
-            @NotNull String[] args) {
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
             help(sender);
             return true;
@@ -37,123 +28,130 @@ public final class HaizCoreCommand implements CommandExecutor, TabCompleter {
         String sub = args[0].toLowerCase(Locale.ROOT);
         switch (sub) {
             case "reload" -> {
-                if (!has(sender, "haizcore.reload")) {
+                if (!sender.hasPermission("haizcore.admin")) {
+                    sender.sendMessage("§cSem permissão.");
                     return true;
                 }
-                reloadCommand.execute(sender);
+                plugin.reloadEverything();
+                sender.sendMessage("§aConfigurações recarregadas.");
             }
             case "status" -> {
-                if (!has(sender, "haizcore.admin")) {
+                if (!sender.hasPermission("haizcore.admin")) {
+                    sender.sendMessage("§cSem permissão.");
                     return true;
                 }
                 status(sender);
             }
-            case "testdiscord" -> {
-                if (!has(sender, "haizcore.discord.test")) {
-                    return true;
-                }
-                if (!plugin.discord().isOnline()) {
-                    sender.sendMessage(plugin.messages().get("discord-disabled"));
-                    return true;
-                }
-                plugin.discordLogs().testAllChannels();
-                sender.sendMessage(plugin.messages().get("discord-test-sent"));
-            }
-            case "metrics" -> metrics(sender, args);
-            case "report" -> report(sender, args);
             case "sendvips" -> {
-                if (!has(sender, "haizcore.vip.send"))
+                if (!sender.hasPermission("haizcore.vip.send")) {
+                    sender.sendMessage("§cSem permissão.");
                     return true;
+                }
                 plugin.vip().sendShopMessage(sender);
             }
-            case "top" -> top(sender, args);
-            default -> sender.sendMessage(plugin.messages().get("unknown-command"));
+            case "update" -> {
+                if (!sender.hasPermission("haizcore.admin")) {
+                    sender.sendMessage("§cSem permissão.");
+                    return true;
+                }
+                handleUpdate(sender);
+            }
+            case "checkupdate" -> {
+                if (!sender.hasPermission("haizcore.admin")) {
+                    sender.sendMessage("§cSem permissão.");
+                    return true;
+                }
+                handleCheckUpdate(sender);
+            }
+            default -> sender.sendMessage("§cComando desconhecido. Use /haizcore para ajuda.");
         }
         return true;
     }
 
+    private void handleCheckUpdate(CommandSender sender) {
+        UpdateManager updater = plugin.updateManager();
+        if (updater == null) {
+            sender.sendMessage("§cUpdater não está configurado.");
+            return;
+        }
+
+        sender.sendMessage("§b[Updater] §fVerificando atualizações...");
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            updater.checkForUpdates();
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                if (updater.isUpdateAvailable()) {
+                    UpdateManager.UpdateInfo info = updater.getLatestUpdate();
+                    sender.sendMessage("§a[Updater] §fNova versão disponível: §b" + info.version());
+                    sender.sendMessage("§7Versão atual: §f" + updater.getCurrentVersion());
+                    sender.sendMessage("§eUse §f/haizcore update §epara baixar.");
+                } else {
+                    sender.sendMessage("§a[Updater] §fPlugin está na versão mais recente: §b" + updater.getCurrentVersion());
+                }
+            });
+        });
+    }
+
+    private void handleUpdate(CommandSender sender) {
+        UpdateManager updater = plugin.updateManager();
+        if (updater == null) {
+            sender.sendMessage("§cUpdater não está configurado.");
+            return;
+        }
+
+        if (updater.isUpdateDownloaded()) {
+            sender.sendMessage("§e[Updater] §fUpdate já baixado. Use §6/haizcore reload §fpara aplicar.");
+            return;
+        }
+
+        if (!updater.isUpdateAvailable()) {
+            sender.sendMessage("§b[Updater] §fNenhuma atualização disponível.");
+            return;
+        }
+
+        UpdateManager.UpdateInfo info = updater.getLatestUpdate();
+        sender.sendMessage("§b[Updater] §fBaixando versão §b" + info.version() + "§f...");
+
+        updater.downloadUpdate(sender).thenAccept(success -> {
+            if (success) {
+                sender.sendMessage("§a[Updater] §fDownload concluído! Use §6/haizcore reload §fpara aplicar.");
+            } else {
+                sender.sendMessage("§c[Updater] §fFalha ao baixar atualização.");
+            }
+        });
+    }
+
     private void help(CommandSender sender) {
         sender.sendMessage("§bHaizServerCore §7- comandos");
-        sender.sendMessage("§f/haizcore status §7- status dos modulos");
+        sender.sendMessage("§f/haizcore status §7- status dos módulos");
         sender.sendMessage("§f/haizcore reload §7- recarrega configs");
-        sender.sendMessage("§f/haizcore testdiscord §7- envia embeds de teste");
-        sender.sendMessage("§f/haizcore metrics §7- resumo atual");
-        sender.sendMessage("§f/haizcore metrics player <nick> §7- metricas do jogador");
-        sender.sendMessage("§f/haizcore report daily|weekly §7- gera relatorio");
-        sender.sendMessage("§f/haizcore top playtime|commands|deaths|activity §7- rankings");
+        sender.sendMessage("§f/haizcore sendvips §7- envia embed da loja no Discord");
+        sender.sendMessage("§f/haizcore checkupdate §7- verifica atualizações");
+        sender.sendMessage("§f/haizcore update §7- baixa e prepara atualização");
     }
 
     private void status(CommandSender sender) {
-        sender.sendMessage(plugin.messages().raw("status-header"));
-        sender.sendMessage("§7Discord: §f" + plugin.discord().getStateLabel());
-        sender.sendMessage("§7Database: §f" + plugin.database().getStateLabel());
-        sender.sendMessage("§7Metricas: §f" + (plugin.config().isMetricsEnabled() ? "on" : "off"));
-        sender.sendMessage("§7Logs comandos: §f" + (plugin.config().isCommandLogEnabled() ? "on" : "off"));
-        sender.sendMessage("§7Jogadores online: §f" + Bukkit.getOnlinePlayers().size());
-    }
+        UpdateManager updater = plugin.updateManager();
+        String updateStatus = "§cinativo";
+        if (updater != null) {
+            updateStatus = updater.isUpdateDownloaded() ? "§epronto para aplicar" :
+                           updater.isUpdateAvailable() ? "§aversão disponível" : "§7atualizado";
+        }
 
-    private void metrics(CommandSender sender, String[] args) {
-        if (!has(sender, "haizcore.metrics")) {
-            return;
-        }
-        if (args.length >= 3 && args[1].equalsIgnoreCase("player")) {
-            statsCommand.player(sender, args[2]);
-            return;
-        }
-        statsCommand.serverSummary(sender);
-    }
-
-    private void report(CommandSender sender, String[] args) {
-        if (!has(sender, "haizcore.report")) {
-            return;
-        }
-        if (args.length < 2) {
-            sender.sendMessage("§cUse /haizcore report daily ou /haizcore report weekly.");
-            return;
-        }
-        if (args[1].equalsIgnoreCase("weekly")) {
-            plugin.metrics().sendWeeklyReport();
-            sender.sendMessage("§aRelatorio semanal enviado para o Discord.");
-        } else {
-            plugin.metrics().sendDailyReport();
-            sender.sendMessage("§aRelatorio diario enviado para o Discord.");
-        }
-    }
-
-    private void top(CommandSender sender, String[] args) {
-        if (!has(sender, "haizcore.metrics")) {
-            return;
-        }
-        String type = args.length >= 2 ? args[1] : "playtime";
-        statsCommand.top(sender, type);
-    }
-
-    private boolean has(CommandSender sender, String permission) {
-        if (sender.hasPermission(permission) || sender.hasPermission("haizcore.admin")) {
-            return true;
-        }
-        sender.sendMessage(plugin.messages().get("no-permission"));
-        return false;
+        sender.sendMessage("§8§l━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        sender.sendMessage("  §b§lHaizServerCore Status");
+        sender.sendMessage("§8§l━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        sender.sendMessage("  §7Versão: §f" + plugin.getDescription().getVersion());
+        sender.sendMessage("  §7Discord: §f" + plugin.discord().getStateLabel());
+        sender.sendMessage("  §7VIPs: §f" + (plugin.vip() != null && plugin.vip().isRunning() ? "§aativo" : "§cinativo"));
+        sender.sendMessage("  §7Update: §f" + updateStatus);
+        sender.sendMessage("  §7Jogadores online: §f" + Bukkit.getOnlinePlayers().size());
+        sender.sendMessage("§8§l━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
-            @NotNull String label, @NotNull String[] args) {
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return filter(args[0], List.of("sendvips", "reload", "status", "testdiscord", "metrics", "report", "top"));
-        }
-        if (args.length == 2 && args[0].equalsIgnoreCase("metrics")) {
-            return filter(args[1], List.of("player"));
-        }
-        if (args.length == 3 && args[0].equalsIgnoreCase("metrics") && args[1].equalsIgnoreCase("player")) {
-            return filter(args[2], Arrays.stream(Bukkit.getOfflinePlayers()).map(OfflinePlayer::getName)
-                    .filter(java.util.Objects::nonNull).toList());
-        }
-        if (args.length == 2 && args[0].equalsIgnoreCase("report")) {
-            return filter(args[1], List.of("daily", "weekly"));
-        }
-        if (args.length == 2 && args[0].equalsIgnoreCase("top")) {
-            return filter(args[1], List.of("playtime", "commands", "deaths", "activity"));
+            return filter(args[0], List.of("sendvips", "reload", "status", "update", "checkupdate"));
         }
         return List.of();
     }

@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.haiz"
-version = "1.0.0"
+version = "1.1.0"
 
 java {
     toolchain {
@@ -27,6 +27,7 @@ tasks.withType(JavaCompile).configureEach {
 dependencies {
     compileOnly "io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT"
     compileOnly "org.apache.logging.log4j:log4j-core:2.22.1"
+    compileOnly "com.google.code.gson:gson:2.10.1"
 
     implementation("net.dv8tion:JDA:5.0.0") {
         exclude module: "opus-java"
@@ -44,8 +45,6 @@ tasks.processResources {
 shadowJar {
     archiveClassifier.set("")
     mergeServiceFiles()
-    relocate "net.dv8tion.jda", "com.haiz.servercore.libs.jda"
-    relocate "org.sqlite", "com.haiz.servercore.libs.sqlite"
 }
 
 tasks.build {
