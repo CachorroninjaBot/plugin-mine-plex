@@ -31,36 +31,45 @@ public final class ServerStatusNotifier {
 
     public void sendOfflineStatus() {
         String content = "## 🛑 **Servidor foi desligado.**\n\nO servidor está offline no momento. Avisaremos quando ele voltar. <@&1516825406924128387>\n-# <:iconswarning:1518121765602066503> Para desativar essa notificação vá em <id:customize>";
-        sendWebhookMessage(content);
+        sendWebhookMessageSync(content);
     }
 
     private void sendWebhookMessage(String content) {
         if (webhookUrl == null || webhookUrl.isBlank()) return;
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            try {
-                deleteLastMessage();
-
-                JsonObject json = new JsonObject();
-                json.addProperty("username", "PEX LEGENDS");
-                json.addProperty("content", content);
-
-                JsonObject allowedMentions = new JsonObject();
-                allowedMentions.add("parse", com.google.gson.JsonParser.parseString("[\"roles\"]").getAsJsonArray());
-                json.add("allowed_mentions", allowedMentions);
-
-                String response = http_request("POST", webhookUrl + "?wait=true", json.toString());
-
-                if (response != null && !response.isBlank()) {
-                    JsonObject obj = JsonParser.parseString(response).getAsJsonObject();
-                    if (obj.has("id")) {
-                        lastMessageId = obj.get("id").getAsString();
-                    }
-                }
-            } catch (Exception e) {
-                plugin.getLogger().warning("[ServerStatus] Falha ao enviar webhook: " + e.getMessage());
-            }
+            executeWebhook(content);
         });
+    }
+
+    private void sendWebhookMessageSync(String content) {
+        if (webhookUrl == null || webhookUrl.isBlank()) return;
+        executeWebhook(content);
+    }
+
+    private void executeWebhook(String content) {
+        try {
+            deleteLastMessage();
+
+            JsonObject json = new JsonObject();
+            json.addProperty("username", "PEX LEGENDS");
+            json.addProperty("content", content);
+
+            JsonObject allowedMentions = new JsonObject();
+            allowedMentions.add("parse", com.google.gson.JsonParser.parseString("[\"roles\"]").getAsJsonArray());
+            json.add("allowed_mentions", allowedMentions);
+
+            String response = http_request("POST", webhookUrl + "?wait=true", json.toString());
+
+            if (response != null && !response.isBlank()) {
+                JsonObject obj = JsonParser.parseString(response).getAsJsonObject();
+                if (obj.has("id")) {
+                    lastMessageId = obj.get("id").getAsString();
+                }
+            }
+        } catch (Exception e) {
+            plugin.getLogger().warning("[ServerStatus] Falha ao enviar webhook: " + e.getMessage());
+        }
     }
 
     private void deleteLastMessage() {
