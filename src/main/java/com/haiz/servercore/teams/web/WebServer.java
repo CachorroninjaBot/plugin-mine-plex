@@ -21,7 +21,8 @@ public final class WebServer {
         try {
             String host = module.teamsConfig().webHost();
             int port = module.teamsConfig().webPort();
-            server = HttpServer.create(new InetSocketAddress(host.equals("0.0.0.0") ? null : host, port), 0);
+            InetSocketAddress addr = host.equals("0.0.0.0") ? new InetSocketAddress(port) : new InetSocketAddress(host, port);
+            server = HttpServer.create(addr, 0);
             server.setExecutor(Executors.newFixedThreadPool(4));
 
             server.createContext("/api/auth/link", new WebAuthHandler(module));
