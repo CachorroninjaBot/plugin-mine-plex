@@ -31,7 +31,7 @@ public final class ServerStatusNotifier {
 
     public void sendOfflineStatus() {
         String content = "## 🛑 **Servidor foi desligado.**\n\nO servidor está offline no momento. Avisaremos quando ele voltar. <@&1516825406924128387>\n-# <:iconswarning:1518121765602066503> Para desativar essa notificação vá em <id:customize>";
-        sendWebhookMessageSync(content);
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> executeWebhook(content));
     }
 
     private void sendWebhookMessage(String content) {

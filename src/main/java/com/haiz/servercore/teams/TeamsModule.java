@@ -87,6 +87,8 @@ public final class TeamsModule {
                 registerDiscordListener();
                 TeamsSlashCommands.register(plugin);
                 task.cancel();
+            } else if (!running) {
+                task.cancel();
             }
         }, 20L, 40L);
     }

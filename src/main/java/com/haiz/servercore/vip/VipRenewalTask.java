@@ -116,7 +116,17 @@ public final class VipRenewalTask {
         vipStorage.renewSubscription(uuid, newExpiry);
 
         OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-        String grantCmd = vipTier.grantCommand().replace("%player%", player.getName());
+        String playerName = player.getName();
+        if (playerName == null) {
+            Player online = Bukkit.getPlayer(uuid);
+            if (online != null) playerName = online.getName();
+        }
+        if (playerName == null) {
+            log.warning("[VipShop] Não foi possível resolver nome para renovação: " + uuid);
+            mobCoins.deposit(uuid, vipTier.price());
+            return false;
+        }
+        String grantCmd = vipTier.grantCommand().replace("%player%", playerName);
         Bukkit.getScheduler().runTask(plugin, () ->
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), grantCmd));
 
@@ -143,7 +153,7 @@ public final class VipRenewalTask {
 
     private void notifyExpiring(UUID uuid, long remainingSeconds) {
         long hours = remainingSeconds / 3600;
-        notifyPlayer(uuid, "§eSeu VIP §fexpira em §c" + hours + " horas§e. Use §f/vipconfig autoresnovar §epara ativar renovação automática.");
+        notifyPlayer(uuid, "§eSeu VIP §fexpira em §c" + hours + " horas§e. Use §f/vipconfig auto-renovar §epara ativar renovação automática.");
     }
 
     private void notifyPlayer(UUID uuid, String message) {

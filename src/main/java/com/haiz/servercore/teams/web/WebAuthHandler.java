@@ -9,6 +9,7 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,6 +18,7 @@ public final class WebAuthHandler implements HttpHandler {
 
     private static final Map<String, AuthCode> PENDING_CODES = new ConcurrentHashMap<>();
     private static final Map<String, UUID> AUTH_TOKENS = new ConcurrentHashMap<>();
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private final TeamsModule module;
     private final Gson gson = new Gson();
 
@@ -63,6 +65,10 @@ public final class WebAuthHandler implements HttpHandler {
         }
 
         JsonObject body = gson.fromJson(new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8), JsonObject.class);
+        if (body == null || !body.has("code")) {
+            sendError(exchange, 400, "Body inválido");
+            return;
+        }
         String code = body.get("code").getAsString();
 
         AuthCode authCode = PENDING_CODES.get(code);
@@ -114,7 +120,7 @@ public final class WebAuthHandler implements HttpHandler {
         String chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 6; i++) {
-            sb.append(chars.charAt((int) (Math.random() * chars.length())));
+            sb.append(chars.charAt(SECURE_RANDOM.nextInt(chars.length())));
         }
         return sb.toString();
     }
@@ -142,8 +148,8 @@ public final class WebAuthHandler implements HttpHandler {
     private static class AuthCode {
         final String code;
         final long createdAt;
-        boolean verified;
-        UUID playerUUID;
+        volatile boolean verified;
+        volatile UUID playerUUID;
 
         AuthCode(String code, long createdAt) {
             this.code = code;

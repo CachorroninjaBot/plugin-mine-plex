@@ -52,7 +52,7 @@ public final class UpdateManager {
     }
 
     public void start() {
-        if (githubOwner.isBlank() || githubRepo.isBlank()) {
+        if (githubOwner == null || githubOwner.isBlank() || githubRepo == null || githubRepo.isBlank()) {
             log.info("[Updater] GitHub owner/repo não configurado. Auto-update desabilitado.");
             return;
         }

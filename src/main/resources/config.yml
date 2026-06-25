@@ -5,7 +5,7 @@ discord:
   activity:
     enabled: true
     text: "Monitorando o servidor"
-  status-webhook: "https://discord.com/api/webhooks/1516662226210263060/DBq0Ca9LX85-Li-RwEcSfM26P1xEtlhf3G-ubJdQnvdok0W85uOsytS6zJmaQ1Gbmlvw"
+  status-webhook: ""
 
 vip:
   discord:

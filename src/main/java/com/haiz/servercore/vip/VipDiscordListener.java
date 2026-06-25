@@ -167,7 +167,12 @@ public final class VipDiscordListener extends ListenerAdapter {
             }
 
             double balance = module.mobCoins().getBalance(uuidOpt.get());
-            module.purchaseManager().startPurchase(discordId, uuidOpt.get(), mcNameOpt.orElse("?"), tier);
+            boolean started = module.purchaseManager().startPurchase(discordId, uuidOpt.get(), mcNameOpt.orElse("?"), tier);
+            if (!started) {
+                sendV2Reply(hook, simpleV2(0xE74C3C, "⚠️ Compra já pendente",
+                        "Você já tem uma compra em andamento. Confirme ou cancele antes de iniciar outra."));
+                return;
+            }
             sendV2Reply(hook, VipEmbedFactory.purchaseConfirmV2(tier, mcNameOpt.orElse("?"), balance));
         });
     }
@@ -236,8 +241,7 @@ public final class VipDiscordListener extends ListenerAdapter {
                 return;
             }
 
-            boolean newAutoRenew = module.vipStorage().toggleAutoRenew(uuid);
-            boolean autoRenew = module.vipStorage().getAutoRenew(uuid);
+            boolean autoRenew = module.vipStorage().toggleAutoRenew(uuid);
             double balance = module.mobCoins().getBalance(uuid);
             String mcName = module.linkManager().mcNameByDiscordId(discordId).orElse("?");
 
@@ -296,17 +300,17 @@ public final class VipDiscordListener extends ListenerAdapter {
                     .thenAccept(status -> {
                         if (status < 200 || status >= 300) {
                             module.plugin().getLogger().warning("[VipShop] V2 reply retornou HTTP " + status);
-                            hook.sendMessage("⚠️ Erro ao carregar. Tente novamente.").queue();
+                            hook.editOriginal("⚠️ Erro ao carregar. Tente novamente.").queue();
                         }
                     })
                     .exceptionally(e -> {
                         module.plugin().getLogger().warning("[VipShop] Falha ao enviar V2: " + e.getMessage());
-                        hook.sendMessage("⚠️ Erro ao carregar. Tente novamente.").queue();
+                        hook.editOriginal("⚠️ Erro ao carregar. Tente novamente.").queue();
                         return null;
                     });
         } catch (Exception e) {
             module.plugin().getLogger().warning("[VipShop] Falha ao enviar V2: " + e.getMessage());
-            hook.sendMessage("⚠️ Erro ao carregar. Tente novamente.").queue();
+            hook.editOriginal("⚠️ Erro ao carregar. Tente novamente.").queue();
         }
     }
 

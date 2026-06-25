@@ -288,7 +288,6 @@ public final class AutoRepairManager implements Listener {
 
             double cost = calculateCost(item, player);
             totalCost += cost;
-            item.setDurability((short) 0);
             repaired++;
         }
 
@@ -305,6 +304,16 @@ public final class AutoRepairManager implements Listener {
                 }
                 withdrawMoney(player, totalCost);
             }
+        }
+
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item == null || item.getType().isAir()) continue;
+            if (blacklistedMaterials.contains(item.getType())) continue;
+
+            int maxDurability = item.getType().getMaxDurability();
+            if (maxDurability <= 0 || item.getDurability() == 0) continue;
+
+            item.setDurability((short) 0);
         }
 
         cooldownsAll.put(uuid, System.currentTimeMillis());

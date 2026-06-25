@@ -61,12 +61,13 @@ public final class V2Messenger {
     public static CompletableFuture<Integer> replyInteraction(JDA jda, String interactionToken, DataObject message) {
         String appId = jda.getSelfUser().getApplicationId();
         String token = jda.getToken();
-        message.put("flags", 32768);
+        DataObject payload = DataObject.fromJson(message.toString());
+        payload.put("flags", 32768);
         HttpRequest request = HttpRequest.newBuilder(URI.create(API_BASE + "/webhooks/" + appId + "/" + interactionToken))
                 .header("Authorization", "Bot " + token)
                 .header("Content-Type", "application/json")
                 .header("User-Agent", "HaizServerCore/1.0")
-                .POST(HttpRequest.BodyPublishers.ofString(message.toString()))
+                .POST(HttpRequest.BodyPublishers.ofString(payload.toString()))
                 .timeout(Duration.ofSeconds(15))
                 .build();
         return HTTP_CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString())

@@ -84,6 +84,8 @@ public final class VipModule {
                 registerDiscordListener();
                 registerDiscordSlashCommands();
                 task.cancel();
+            } else if (!running) {
+                task.cancel();
             }
         }, 20L, 40L);
     }

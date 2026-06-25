@@ -107,7 +107,8 @@ public final class MobCoinsHook {
                     Object user = getUser.invoke(dbManager, uuid);
                     if (user != null) {
                         Method getMobcoins = user.getClass().getMethod("getMobcoins");
-                        int current = (int) getMobcoins.invoke(user);
+                        Number currentNum = (Number) getMobcoins.invoke(user);
+                        int current = currentNum.intValue();
                         int newBalance = current - (int) amount;
                         if (newBalance < 0) return false;
                         Method setMobcoins = user.getClass().getMethod("setMobcoins", int.class);
@@ -149,7 +150,8 @@ public final class MobCoinsHook {
                     Object user = getUser.invoke(dbManager, uuid);
                     if (user != null) {
                         Method getMobcoins = user.getClass().getMethod("getMobcoins");
-                        int current = (int) getMobcoins.invoke(user);
+                        Number currentNum = (Number) getMobcoins.invoke(user);
+                        int current = currentNum.intValue();
                         int newBalance = current + (int) amount;
                         Method setMobcoins = user.getClass().getMethod("setMobcoins", int.class);
                         setMobcoins.invoke(user, newBalance);

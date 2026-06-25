@@ -103,8 +103,11 @@ public final class PurchaseManager {
 
         String playerName = resolvePlayerName(p.uuid());
         if (playerName == null) {
-            plugin.getLogger().warning("[VipShop] Não foi possível resolver o nome do jogador: " + p.uuid());
-            mobCoins.deposit(p.uuid(), p.tier().price());
+            plugin.getLogger().warning("[VipShop] Não foi possível resolver o nome do jogador: " + p.uuid() + ". Estornando coins.");
+            boolean refunded = mobCoins.deposit(p.uuid(), p.tier().price());
+            if (!refunded) {
+                plugin.getLogger().severe("[VipShop] FALHA AO ESTORNAR " + p.tier().price() + " coins para " + p.uuid() + ". Contato manual necessário.");
+            }
             return PurchaseResult.MOBCOINS_UNAVAILABLE;
         }
 
