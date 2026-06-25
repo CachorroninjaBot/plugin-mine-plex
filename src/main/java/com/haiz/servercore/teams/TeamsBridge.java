@@ -109,30 +109,29 @@ public final class TeamsBridge {
     }
 
     private void initModelMethods() throws Exception {
-        getTeamByUUID = teamClass.getMethod("getTeam", UUID.class);
-        getTeamByName = teamClass.getMethod("getTeam", String.class);
-        getMembers = teamClass.getMethod("getMembers");
-        getName = teamClass.getMethod("getName");
-        getTag = teamClass.getMethod("getTag");
-        getDescription = teamClass.getMethod("getDescription");
-        getColor = teamClass.getMethod("getColor");
-        isOpen = teamClass.getMethod("isOpen");
-        isPvp = teamClass.getMethod("isPvp");
-        getLevel = teamClass.getMethod("getLevel");
-        getScore = teamClass.getMethod("getScore");
-        getMoney = teamClass.getMethod("getMoney");
-        getWarps = teamClass.getMethod("getWarps");
-        getAllies = teamClass.getMethod("getAllies");
-        getTeamId = teamClass.getMethod("getId");
-
+        getTeamByUUID = findMethod(teamClass, "getTeam", UUID.class);
+        getTeamByName = findMethod(teamClass, "getTeam", String.class);
+        getMembers = findMethod(teamClass, "getMembers");
+        getName = findMethod(teamClass, "getName");
+        getTag = findMethod(teamClass, "getTag");
+        getDescription = findMethod(teamClass, "getDescription");
+        getColor = findMethod(teamClass, "getColor");
+        isOpen = findMethod(teamClass, "isOpen");
+        isPvp = findMethod(teamClass, "isPvp");
+        getLevel = findMethod(teamClass, "getLevel");
+        getScore = findMethod(teamClass, "getScore");
+        getMoney = findMethod(teamClass, "getMoney");
+        getWarps = findMethod(teamClass, "getWarps");
+        getAllies = findMethod(teamClass, "getAllies");
+        getTeamId = findMethod(teamClass, "getId");
         getHome = findMethod(teamClass, "getHome");
         teamSetHome = findMethod(teamClass, "setHome", Location.class);
         teamDelHome = findMethod(teamClass, "delHome");
         getBannedPlayers = findMethod(teamClass, "getBannedPlayers");
         getInvitedPlayers = findMethod(teamClass, "getInvitedPlayers");
 
-        tpGetPlayer = teamPlayerClass.getMethod("getPlayer");
-        tpGetRank = teamPlayerClass.getMethod("getRank");
+        tpGetPlayer = findMethod(teamPlayerClass, "getPlayer");
+        tpGetRank = findMethod(teamPlayerClass, "getRank");
         tpGetTitle = findMethod(teamPlayerClass, "getTitle");
 
         prName = playerRankClass.getMethod("name");
