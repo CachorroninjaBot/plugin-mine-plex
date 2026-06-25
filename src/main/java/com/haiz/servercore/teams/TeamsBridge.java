@@ -121,23 +121,25 @@ public final class TeamsBridge {
         getLevel = teamClass.getMethod("getLevel");
         getScore = teamClass.getMethod("getScore");
         getMoney = teamClass.getMethod("getMoney");
-        getHome = teamClass.getMethod("getHome");
         getWarps = teamClass.getMethod("getWarps");
         getAllies = teamClass.getMethod("getAllies");
         getTeamId = teamClass.getMethod("getId");
 
-        try { getBannedPlayers = teamClass.getMethod("getBannedPlayers"); } catch (NoSuchMethodException ignored) {}
-        try { getInvitedPlayers = teamClass.getMethod("getInvitedPlayers"); } catch (NoSuchMethodException ignored) {}
+        getHome = findMethod(teamClass, "getHome");
+        teamSetHome = findMethod(teamClass, "setHome", Location.class);
+        teamDelHome = findMethod(teamClass, "delHome");
+        getBannedPlayers = findMethod(teamClass, "getBannedPlayers");
+        getInvitedPlayers = findMethod(teamClass, "getInvitedPlayers");
 
         tpGetPlayer = teamPlayerClass.getMethod("getPlayer");
         tpGetRank = teamPlayerClass.getMethod("getRank");
-        try { tpGetTitle = teamPlayerClass.getMethod("getTitle"); } catch (NoSuchMethodException ignored) {}
+        tpGetTitle = findMethod(teamPlayerClass, "getTitle");
 
         prName = playerRankClass.getMethod("name");
         prOrdinal = playerRankClass.getMethod("ordinal");
 
-        warpGetLocation = warpClass.getMethod("getLocation");
-        warpGetName = warpClass.getMethod("getName");
+        warpGetLocation = findMethod(warpClass, "getLocation");
+        warpGetName = findMethod(warpClass, "getName");
     }
 
     private void initMutatorMethods() throws Exception {
@@ -147,8 +149,6 @@ public final class TeamsBridge {
         teamSetColor = findMethod(teamClass, "setColor", Class.forName("org.bukkit.ChatColor"));
         teamSetOpen = findMethod(teamClass, "setOpen", boolean.class);
         teamSetPvp = findMethod(teamClass, "setPvp", boolean.class);
-        teamSetHome = findMethod(teamClass, "setHome", Location.class);
-        teamDelHome = findMethod(teamClass, "delHome");
 
         teamInvite = findMethod(teamClass, "invite", UUID.class);
         teamKick = findMethod(teamClass, "kick", UUID.class);
