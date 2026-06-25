@@ -26,7 +26,7 @@ public final class RepairCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        if (!autoRepairManager.isEnabled()) {
+        if (autoRepairManager == null || !autoRepairManager.isEnabled()) {
             player.sendMessage("§cAuto-repair está desativado.");
             return true;
         }

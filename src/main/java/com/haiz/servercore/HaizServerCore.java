@@ -6,6 +6,7 @@ import com.haiz.servercore.discord.DiscordBotManager;
 import com.haiz.servercore.discord.ServerStatusNotifier;
 import com.haiz.servercore.storage.SQLiteDatabase;
 import com.haiz.servercore.update.UpdateManager;
+import com.haiz.servercore.teams.TeamsModule;
 import com.haiz.servercore.vip.VipModule;
 
 import org.bukkit.Bukkit;
@@ -18,6 +19,7 @@ public final class HaizServerCore extends JavaPlugin {
     private DiscordBotManager discordBotManager;
     private ServerStatusNotifier statusNotifier;
     private VipModule vipModule;
+    private TeamsModule teamsModule;
     private UpdateManager updateManager;
 
     @Override
@@ -48,6 +50,9 @@ public final class HaizServerCore extends JavaPlugin {
         this.vipModule = new VipModule(this);
         this.vipModule.start();
 
+        this.teamsModule = new TeamsModule(this);
+        this.teamsModule.start();
+
         this.updateManager.start();
 
         PluginCommand command = getCommand("haizcore");
@@ -66,6 +71,9 @@ public final class HaizServerCore extends JavaPlugin {
 
         if (vipModule != null) {
             vipModule.stop();
+        }
+        if (teamsModule != null) {
+            teamsModule.stop();
         }
         if (updateManager != null) {
             updateManager.stop();
@@ -93,6 +101,9 @@ public final class HaizServerCore extends JavaPlugin {
         if (vipModule != null) {
             vipModule.reload();
         }
+        if (teamsModule != null) {
+            teamsModule.reload();
+        }
         if (updateManager != null) {
             updateManager.stop();
             updateManager = new UpdateManager(this,
@@ -106,6 +117,7 @@ public final class HaizServerCore extends JavaPlugin {
     public ConfigManager config() { return configManager; }
     public DiscordBotManager discord() { return discordBotManager; }
     public VipModule vip() { return vipModule; }
+    public TeamsModule teams() { return teamsModule; }
     public SQLiteDatabase sqliteDatabase() { return sqliteDatabase; }
     public UpdateManager updateManager() { return updateManager; }
 }

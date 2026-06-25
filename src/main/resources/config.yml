@@ -159,3 +159,15 @@ updater:
   github-owner: "HaizMC"
   github-repo: "HaizServerCore"
   check-interval-minutes: 30
+
+teams:
+  enabled: true
+  web:
+    enabled: true
+    port: 8080
+    host: "0.0.0.0"
+    auth-code-expiry: 300
+  discord:
+    panel-channel-id: ""
+  gui:
+    title: "§8§lGerenciar Time"

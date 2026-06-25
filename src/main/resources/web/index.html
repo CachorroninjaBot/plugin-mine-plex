@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haiz Network - Gerenciar Time</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Painel do Time</h1>
+            <p class="subtitle">Haiz Network</p>
+        </header>
+
+        <div id="auth-section" class="section">
+            <div class="card">
+                <h2>Vincular Conta</h2>
+                <p>Para acessar o painel do seu time, vincule sua conta Minecraft.</p>
+                <button id="btn-generate-code" class="btn btn-primary">Gerar Código</button>
+                <div id="code-display" class="hidden">
+                    <p class="code-text" id="auth-code"></p>
+                    <p>Use <code>/time web &lt;código&gt;</code> no Minecraft</p>
+                    <div class="input-group">
+                        <input type="text" id="verify-code" placeholder="Digite o código" maxlength="6">
+                        <button id="btn-verify" class="btn btn-success">Verificar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="team-section" class="hidden">
+            <nav class="tabs">
+                <button class="tab active" data-tab="info">Informações</button>
+                <button class="tab" data-tab="members">Membros</button>
+                <button class="tab" data-tab="warps">Warps</button>
+                <button class="tab" data-tab="allies">Alianças</button>
+                <button class="tab" data-tab="bank">Banco</button>
+                <button class="tab owner-only" data-tab="settings">Configurações</button>
+            </nav>
+
+            <div id="tab-info" class="tab-content active">
+                <div class="card">
+                    <div class="team-header">
+                        <h2 id="team-name"></h2>
+                        <span class="tag" id="team-tag"></span>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat">
+                            <span class="stat-label">Level</span>
+                            <span class="stat-value" id="team-level"></span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Score</span>
+                            <span class="stat-value" id="team-score"></span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Membros</span>
+                            <span class="stat-value" id="team-members-count"></span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Banco</span>
+                            <span class="stat-value" id="team-money"></span>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <span>Descrição:</span>
+                        <span id="team-description"></span>
+                    </div>
+                    <div class="info-row">
+                        <span>Cor:</span>
+                        <span id="team-color"></span>
+                    </div>
+                    <div class="info-row">
+                        <span>Aberto:</span>
+                        <span id="team-open"></span>
+                    </div>
+                    <div class="info-row">
+                        <span>PvP:</span>
+                        <span id="team-pvp"></span>
+                    </div>
+                    <div class="info-row" id="team-home-row">
+                        <span>Home:</span>
+                        <span id="team-home"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-members" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Membros</h2>
+                        <button class="btn btn-primary owner-admin-only" id="btn-invite">Convidar</button>
+                    </div>
+                    <div id="members-list" class="members-list"></div>
+                </div>
+            </div>
+
+            <div id="tab-warps" class="tab-content">
+                <div class="card">
+                    <h2>Warps</h2>
+                    <div id="warps-list" class="warps-list"></div>
+                </div>
+            </div>
+
+            <div id="tab-allies" class="tab-content">
+                <div class="card">
+                    <h2>Alianças</h2>
+                    <div id="allies-list" class="allies-list"></div>
+                </div>
+            </div>
+
+            <div id="tab-bank" class="tab-content">
+                <div class="card">
+                    <h2>Banco do Time</h2>
+                    <div class="bank-balance">
+                        <span class="balance-label">Saldo</span>
+                        <span class="balance-value" id="bank-balance"></span>
+                    </div>
+                    <div class="bank-actions">
+                        <div class="input-group">
+                            <input type="number" id="bank-amount" placeholder="Valor" min="1">
+                            <button class="btn btn-success" id="btn-deposit">Depositar</button>
+                            <button class="btn btn-danger owner-admin-only" id="btn-withdraw">Sacar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-settings" class="tab-content">
+                <div class="card owner-only">
+                    <h2>Configurações</h2>
+                    <div class="settings-list">
+                        <div class="setting-item">
+                            <label>Nome do Time</label>
+                            <div class="input-group">
+                                <input type="text" id="setting-name" placeholder="Novo nome">
+                                <button class="btn btn-primary" data-setting="name">Alterar</button>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label>Tag</label>
+                            <div class="input-group">
+                                <input type="text" id="setting-tag" placeholder="Nova tag" maxlength="10">
+                                <button class="btn btn-primary" data-setting="tag">Alterar</button>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label>Descrição</label>
+                            <div class="input-group">
+                                <input type="text" id="setting-description" placeholder="Nova descrição">
+                                <button class="btn btn-primary" data-setting="description">Alterar</button>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label>Time Aberto</label>
+                            <button class="btn" id="setting-open">Carregando...</button>
+                        </div>
+                        <div class="setting-item">
+                            <label>PvP entre Membros</label>
+                            <button class="btn" id="setting-pvp">Carregando...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading" class="hidden">
+            <div class="spinner"></div>
+            <p>Carregando...</p>
+        </div>
+
+        <div id="toast" class="toast hidden"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

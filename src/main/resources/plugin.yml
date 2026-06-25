@@ -25,6 +25,10 @@ commands:
     usage: /repair [hand|all]
     aliases: [reparar]
     permission: haizcore.repair
+  time:
+    description: Abre o painel de gerenciamento do time.
+    usage: /time [web <código>]
+    permission: haiz.teams.use
 
 permissions:
   haizcore.admin:
@@ -45,3 +49,6 @@ permissions:
   haizcore.repair.bypass:
     description: Bypass de custo e cooldown no repair.
     default: op
+  haiz.teams.use:
+    description: Permite usar /time para gerenciar o time.
+    default: true
