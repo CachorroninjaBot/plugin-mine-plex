@@ -69,14 +69,8 @@ public final class TeamsBridge {
     private Method setMoneyMethod;
     private Method getScoreInt;
 
-    // MemberSetComponent
-    private Method mscAsList;
-
-    // AllySetComponent
-    private Method ascAsList;
-
-    // WarpSetComponent
-    private Method wscAsList;
+    // SetTeamComponent.get() - returns Set<T>
+    private Method setGet;
     private Method getWarpsMethod;
 
     // TeamPlayer
@@ -173,10 +167,10 @@ public final class TeamsBridge {
         setMoneyMethod = findMethod(teamClass, "setMoney", double.class);
         getScoreInt = findMethod(teamClass, "getScore");
 
-        // Component methods
-        mscAsList = memberSetClass.getMethod("asList");
-        ascAsList = allySetClass.getMethod("asList");
-        wscAsList = warpSetClass.getMethod("asList");
+        // Component methods - get() from SetTeamComponent
+        Class<?> setTeamComponentClass = Class.forName("com.booksaw.betterTeams.team.SetTeamComponent");
+        setGet = setTeamComponentClass.getMethod("get");
+        getWarpsMethod = findMethod(teamClass, "getWarps");
 
         // TeamPlayer methods
         tpGetPlayer = teamPlayerClass.getMethod("getPlayer");
@@ -278,9 +272,9 @@ public final class TeamsBridge {
         Object memberSet = invoke(team, getMembers);
         if (memberSet == null) return Collections.emptyList();
         try {
-            Object list = mscAsList.invoke(memberSet);
-            if (list instanceof Collection<?> col) {
-                return new ArrayList<>(col);
+            Object set = setGet.invoke(memberSet);
+            if (set instanceof Set<?> s) {
+                return new ArrayList<>(s);
             }
         } catch (Exception ignored) {}
         return Collections.emptyList();
@@ -346,9 +340,9 @@ public final class TeamsBridge {
         Object warpSet = invoke(team, getWarpsMethod);
         if (warpSet == null) return Collections.emptyList();
         try {
-            Object list = wscAsList.invoke(warpSet);
-            if (list instanceof Collection<?> col) {
-                return new ArrayList<>(col);
+            Object set = setGet.invoke(warpSet);
+            if (set instanceof Set<?> s) {
+                return new ArrayList<>(s);
             }
         } catch (Exception ignored) {}
         return Collections.emptyList();
@@ -369,9 +363,9 @@ public final class TeamsBridge {
         Object allySet = invoke(team, getAllies);
         if (allySet == null) return Collections.emptyList();
         try {
-            Object list = ascAsList.invoke(allySet);
-            if (list instanceof Collection<?> col) {
-                return new ArrayList<>(col);
+            Object set = setGet.invoke(allySet);
+            if (set instanceof Set<?> s) {
+                return new ArrayList<>(s);
             }
         } catch (Exception ignored) {}
         return Collections.emptyList();
