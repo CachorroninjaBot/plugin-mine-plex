@@ -1,0 +1,66 @@
+# ============================================
+#  Command Logs Configuration
+# ============================================
+# Log de comandos dos jogadores para Discord webhooks.
+# Requer ProtocolLib para funcionar.
+
+enabled: true
+
+# Webhooks para cada tipo de evento
+# Se vazio, o evento não será enviado
+webhooks:
+  # Comando executado com sucesso
+  executed: ""
+  # Jogador tentou executar comando sem permissão
+  no-permission: ""
+  # Jogador tentou executar comando inexistente
+  unknown-command: ""
+
+# Configurações padrão dos embeds
+embed-defaults:
+  author-name: "Command Logs"
+  color: 5814783
+  footer-text: "Server Logs"
+  include-timestamp: true
+  footer-icon-url: ""
+
+# Templates de embed para cada tipo de evento
+templates:
+  executed:
+    title: ":white_check_mark: %player% executou comando: %command%"
+    description: "**Discord ID:** %discord_mention%\n**Jogador:** %player%\n**Grupo:** %group%"
+    color: 43520
+    footer: "Executado"
+    include-timestamp: true
+    include-image: false
+    image-url: ""
+    include-thumbnail: false
+    thumbnail-url: ""
+
+  no-permission:
+    title: ":no_entry_sign: %player% tentou comando sem permissão: %command%"
+    description: "**Discord ID:** %discord_mention%\n**Jogador:** %player%\n**Grupo:** %group%"
+    color: 16711680
+    footer: "Sem permissão"
+    include-timestamp: true
+    include-image: false
+    image-url: ""
+    include-thumbnail: false
+    thumbnail-url: ""
+
+  unknown-command:
+    title: ":warning: %player% tentou comando inexistente: %command%"
+    description: "**Discord ID:** %discord_mention%\n**Jogador:** %player%"
+    color: 16753920
+    footer: "Comando desconhecido"
+    include-timestamp: true
+    include-image: false
+    image-url: ""
+    include-thumbnail: false
+    thumbnail-url: ""
+
+# Delay em ticks após executar o comando antes de enviar o webhook
+wait-ticks-after-execute: 1
+
+# Modo debug (apenas para troubleshooting)
+debug: false

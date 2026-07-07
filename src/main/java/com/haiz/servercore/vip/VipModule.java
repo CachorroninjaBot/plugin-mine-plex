@@ -30,7 +30,7 @@ public final class VipModule {
     }
 
     public void start() {
-        this.vipConfig     = new VipConfig(plugin.getConfig());
+        this.vipConfig     = new VipConfig(plugin.config().getModuleConfig("vip"), plugin.config().getModuleConfig("linking"));
         this.linkStorage   = new LinkStorage(plugin, plugin.sqliteDatabase());
         this.linkManager   = new LinkManager(plugin, linkStorage, vipConfig);
         this.linkManager.setOnLinkConfirmed(() -> {

@@ -41,7 +41,7 @@ public final class CannedResponseManager extends ListenerAdapter {
     private void loadResponses() {
         responses.clear();
         try {
-            var config = plugin.getConfig().getConfigurationSection("canned-responses.responses");
+            var config = plugin.config().getModuleConfig("responses").getConfigurationSection("responses");
             if (config != null) {
                 for (String key : config.getKeys(false)) {
                     String value = config.getString(key);

@@ -1,0 +1,47 @@
+# ============================================
+#  Chat Bridge Configuration
+# ============================================
+# Ponte de chat bidirecional entre Discord e Minecraft.
+
+enabled: true
+
+# Mensagens do Discord -> Minecraft
+discord-to-minecraft:
+  enabled: true
+  # IDs dos canais do Discord que enviam para o MC (deixe vazio = todos)
+  channel-ids: []
+  # Formato da mensagem no chat do MC (use & para cores)
+  # Placeholders: %name%, %message%, %toprole%, %toprolecolor%
+  format: "&b[Discord] &e%name% &7>> &f%message%"
+  # Bloquear mensagens de bots do Discord?
+  block-bots: true
+  # Como mostrar emojis: "show" (unicode), "name" (:emoji:), "hide"
+  emoji-behavior: "show"
+  # Como mostrar menções: "show", "format" (nomes), "hide"
+  mention-behavior: "show"
+  # Comprimento máximo da mensagem (0 = sem limite)
+  max-length: 256
+
+# Mensagens do Minecraft -> Discord
+minecraft-to-discord:
+  enabled: true
+  # ID do canal do Discord onde as mensagens do MC vão
+  channel-id: ""
+  # Formato da mensagem no Discord
+  # Placeholders: %primarygroup%, %displayname%, %message%, %world%
+  format: "**%primarygroup%** %displayname% >> %message%"
+  # Requerer um prefixo para enviar (vazio = qualquer mensagem)
+  prefix-required: ""
+  # Usar webhook para mostrar como o jogador no Discord?
+  use-webhook: false
+  # Avatar do webhook (use %uuid% para avatar do jogador)
+  webhook-avatar: "https://mc-heads.net/avatar/%uuid%"
+  # Nome do webhook
+  webhook-name: "%displayname%"
+
+# Conversão de formatação entre Minecraft e Discord
+reserializer:
+  # Converter formatação MC (&a, &b, etc) para Markdown do Discord?
+  to-discord: true
+  # Converter Markdown do Discord para formatação MC?
+  to-minecraft: true

@@ -24,17 +24,19 @@ public final class VipConfig {
             String grantCommand   // %player% será substituído
     ) {}
 
-    private final FileConfiguration config;
+    private final FileConfiguration vipConfig;
+    private final FileConfiguration linkingConfig;
     private final List<VipTier> tiers = new ArrayList<>();
 
-    public VipConfig(FileConfiguration config) {
-        this.config = config;
+    public VipConfig(FileConfiguration vipConfig, FileConfiguration linkingConfig) {
+        this.vipConfig = vipConfig;
+        this.linkingConfig = linkingConfig;
         load();
     }
 
     private void load() {
         tiers.clear();
-        ConfigurationSection section = config.getConfigurationSection("vip.tiers");
+        ConfigurationSection section = vipConfig.getConfigurationSection("tiers");
         if (section == null) return;
         for (String key : section.getKeys(false)) {
             ConfigurationSection t = section.getConfigurationSection(key);
@@ -59,40 +61,40 @@ public final class VipConfig {
     }
 
     public String vipShopChannelId() {
-        return config.getString("vip.discord.shop-channel-id", "");
+        return vipConfig.getString("discord.shop-channel-id", "");
     }
 
     public String vipLogsChannelId() {
-        return config.getString("vip.discord.logs-channel-id", "");
+        return vipConfig.getString("discord.logs-channel-id", "");
     }
 
     public int linkCodeExpirySeconds() {
-        return Math.max(60, config.getInt("vip.link.code-expiry-seconds", 120));
+        return Math.max(60, vipConfig.getInt("link.code-expiry-seconds", 120));
     }
 
     public int purchaseConfirmTimeoutSeconds() {
-        return Math.max(30, config.getInt("vip.purchase.confirm-timeout-seconds", 60));
+        return Math.max(30, vipConfig.getInt("purchase.confirm-timeout-seconds", 60));
     }
 
     public String linkedRoleId() {
-        return config.getString("account-linking.linked-role-id", "");
+        return linkingConfig.getString("linked-role-id", "");
     }
 
     public java.util.List<String> onLinkCommands() {
-        return config.getStringList("account-linking.on-link-commands");
+        return linkingConfig.getStringList("on-link-commands");
     }
 
     public java.util.List<String> onUnlinkCommands() {
-        return config.getStringList("account-linking.on-unlink-commands");
+        return linkingConfig.getStringList("on-unlink-commands");
     }
 
     public String shopImageUrl() {
-        return config.getString("vip.discord.shop-image-url",
+        return vipConfig.getString("discord.shop-image-url",
                 "https://cdn.discordapp.com/attachments/1490081242937557177/1516646686209081424/d3678e7c-7dcd-4af5-af35-fdc15eb0c811.png");
     }
 
     public String shopThumbnailUrl() {
-        return config.getString("vip.discord.shop-thumbnail-url",
+        return vipConfig.getString("discord.shop-thumbnail-url",
                 "https://cdn.discordapp.com/icons/1375700384353484820/a66b5a142f5a32fdb1502785ca875a67.png?size=4096");
     }
 }

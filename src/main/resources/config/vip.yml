@@ -1,0 +1,80 @@
+# ============================================
+#  VIP Shop Configuration
+# ============================================
+# Sistema de loja de VIPs integrado ao Discord.
+
+discord:
+  # ID do canal da loja (onde ficam os embeds de compra)
+  shop-channel-id: ""
+  # ID do canal de logs de compras
+  logs-channel-id: ""
+  # Imagem do embed da loja
+  shop-image-url: "https://cdn.discordapp.com/attachments/1490081242937557177/1516646686209081424/d3678e7c-7dcd-4af5-af35-fdc15eb0c811.png"
+  # Thumbnail do embed
+  shop-thumbnail-url: "https://cdn.discordapp.com/icons/1375700384353484820/a66b5a142f5a32fdb1502785ca875a67.png?size=4096"
+
+link:
+  # Tempo para o código de vinculação expirar
+  code-expiry-seconds: 120
+
+purchase:
+  # Tempo para confirmar a compra (em segundos)
+  confirm-timeout-seconds: 60
+
+# Hierarquia de VIPs (do mais barato ao mais caro)
+tiers:
+  Vip:
+    display-name: "VIP"
+    price: 5000
+    emoji-id: "1516290472979595436"
+    emoji-name: "vip"
+    description: "O plano inicial para apoiadores do servidor."
+    perks:
+      - "Prefixo [VIP] colorido"
+      - "Kit VIP semanal"
+      - "Acesso a comandos exclusivos"
+    grant-command: "lp user %player% parent add vip"
+  Elite:
+    display-name: "Elite"
+    price: 10000
+    emoji-id: "1516290514847269014"
+    emoji-name: "elite"
+    description: "Um nível acima, com mais vantagens."
+    perks:
+      - "Tudo do VIP"
+      - "Kit Elite semanal"
+      - "Voo em mundos de sobrevivência"
+    grant-command: "lp user %player% parent add elite"
+  Ultra:
+    display-name: "Ultra"
+    price: 20000
+    emoji-id: "1516290555653390448"
+    emoji-name: "ultra"
+    description: "Para os jogadores mais dedicados."
+    perks:
+      - "Tudo do Elite"
+      - "Kit Ultra diário"
+      - "Acesso a regiões exclusivas"
+    grant-command: "lp user %player% parent add ultra"
+  Midia:
+    display-name: "Mídia"
+    price: 15000
+    emoji-id: "1516639500317626469"
+    emoji-name: "midia"
+    description: "Para criadores de conteúdo parceiros."
+    perks:
+      - "Tag [Mídia] no chat"
+      - "Kit exclusivo de Mídia"
+    grant-command: "lp user %player% parent add midia"
+  Famoso:
+    display-name: "Famoso"
+    price: 30000
+    emoji-id: "1516639945358577756"
+    emoji-name: "famoso"
+    description: "O plano premium máximo do servidor."
+    perks:
+      - "Tudo do Ultra"
+      - "Tag [Famoso] dourada"
+      - "Kit Famoso diário premium"
+      - "Acesso antecipado a novidades"
+    grant-command: "lp user %player% parent add famoso"

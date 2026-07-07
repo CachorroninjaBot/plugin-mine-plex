@@ -17,13 +17,13 @@ public final class TeamsConfig {
     }
 
     public void reload(FileConfiguration config) {
-        this.enabled = config.getBoolean("teams.enabled", true);
-        this.webEnabled = config.getBoolean("teams.web.enabled", true);
-        this.webPort = config.getInt("teams.web.port", 8080);
-        this.webHost = config.getString("teams.web.host", "0.0.0.0");
-        this.authCodeExpiry = config.getInt("teams.web.auth-code-expiry", 300);
-        this.discordPanelChannelId = config.getString("teams.discord.panel-channel-id", "");
-        this.guiTitle = config.getString("teams.gui.title", "§8§lGerenciar Time");
+        this.enabled = config.getBoolean("enabled", true);
+        this.webEnabled = config.getBoolean("web.enabled", true);
+        this.webPort = config.getInt("web.port", 8080);
+        this.webHost = config.getString("web.host", "0.0.0.0");
+        this.authCodeExpiry = config.getInt("web.auth-code-expiry", 300);
+        this.discordPanelChannelId = config.getString("discord.panel-channel-id", "");
+        this.guiTitle = config.getString("gui.title", "§8§lGerenciar Time");
     }
 
     public boolean enabled() { return enabled; }

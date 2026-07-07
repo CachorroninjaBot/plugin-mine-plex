@@ -1,0 +1,22 @@
+# ============================================
+#  Account Linking Configuration
+# ============================================
+# Sistema para vincular contas Minecraft com Discord.
+
+enabled: true
+
+# Comprimento do código de vinculação
+code-length: 4
+
+# Tempo para o código expirar (em segundos)
+code-expiry-seconds: 120
+
+# ID do cargo do Discord atribuído ao vincular (deixe vazio = nenhum)
+linked-role-id: ""
+
+# Comandos executados no servidor ao vincular uma conta
+# Placeholders: %minecraftplayername%, %minecraftuuid%, %discordid%, %discordname%
+on-link-commands: []
+
+# Comandos executados ao desvincular
+on-unlink-commands: []

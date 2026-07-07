@@ -1,0 +1,55 @@
+# ============================================
+#  Server Events Configuration
+# ============================================
+# Notificações automáticas no Discord quando algo acontece no servidor.
+
+enabled: true
+
+# ID do canal do Discord para notificações
+channel-id: ""
+
+# Usar webhook para mostrar como o jogador?
+use-webhook: false
+
+# Avatar do webhook
+webhook-avatar: "https://mc-heads.net/avatar/%uuid%"
+
+# Jogador entrou no servidor
+join:
+  enabled: true
+  # Placeholders: %displayname%, %username%, %uuid%, %ip%
+  format: "**%displayname%** entrou no servidor."
+  # Cor do embed (formato hex: #RRGGBB)
+  embed-color: "#55FF55"
+  # Thumbnail do embed (usar %uuid% para avatar)
+  embed-thumbnail: "https://mc-heads.net/avatar/%uuid%"
+
+# Primeira vez que o jogador entra
+first-join:
+  enabled: true
+  format: "**%displayname%** entrou pela primeira vez!"
+  embed-color: "#FFAA00"
+  embed-thumbnail: "https://mc-heads.net/avatar/%uuid%"
+
+# Jogador saiu do servidor
+leave:
+  enabled: true
+  format: "**%displayname%** saiu do servidor."
+  embed-color: "#FF5555"
+  embed-thumbnail: "https://mc-heads.net/avatar/%uuid%"
+
+# Jogador morreu
+death:
+  enabled: true
+  # Placeholders: %deathmessage%, %displayname%, %world%, %killer%
+  format: "%deathmessage%"
+  embed-color: "#000000"
+  embed-thumbnail: "https://mc-heads.net/avatar/%uuid%"
+
+# Conquista desbloqueada
+advancement:
+  enabled: true
+  # Placeholders: %displayname%, %advancement%, %advancementdescription%
+  format: "**%displayname%** desbloqueou **%advancement%**"
+  embed-color: "#FFAA00"
+  embed-thumbnail: "https://mc-heads.net/avatar/%uuid%"

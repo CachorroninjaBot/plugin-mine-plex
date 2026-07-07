@@ -1,0 +1,19 @@
+# ============================================
+#  Discord Bot Configuration
+# ============================================
+
+# Ativar/desativar a conexão com o Discord
+enabled: true
+
+# Token do bot (pegue em https://discord.com/developers/applications)
+token: "COLOQUE_O_TOKEN_AQUI"
+
+# ID do servidor (guild) do Discord
+guild-id: ""
+
+# Status exibido no perfil do bot
+activity:
+  enabled: true
+  text: "Monitorando o servidor"
+  # Tipo: PLAYING, WATCHING, LISTENING, COMPETING
+  type: "PLAYING"

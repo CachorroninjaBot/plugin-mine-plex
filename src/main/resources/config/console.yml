@@ -1,0 +1,26 @@
+# ============================================
+#  Console in Discord Configuration
+# ============================================
+# Envia o output do console do servidor para um canal do Discord em tempo real.
+
+enabled: false
+
+# ID do canal do Discord para o console
+channel-id: ""
+
+# Prefixo para executar comandos do servidor pelo Discord
+# Exemplo: "!c stop" executa "stop" no servidor
+command-prefix: "!c"
+
+# Comandos bloqueados (não podem ser executados pelo Discord)
+blocked-commands:
+  - "stop"
+  - "restart"
+  - "reload"
+
+# Formato da mensagem
+# Placeholders: {date}, {level}, {name}, {message}
+format: "[{date} {level}] {message}"
+
+# Nível mínimo de log para enviar (INFO, WARNING, SEVERE)
+min-level: "INFO"

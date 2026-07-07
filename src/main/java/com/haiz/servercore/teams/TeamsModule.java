@@ -26,7 +26,7 @@ public final class TeamsModule {
     }
 
     public void start() {
-        this.teamsConfig = new TeamsConfig(plugin.getConfig());
+        this.teamsConfig = new TeamsConfig(plugin.config().getModuleConfig("teams"));
         if (!teamsConfig.enabled()) {
             plugin.getLogger().info("[Teams] Módulo desativado no config.yml.");
             return;

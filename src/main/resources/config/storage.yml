@@ -1,0 +1,9 @@
+# ============================================
+#  Storage Configuration
+# ============================================
+# Configuração do banco de dados do plugin.
+
+type: "sqlite"
+
+sqlite:
+  file: "haizservercore.db"

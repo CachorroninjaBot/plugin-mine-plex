@@ -1,0 +1,13 @@
+# ============================================
+#  Canned Responses Configuration
+# ============================================
+# O bot responde automaticamente a triggers específicas no Discord.
+
+enabled: false
+
+# Lista de triggers e respostas
+# Placeholders: %playercount%, %playermax%, %serverversion%, %motd%
+responses:
+  "!ip": "play.haiz.com"
+  "!site": "https://haiz.com"
+  "!players": "Jogadores online: %playercount%/%playermax%"

@@ -12,7 +12,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.plugin.java.JavaPlugin;
+
+import com.haiz.servercore.HaizServerCore;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,7 +29,7 @@ import java.util.logging.Logger;
  */
 public final class AutoRepairManager implements Listener {
 
-    private final JavaPlugin plugin;
+    private final HaizServerCore plugin;
     private final Logger log;
     private final VipStorage vipStorage;
     private final VipConfig vipConfig;
@@ -54,7 +55,7 @@ public final class AutoRepairManager implements Listener {
 
     private Object economy = null;
 
-    public AutoRepairManager(JavaPlugin plugin, VipStorage vipStorage, VipConfig vipConfig) {
+    public AutoRepairManager(HaizServerCore plugin, VipStorage vipStorage, VipConfig vipConfig) {
         this.plugin = plugin;
         this.log = plugin.getLogger();
         this.vipStorage = vipStorage;
@@ -81,7 +82,7 @@ public final class AutoRepairManager implements Listener {
     }
 
     private void loadConfig() {
-        ConfigurationSection section = plugin.getConfig().getConfigurationSection("auto-repair");
+        ConfigurationSection section = plugin.config().getModuleConfig("repair");
         if (section == null) {
             enabled = false;
             return;

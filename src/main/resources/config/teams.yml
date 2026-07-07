@@ -1,0 +1,22 @@
+# ============================================
+#  Teams Configuration
+# ============================================
+# Sistema de gerenciamento de times.
+
+enabled: true
+
+# Servidor web para gerenciamento remoto
+web:
+  enabled: true
+  port: 8080
+  host: "0.0.0.0"
+  # Tempo para o código de autenticação expirar (em segundos)
+  auth-code-expiry: 300
+
+# Canal do Discord para o painel de times
+discord:
+  panel-channel-id: ""
+
+# Título do GUI de times no MC
+gui:
+  title: "§8§lGerenciar Time"

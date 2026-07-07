@@ -1,0 +1,15 @@
+# ============================================
+#  Status Webhook Configuration
+# ============================================
+# Notifica quando o servidor liga ou desliga.
+
+enabled: false
+
+# URL do webhook do Discord
+url: ""
+
+# Mensagem quando o servidor liga
+online-message: "## 🟢 **Servidor está ligado.**"
+
+# Mensagem quando o servidor desliga
+offline-message: "## 🛑 **Servidor foi desligado.**"

@@ -1,5 +1,6 @@
 package com.haiz.servercore.storage;
 
+import com.haiz.servercore.HaizServerCore;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -27,7 +28,10 @@ public final class SQLiteDatabase {
         if (!plugin.getDataFolder().exists() && !plugin.getDataFolder().mkdirs()) {
             plugin.getLogger().warning("Nao foi possivel criar a pasta de dados do plugin.");
         }
-        String fileName = plugin.getConfig().getString("storage.sqlite.file", "haizservercore.db");
+        String fileName = "haizservercore.db";
+        if (plugin instanceof HaizServerCore core) {
+            fileName = core.config().getModuleConfig("storage").getString("sqlite.file", "haizservercore.db");
+        }
         File file = new File(plugin.getDataFolder(), fileName);
         this.connection = DriverManager.getConnection("jdbc:sqlite:" + file.getAbsolutePath());
         try (Statement statement = connection.createStatement()) {

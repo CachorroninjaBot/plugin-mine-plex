@@ -68,6 +68,7 @@ public final class HaizCoreCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage("  §7Discord: §f" + plugin.discord().getStateLabel());
         sender.sendMessage("  §7VIPs: §f" + (plugin.vip() != null && plugin.vip().isRunning() ? "§aativo" : "§cinativo"));
         sender.sendMessage("  §7Teams: §f" + (plugin.teams() != null && plugin.teams().isRunning() ? "§aativo" : "§cinativo"));
+        sender.sendMessage("  §7CommandLog: §f" + (plugin.commandLog() != null && plugin.commandLog().isRunning() ? "§aativo" : "§cinativo"));
         sender.sendMessage("  §7Jogadores online: §f" + Bukkit.getOnlinePlayers().size());
         sender.sendMessage("§8§l━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     }

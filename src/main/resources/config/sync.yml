@@ -1,0 +1,28 @@
+# ============================================
+#  Synchronization Configuration
+# ============================================
+# Sincroniza dados entre Minecraft e Discord automaticamente.
+
+# Sincronizar grupos de permissão do MC com cargos do Discord
+group-role:
+  enabled: false
+  # Mapeamento: "grupo_mc" = "ID_CARGO_DISCORD"
+  # Exemplo: {"vip": "1234567890", "admin": "0987654321"}
+  mappings: {}
+  # Quem é autoritário quando há conflito?
+  # "minecraft" = MC define os cargos
+  # "discord" = Discord define os grupos
+  authoritative: "minecraft"
+  # Sincronizar apenas o grupo primário (true) ou todos os grupos (false)?
+  primary-group-only: true
+  # Intervalo de sincronização em minutos (0 = apenas no login/link)
+  cycle-interval-minutes: 0
+
+# Sincronizar apelido do Discord com nome do MC
+nickname:
+  enabled: false
+  # Formato do apelido
+  # Placeholders: %displayname%, %username%, %discord_name%
+  format: "%displayname%"
+  # Intervalo de sincronização em minutos (0 = apenas no login)
+  cycle-interval-minutes: 0

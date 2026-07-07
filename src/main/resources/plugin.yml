@@ -5,7 +5,7 @@ api-version: "1.20.6"
 author: Haiz
 description: Core do servidor Haiz com integração Discord, VIP Shop, Teams e mais.
 folia-supported: false
-softdepend: [Vault, LuckPerms, BetterTeams, IridiumMobCoins]
+softdepend: [Vault, LuckPerms, BetterTeams, IridiumMobCoins, ProtocolLib]
 
 commands:
   haizcore:

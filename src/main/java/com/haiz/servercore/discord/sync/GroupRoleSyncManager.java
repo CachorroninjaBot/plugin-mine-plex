@@ -127,7 +127,7 @@ public final class GroupRoleSyncManager {
     private Map<String, String> getGroupRoleMappings() {
         Map<String, String> mappings = new HashMap<>();
         try {
-            var config = plugin.getConfig().getConfigurationSection("synchronization.group-role.mappings");
+            var config = plugin.config().getModuleConfig("sync").getConfigurationSection("group-role.mappings");
             if (config != null) {
                 for (String key : config.getKeys(false)) {
                     String value = config.getString(key);

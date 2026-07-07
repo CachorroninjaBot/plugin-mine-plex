@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.haiz"
-version = "1.6.3"
+version = "1.7.0"
 
 java {
     toolchain {
@@ -26,6 +26,10 @@ repositories {
         name = "vault"
         url = "https://repo.extendedclip.com/content/repositories/placeholderapi/"
     }
+    maven {
+        name = "protocolLib"
+        url = "https://repo.dmulloy2.net/repository/public/"
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -37,6 +41,7 @@ dependencies {
     compileOnly "org.apache.logging.log4j:log4j-core:2.22.1"
     compileOnly "com.google.code.gson:gson:2.10.1"
     compileOnly "com.github.MilkBowl:VaultAPI:1.7.1"
+    compileOnly "com.comphenix.protocol:ProtocolLib:5.3.0"
 
     implementation("net.dv8tion:JDA:5.0.0") {
         exclude module: "opus-java"
