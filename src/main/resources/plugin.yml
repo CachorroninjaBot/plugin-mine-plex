@@ -3,8 +3,9 @@ version: ${version}
 main: com.haiz.servercore.HaizServerCore
 api-version: "1.20.6"
 author: Haiz
-description: Sistema de VIP com loja integrada ao Discord.
+description: Core do servidor Haiz com integração Discord, VIP Shop, Teams e mais.
 folia-supported: false
+softdepend: [Vault, LuckPerms, BetterTeams, IridiumMobCoins]
 
 commands:
   haizcore:
@@ -13,7 +14,7 @@ commands:
     aliases: [hcore, hsc]
     permission: haizcore.admin
   linkar:
-    description: Vincula sua conta Minecraft ao Discord para comprar VIPs.
+    description: Vincula sua conta Minecraft ao Discord.
     usage: /linkar <código>
     permission: haiz.vip.link
   vipconfig:
@@ -37,6 +38,15 @@ permissions:
   haizcore.vip.send:
     description: Permite enviar a mensagem de loja de VIPs no Discord.
     default: op
+  haizcore.chat.receive:
+    description: Permite receber mensagens do Discord no chat.
+    default: true
+  haizcore.chat.send:
+    description: Permite enviar mensagens do chat para o Discord.
+    default: true
+  haizcore.events.receive:
+    description: Permite receber notificações de eventos.
+    default: true
   haiz.vip.link:
     description: Permite usar /linkar para vincular conta ao Discord.
     default: true
@@ -52,3 +62,6 @@ permissions:
   haiz.teams.use:
     description: Permite usar /time para gerenciar o time.
     default: true
+  haizcore.console:
+    description: Permite executar comandos via console do Discord.
+    default: op

@@ -1,25 +1,245 @@
+# ============================================
+#  HaizServerCore - Configuração Principal
+# ============================================
+# Cada seção controla um módulo diferente do plugin.
+# Desative módulos que não usando para melhor performance.
+
+# ──────────────────────────────────────────────
+# 🤖 BOT DISCORD
+# Configurações gerais da conexão com o Discord.
+# O bot é necessário para a maioria das funcionalidades.
+# ──────────────────────────────────────────────
 discord:
+  # Ativar/desativar a conexão com o Discord
   enabled: true
+  # Token do bot (pegue em https://discord.com/developers/applications)
   token: "COLOQUE_O_TOKEN_AQUI"
+  # ID do servidor (guild) do Discord
   guild-id: ""
+  # Status exibido no perfil do bot
   activity:
     enabled: true
     text: "Monitorando o servidor"
-  status-webhook: ""
+    # Tipo: PLAYING, WATCHING, LISTENING, COMPETING
+    type: "PLAYING"
 
+# ──────────────────────────────────────────────
+# 💬 CHAT BRIDGE
+# Ponte de chat bidirecional entre Discord e Minecraft.
+# Quando ativado, mensagens do Discord aparecem no chat
+# do MC e vice-versa.
+# ──────────────────────────────────────────────
+chat-bridge:
+  enabled: true
+  # Mensagens do Discord -> Minecraft
+  discord-to-minecraft:
+    enabled: true
+    # IDs dos canais do Discord que enviam para o MC (deixe vazio = todos)
+    channel-ids: []
+    # Formato da mensagem no chat do MC (use & para cores)
+    # Placeholders: %name%, %message%, %toprole%, %toprolecolor%
+    format: "&b[Discord] &e%name% &7>> &f%message%"
+    # Bloquear mensagens de bots do Discord?
+    block-bots: true
+    # Como mostrar emojis: "show" (unicode), "name" (:emoji:), "hide"
+    emoji-behavior: "show"
+    # Como mostrar menções: "show", "format" (nomes), "hide"
+    mention-behavior: "show"
+    # Comprimento máximo da mensagem (0 = sem limite)
+    max-length: 256
+  # Mensagens do Minecraft -> Discord
+  minecraft-to-discord:
+    enabled: true
+    # ID do canal do Discord onde as mensagens do MC vão
+    channel-id: ""
+    # Formato da mensagem no Discord
+    # Placeholders: %primarygroup%, %displayname%, %message%, %world%
+    format: "**%primarygroup%** %displayname% >> %message%"
+    # Requerer um prefixo para enviar (vazio = qualquer mensagem)
+    prefix-required: ""
+    # Usar webhook para mostrar como o jogador no Discord?
+    use-webhook: false
+    # Avatar do webhook (use %uuid% para avatar do jogador)
+    webhook-avatar: "https://mc-heads.net/avatar/%uuid%"
+    # Nome do webhook
+    webhook-name: "%displayname%"
+  # Conversão de formatação entre Minecraft e Discord
+  reserializer:
+    # Converter formatação MC (&a, &b, etc) para Markdown do Discord?
+    to-discord: true
+    # Converter Markdown do Discord para formatação MC?
+    to-minecraft: true
+
+# ──────────────────────────────────────────────
+# 🔗 VINCULAÇÃO DE CONTAS
+# Sistema para vincular contas Minecraft com Discord.
+# O jogador recebe um código no MC e envia no DM do bot.
+# ──────────────────────────────────────────────
+account-linking:
+  enabled: true
+  # Comprimento do código de vinculação
+  code-length: 4
+  # Tempo para o código expirar (em segundos)
+  code-expiry-seconds: 120
+  # ID do cargo do Discord atribuído ao vincular (deixe vazio = nenhum)
+  linked-role-id: ""
+  # Comandos executados no servidor ao vincular uma conta
+  # Placeholders: %minecraftplayername%, %minecraftuuid%, %discordid%, %discordname%
+  on-link-commands: []
+  # Comandos executados ao desvincular
+  on-unlink-commands: []
+
+# ──────────────────────────────────────────────
+# 📢 EVENTOS DO SERVIDOR
+# Notificações automáticas no Discord quando algo
+# acontece no servidor (entradas, saídas, mortes, etc).
+# ──────────────────────────────────────────────
+events:
+  enabled: true
+  # ID do canal do Discord para notificações
+  channel-id: ""
+  # Usar webhook para mostrar como o jogador?
+  use-webhook: false
+  # Avatar do webhook
+  webhook-avatar: "https://mc-heads.net/avatar/%uuid%"
+  # Jogador entrou no servidor
+  join:
+    enabled: true
+    # Placeholders: %displayname%, %username%, %uuid%, %ip%
+    format: "**%displayname%** entrou no servidor."
+    # Cor do embed (formato hex: #RRGGBB)
+    embed-color: "#55FF55"
+    # Thumbnail do embed (usar %uuid% para avatar)
+    embed-thumbnail: "https://mc-heads.net/avatar/%uuid%"
+  # Primeira vez que o jogador entra
+  first-join:
+    enabled: true
+    format: "**%displayname%** entrou pela primeira vez!"
+    embed-color: "#FFAA00"
+    embed-thumbnail: "https://mc-heads.net/avatar/%uuid%"
+  # Jogador saiu do servidor
+  leave:
+    enabled: true
+    format: "**%displayname%** saiu do servidor."
+    embed-color: "#FF5555"
+    embed-thumbnail: "https://mc-heads.net/avatar/%uuid%"
+  # Jogador morreu
+  death:
+    enabled: true
+    # Placeholders: %deathmessage%, %displayname%, %world%, %killer%
+    format: "%deathmessage%"
+    embed-color: "#000000"
+    embed-thumbnail: "https://mc-heads.net/avatar/%uuid%"
+  # Conquista desbloqueada
+  advancement:
+    enabled: true
+    # Placeholders: %displayname%, %advancement%, %advancementdescription%
+    format: "**%displayname%** desbloqueou **%advancement%**"
+    embed-color: "#FFAA00"
+    embed-thumbnail: "https://mc-heads.net/avatar/%uuid%"
+
+# ──────────────────────────────────────────────
+# 🔄 SINCRONIZAÇÃO
+# Sincroniza dados entre Minecraft e Discord
+# automaticamente. Requer Vault para sync de grupos.
+# ──────────────────────────────────────────────
+synchronization:
+  # Sincronizar grupos de permissão do MC com cargos do Discord
+  group-role:
+    enabled: false
+    # Mapeamento: "grupo_mc" = "ID_CARGO_DISCORD"
+    # Exemplo: {"vip": "1234567890", "admin": "0987654321"}
+    mappings: {}
+    # Quem é autoritário quando há conflito?
+    # "minecraft" = MC define os cargos
+    # "discord" = Discord define os grupos
+    authoritative: "minecraft"
+    # Sincronizar apenas o grupo primário (true) ou todos os grupos (false)?
+    primary-group-only: true
+    # Intervalo de sincronização em minutos (0 = apenas no login/link)
+    cycle-interval-minutes: 0
+  # Sincronizar apelido do Discord com nome do MC
+  nickname:
+    enabled: false
+    # Formato do apelido
+    # Placeholders: %displayname%, %username%, %discord_name%
+    format: "%displayname%"
+    # Intervalo de sincronização em minutos (0 = apenas no login)
+    cycle-interval-minutes: 0
+
+# ──────────────────────────────────────────────
+# 📺 CONSOLE NO DISCORD
+# Envia o output do console do servidor para um
+# canal do Discord em tempo real.
+# ──────────────────────────────────────────────
+console:
+  enabled: false
+  # ID do canal do Discord para o console
+  channel-id: ""
+  # Prefixo para executar comandos do servidor pelo Discord
+  # Exemplo: "!c stop" executa "stop" no servidor
+  command-prefix: "!c"
+  # Comandos bloqueados (não podem ser executados pelo Discord)
+  blocked-commands:
+    - "stop"
+    - "restart"
+    - "reload"
+  # Formato da mensagem
+  # Placeholders: {date}, {level}, {name}, {message}
+  format: "[{date} {level}] {message}"
+  # Nível mínimo de log para enviar (INFO, WARNING, SEVERE)
+  min-level: "INFO"
+
+# ──────────────────────────────────────────────
+# 💬 RESPOSTAS AUTOMÁTICAS
+# O bot responde automaticamente a triggers específicas
+# no Discord. Útil para informações rápidas.
+# ──────────────────────────────────────────────
+canned-responses:
+  enabled: false
+  # Lista de triggers e respostas
+  # Placeholders: %playercount%, %playermax%, %serverversion%, %motd%
+  responses:
+    "!ip": "play.haiz.com"
+    "!site": "https://haiz.com"
+    "!players": "Jogadores online: %playercount%/%playermax%"
+
+# ──────────────────────────────────────────────
+# 🟢 STATUS DO SERVIDOR
+# Notifica quando o servidor liga ou desliga.
+# Usa webhook para enviar mensagem no Discord.
+# ──────────────────────────────────────────────
+status-webhook:
+  enabled: false
+  # URL do webhook do Discord
+  url: ""
+  # Mensagem quando o servidor liga
+  online-message: "## 🟢 **Servidor está ligado.**"
+  # Mensagem quando o servidor desliga
+  offline-message: "## 🛑 **Servidor foi desligado.**"
+
+# ──────────────────────────────────────────────
+# 💎 VIP SHOP
+# Sistema de loja de VIPs integrado ao Discord.
+# Jogadores compram VIPs usando MobCoins.
+# ──────────────────────────────────────────────
 vip:
   discord:
-    shop-channel-id: "ID_DO_CANAL_DE_VIPS"
-    logs-channel-id: "ID_DO_CANAL_DE_LOGS"
+    # ID do canal da loja (onde ficam os embeds de compra)
+    shop-channel-id: ""
+    # ID do canal de logs de compras
+    logs-channel-id: ""
+    # Imagem do embed da loja
     shop-image-url: "https://cdn.discordapp.com/attachments/1490081242937557177/1516646686209081424/d3678e7c-7dcd-4af5-af35-fdc15eb0c811.png"
+    # Thumbnail do embed
     shop-thumbnail-url: "https://cdn.discordapp.com/icons/1375700384353484820/a66b5a142f5a32fdb1502785ca875a67.png?size=4096"
-
   link:
+    # Tempo para o código de vinculação expirar
     code-expiry-seconds: 120
-
   purchase:
+    # Tempo para confirmar a compra (em segundos)
     confirm-timeout-seconds: 60
-
+  # Hierarquia de VIPs (do mais barato ao mais caro)
   tiers:
     Vip:
       display-name: "VIP"
@@ -32,7 +252,6 @@ vip:
         - "Kit VIP semanal"
         - "Acesso a comandos exclusivos"
       grant-command: "lp user %player% parent add vip"
-
     Elite:
       display-name: "Elite"
       price: 10000
@@ -44,7 +263,6 @@ vip:
         - "Kit Elite semanal"
         - "Voo em mundos de sobrevivência"
       grant-command: "lp user %player% parent add elite"
-
     Ultra:
       display-name: "Ultra"
       price: 20000
@@ -56,7 +274,6 @@ vip:
         - "Kit Ultra diário"
         - "Acesso a regiões exclusivas"
       grant-command: "lp user %player% parent add ultra"
-
     Midia:
       display-name: "Mídia"
       price: 15000
@@ -67,7 +284,6 @@ vip:
         - "Tag [Mídia] no chat"
         - "Kit exclusivo de Mídia"
       grant-command: "lp user %player% parent add midia"
-
     Famoso:
       display-name: "Famoso"
       price: 30000
@@ -81,31 +297,41 @@ vip:
         - "Acesso antecipado a novidades"
       grant-command: "lp user %player% parent add famoso"
 
-storage:
-  type: "sqlite"
-  sqlite:
-    file: "haizservercore.db"
-
+# ──────────────────────────────────────────────
+# 🔧 AUTO REPAIR
+# Sistema de reparo automático de itens.
+# Jogadores podem reparar itens usando economia.
+# ──────────────────────────────────────────────
 auto-repair:
   enabled: true
-  apply-to-all: false
+  # Aplicar reparo automático em todos os itens (true) ou apenas no item da mão (false)?
+  apply-to-usel: false
+  # Usar economia (Vault) para cobrar pelo reparo?
   use-economy: true
+  # Multiplicador de durabilidade (0.5 = repara até 50% da durabilidade máxima)
   durability-multiplier: 0.5
+  # Cooldown entre reparos (em segundos)
   cooldown-hand: 5
   cooldown-all: 10
+  # Som ao reparar
   play-sound: true
+  # Enviar mensagem ao reparar
   send-message: true
+  # Mensagens
   message-hand: "§8[§bHaizCore§8] §aItem na mão reparado!"
   message-all: "§8[§bHaizCore§8] §aTodos os itens reparados!"
   message-cooldown: "§8[§bHaizCore§8] §cAguarde §f%time% §cpara reparar novamente."
   message-insufficient-funds: "§8[§bHaizCore§8] §cVocê precisa de §f$%cost% §cpara reparar."
+  # Tiers de VIP que repararam grátis
   free-tiers:
     - "Ultra"
     - "Famoso"
     - "Midia"
+  # Materiais que não podem ser reparados
   blacklisted-materials:
     - "ELYTRA"
     - "SHIELD"
+  # Custo de reparo por material
   material-costs:
     WOODEN_SWORD: 5.0
     WOODEN_PICKAXE: 5.0
@@ -146,7 +372,8 @@ auto-repair:
     FLINT_AND_STEEL: 15.0
     FISHING_ROD: 10.0
     CARROT_ON_A_STICK: 10.0
-    WARRED_FISHING_ROD: 10.0
+    WARRIOR_FISHING_ROD: 10.0
+  # Limites de durabilidade customizados (repara quando atinge esse valor)
   custom-thresholds:
     DIAMOND_PICKAXE: 3
     DIAMOND_AXE: 3
@@ -155,19 +382,32 @@ auto-repair:
     NETHERITE_AXE: 3
     NETHERITE_SWORD: 3
 
-updater:
-  github-owner: "HaizMC"
-  github-repo: "HaizServerCore"
-  check-interval-minutes: 30
+# ──────────────────────────────────────────────
+# 💾 ARMAZENAMENTO
+# Configuração do banco de dados do plugin.
+# ──────────────────────────────────────────────
+storage:
+  type: "sqlite"
+  sqlite:
+    file: "haizservercore.db"
 
+# ──────────────────────────────────────────────
+# 👥 TEAMS
+# Sistema de gerenciamento de times.
+# Requer BetterTeams no servidor.
+# ──────────────────────────────────────────────
 teams:
   enabled: true
+  # Servidor web para gerenciamento remoto
   web:
     enabled: true
     port: 8080
     host: "0.0.0.0"
+    # Tempo para o código de autenticação expirar (em segundos)
     auth-code-expiry: 300
+  # Canal do Discord para o painel de times
   discord:
     panel-channel-id: ""
+  # Título do GUI de times no MC
   gui:
     title: "§8§lGerenciar Time"

@@ -4,8 +4,16 @@ import com.haiz.servercore.commands.HaizCoreCommand;
 import com.haiz.servercore.config.ConfigManager;
 import com.haiz.servercore.discord.DiscordBotManager;
 import com.haiz.servercore.discord.ServerStatusNotifier;
+import com.haiz.servercore.discord.chat.ChatBridgeListener;
+import com.haiz.servercore.discord.chat.GameChatListener;
+import com.haiz.servercore.discord.console.ConsoleChannelManager;
+import com.haiz.servercore.discord.events.PlayerAdvancementListener;
+import com.haiz.servercore.discord.events.PlayerDeathListener;
+import com.haiz.servercore.discord.events.PlayerJoinLeaveListener;
+import com.haiz.servercore.discord.responses.CannedResponseManager;
+import com.haiz.servercore.discord.sync.GroupRoleSyncManager;
+import com.haiz.servercore.discord.sync.NicknameSyncManager;
 import com.haiz.servercore.storage.SQLiteDatabase;
-import com.haiz.servercore.update.UpdateManager;
 import com.haiz.servercore.teams.TeamsModule;
 import com.haiz.servercore.vip.VipModule;
 
@@ -20,20 +28,20 @@ public final class HaizServerCore extends JavaPlugin {
     private ServerStatusNotifier statusNotifier;
     private VipModule vipModule;
     private TeamsModule teamsModule;
-    private UpdateManager updateManager;
+
+    private ChatBridgeListener chatBridgeListener;
+    private GameChatListener gameChatListener;
+    private PlayerJoinLeaveListener joinLeaveListener;
+    private PlayerDeathListener deathListener;
+    private PlayerAdvancementListener advancementListener;
+    private GroupRoleSyncManager groupRoleSyncManager;
+    private NicknameSyncManager nicknameSyncManager;
+    private ConsoleChannelManager consoleChannelManager;
+    private CannedResponseManager cannedResponseManager;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
-
-        this.updateManager = new UpdateManager(this,
-                getConfig().getString("updater.github-owner", "HaizMC"),
-                getConfig().getString("updater.github-repo", "HaizServerCore"),
-                getConfig().getInt("updater.check-interval-minutes", 30));
-
-        if (updateManager.applyPendingUpdate()) return;
-
-        updateManager.mergeConfig();
 
         this.configManager = new ConfigManager(this);
         this.configManager.reload();
@@ -44,7 +52,7 @@ public final class HaizServerCore extends JavaPlugin {
         this.sqliteDatabase = new SQLiteDatabase(this);
 
         this.statusNotifier = new ServerStatusNotifier(this,
-                getConfig().getString("discord.status-webhook", ""));
+                configManager.statusWebhookUrl());
         Bukkit.getScheduler().runTaskLater(this, () -> statusNotifier.sendOnlineStatus(), 60L);
 
         this.vipModule = new VipModule(this);
@@ -53,7 +61,7 @@ public final class HaizServerCore extends JavaPlugin {
         this.teamsModule = new TeamsModule(this);
         this.teamsModule.start();
 
-        this.updateManager.start();
+        Bukkit.getScheduler().runTaskLater(this, this::startDiscordModules, 40L);
 
         PluginCommand command = getCommand("haizcore");
         if (command != null) {
@@ -65,18 +73,106 @@ public final class HaizServerCore extends JavaPlugin {
         getLogger().info("HaizServerCore habilitado. Discord=" + discordBotManager.getStateLabel() + " Versão=" + getDescription().getVersion());
     }
 
+    private void startDiscordModules() {
+        if (!discordBotManager.isOnline()) {
+            getLogger().warning("[Discord] Bot não está online. Módulos Discord não iniciados.");
+            return;
+        }
+
+        if (configManager.isChatBridgeEnabled()) {
+            chatBridgeListener = new ChatBridgeListener(this);
+            discordBotManager.addListener(chatBridgeListener);
+
+            if (configManager.isMinecraftToDiscordEnabled()) {
+                gameChatListener = new GameChatListener(this);
+                Bukkit.getPluginManager().registerEvents(gameChatListener, this);
+            }
+            getLogger().info("[ChatBridge] Módulo iniciado.");
+        }
+
+        if (configManager.isEventsEnabled()) {
+            joinLeaveListener = new PlayerJoinLeaveListener(this);
+            Bukkit.getPluginManager().registerEvents(joinLeaveListener, this);
+
+            if (configManager.isEventDeathEnabled()) {
+                deathListener = new PlayerDeathListener(this);
+                Bukkit.getPluginManager().registerEvents(deathListener, this);
+            }
+
+            if (configManager.isEventAdvancementEnabled()) {
+                advancementListener = new PlayerAdvancementListener(this);
+                Bukkit.getPluginManager().registerEvents(advancementListener, this);
+            }
+            getLogger().info("[Events] Módulo iniciado.");
+        }
+
+        if (configManager.isGroupRoleSyncEnabled()) {
+            groupRoleSyncManager = new GroupRoleSyncManager(this);
+            groupRoleSyncManager.start();
+        }
+
+        if (configManager.isNicknameSyncEnabled()) {
+            nicknameSyncManager = new NicknameSyncManager(this);
+            nicknameSyncManager.start();
+        }
+
+        if (configManager.isConsoleEnabled()) {
+            consoleChannelManager = new ConsoleChannelManager(this);
+            consoleChannelManager.start();
+        }
+
+        if (configManager.isCannedResponsesEnabled()) {
+            cannedResponseManager = new CannedResponseManager(this);
+            cannedResponseManager.start();
+        }
+    }
+
+    private void stopDiscordModules() {
+        if (chatBridgeListener != null) {
+            discordBotManager.removeListener(chatBridgeListener);
+            chatBridgeListener = null;
+        }
+        if (gameChatListener != null) {
+            gameChatListener = null;
+        }
+        if (joinLeaveListener != null) {
+            joinLeaveListener = null;
+        }
+        if (deathListener != null) {
+            deathListener = null;
+        }
+        if (advancementListener != null) {
+            advancementListener = null;
+        }
+        if (groupRoleSyncManager != null) {
+            groupRoleSyncManager.stop();
+            groupRoleSyncManager = null;
+        }
+        if (nicknameSyncManager != null) {
+            nicknameSyncManager.stop();
+            nicknameSyncManager = null;
+        }
+        if (consoleChannelManager != null) {
+            consoleChannelManager.stop();
+            consoleChannelManager = null;
+        }
+        if (cannedResponseManager != null) {
+            cannedResponseManager.stop();
+            cannedResponseManager = null;
+        }
+    }
+
     @Override
     public void onDisable() {
         statusNotifier.sendOfflineStatus();
+
+        stopDiscordModules();
 
         if (vipModule != null) {
             vipModule.stop();
         }
         if (teamsModule != null) {
             teamsModule.stop();
-        }
-        if (updateManager != null) {
-            updateManager.stop();
         }
         if (discordBotManager != null) {
             discordBotManager.stop();
@@ -88,11 +184,6 @@ public final class HaizServerCore extends JavaPlugin {
     }
 
     public void reloadEverything() {
-        if (updateManager != null && updateManager.isUpdateDownloaded()) {
-            updateManager.applyPendingUpdate();
-            return;
-        }
-
         reloadConfig();
         configManager.reload();
         if (discordBotManager != null) {
@@ -104,14 +195,7 @@ public final class HaizServerCore extends JavaPlugin {
         if (teamsModule != null) {
             teamsModule.reload();
         }
-        if (updateManager != null) {
-            updateManager.stop();
-            updateManager = new UpdateManager(this,
-                    getConfig().getString("updater.github-owner", "HaizMC"),
-                    getConfig().getString("updater.github-repo", "HaizServerCore"),
-                    getConfig().getInt("updater.check-interval-minutes", 30));
-            updateManager.start();
-        }
+        Bukkit.getScheduler().runTaskLater(this, this::startDiscordModules, 40L);
     }
 
     public ConfigManager config() { return configManager; }
@@ -119,5 +203,4 @@ public final class HaizServerCore extends JavaPlugin {
     public VipModule vip() { return vipModule; }
     public TeamsModule teams() { return teamsModule; }
     public SQLiteDatabase sqliteDatabase() { return sqliteDatabase; }
-    public UpdateManager updateManager() { return updateManager; }
 }

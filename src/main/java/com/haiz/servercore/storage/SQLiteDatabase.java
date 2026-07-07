@@ -5,6 +5,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -43,6 +45,24 @@ public final class SQLiteDatabase {
             open();
         }
         return connection;
+    }
+
+    public String getDiscordIdByUuid(String uuid) {
+        try {
+            Connection conn = connection();
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "SELECT discord_id FROM discord_links WHERE uuid = ?")) {
+                ps.setString(1, uuid);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getString("discord_id");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().warning("[SQLite] Falha ao buscar discord_id: " + e.getMessage());
+        }
+        return null;
     }
 
     public synchronized void close() {

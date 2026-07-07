@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
 public final class DiscordBotManager {
@@ -36,11 +37,27 @@ public final class DiscordBotManager {
         state = State.STARTING;
         CompletableFuture.runAsync(() -> {
             try {
-                JDABuilder builder = JDABuilder.createDefault(token, EnumSet.of(GatewayIntent.GUILD_MESSAGES));
+                EnumSet<GatewayIntent> intents = EnumSet.of(
+                        GatewayIntent.GUILD_MESSAGES,
+                        GatewayIntent.GUILD_MESSAGE_REACTIONS,
+                        GatewayIntent.MESSAGE_CONTENT
+                );
+
+                JDABuilder builder = JDABuilder.createDefault(token, intents);
                 builder.setStatus(OnlineStatus.ONLINE);
+
                 if (plugin.config().isActivityEnabled()) {
-                    builder.setActivity(Activity.playing(plugin.config().activityText()));
+                    String activityType = plugin.config().activityType();
+                    String activityText = plugin.config().activityText();
+                    Activity activity = switch (activityType.toUpperCase(java.util.Locale.ROOT)) {
+                        case "WATCHING" -> Activity.watching(activityText);
+                        case "LISTENING" -> Activity.listening(activityText);
+                        case "COMPETING" -> Activity.competing(activityText);
+                        default -> Activity.playing(activityText);
+                    };
+                    builder.setActivity(activity);
                 }
+
                 JDA built = builder.build();
                 built.awaitReady();
                 this.jda = built;
@@ -52,6 +69,20 @@ public final class DiscordBotManager {
                         .warning("Discord falhou ao iniciar. Erro: " + exception.getMessage());
             }
         });
+    }
+
+    public void addListener(ListenerAdapter listener) {
+        JDA current = jda;
+        if (current != null) {
+            current.addEventListener(listener);
+        }
+    }
+
+    public void removeListener(ListenerAdapter listener) {
+        JDA current = jda;
+        if (current != null) {
+            current.removeEventListener(listener);
+        }
     }
 
     public void reload() {
