@@ -20,10 +20,10 @@ public final class TeamBankGUI {
         Inventory inv = Bukkit.createInventory(new BankHolder(team), 36, "§8§lBanco do Time");
 
         inv.setItem(11, TeamMainMenu.createItem(Material.GOLD_BLOCK, "§6§lSaldo",
-                "§7Saldo atual: §a$" + String.format("%.2f", bridge.getTeamMoney(team))));
+                "§7Saldo atual: §a$" + bridge.getTeamBalance(team)));
 
         inv.setItem(13, TeamMainMenu.createItem(Material.EXPERIENCE_BOTTLE, "§b§lScore",
-                "§7Score do time: §a" + String.format("%.0f", bridge.getTeamScore(team)),
+                "§7Score do time: §a" + bridge.getTeamScore(team),
                 "§7Level: §a" + bridge.getTeamLevel(team)));
 
         inv.setItem(15, TeamMainMenu.createItem(Material.EMERALD, "§a§lDepositar",

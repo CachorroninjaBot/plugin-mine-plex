@@ -48,7 +48,7 @@ public final class TeamInfoHandler implements HttpHandler {
         resp.addProperty("pvp", bridge.isTeamPvp(team));
         resp.addProperty("level", bridge.getTeamLevel(team));
         resp.addProperty("score", bridge.getTeamScore(team));
-        resp.addProperty("money", bridge.getTeamMoney(team));
+        resp.addProperty("money", bridge.getTeamBalance(team));
 
         Object home = bridge.getTeamHome(team);
         if (home != null) {

@@ -23,7 +23,7 @@ public final class TeamLevelGUI {
 
         inv.setItem(11, TeamMainMenu.createItem(Material.EXPERIENCE_BOTTLE, "§b§lLevel Atual",
                 "§7Level: §a" + level,
-                "§7Score: §a" + String.format("%.0f", score)));
+                "§7Score: §a" + score));
 
         inv.setItem(13, TeamMainMenu.createItem(Material.DIAMOND, "§e§lInformações",
                 "§7Limite de membros: §a" + getLevelLimit(level),

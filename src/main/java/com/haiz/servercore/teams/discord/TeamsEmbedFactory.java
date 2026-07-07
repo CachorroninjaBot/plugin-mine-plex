@@ -33,11 +33,11 @@ public final class TeamsEmbedFactory {
 
             children.add(DataObject.empty()
                     .put("type", 10)
-                    .put("content", "**Tag:** `" + bridge.getTeamTag(team) + "` | **Level:** " + bridge.getTeamLevel(team) + " | **Score:** " + String.format("%.0f", bridge.getTeamScore(team))));
+                    .put("content", "**Tag:** `" + bridge.getTeamTag(team) + "` | **Level:** " + bridge.getTeamLevel(team) + " | **Score:** " + bridge.getTeamScore(team)));
 
             children.add(DataObject.empty()
                     .put("type", 10)
-                    .put("content", "**Membros:** " + bridge.getMembers(team).size() + " | **Banco:** $" + String.format("%.2f", bridge.getTeamMoney(team))));
+                    .put("content", "**Membros:** " + bridge.getMembers(team).size() + " | **Banco:** $" + bridge.getTeamBalance(team)));
 
             String desc = bridge.getTeamDescription(team);
             if (desc != null && !desc.isEmpty()) {
@@ -131,11 +131,11 @@ public final class TeamsEmbedFactory {
 
             children.add(DataObject.empty()
                     .put("type", 10)
-                    .put("content", "**Saldo:** $" + String.format("%.2f", bridge.getTeamMoney(team))));
+                    .put("content", "**Saldo:** $" + bridge.getTeamBalance(team)));
 
             children.add(DataObject.empty()
                     .put("type", 10)
-                    .put("content", "**Score:** " + String.format("%.0f", bridge.getTeamScore(team))));
+                    .put("content", "**Score:** " + bridge.getTeamScore(team)));
 
             children.add(DataObject.empty()
                     .put("type", 10)

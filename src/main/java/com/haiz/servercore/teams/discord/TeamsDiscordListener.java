@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -104,7 +105,8 @@ public final class TeamsDiscordListener extends ListenerAdapter {
                 if (warps.isEmpty()) {
                     sb.append("_Nenhuma warp definida._");
                 } else {
-                    warps.forEach((name, warp) -> {
+                    for (Object warp : warps) {
+                        String name = bridge.getWarpName(warp);
                         var loc = bridge.getWarpLocation(warp);
                         sb.append("• **").append(name).append("**");
                         if (loc != null && loc.getWorld() != null) {
@@ -114,13 +116,13 @@ public final class TeamsDiscordListener extends ListenerAdapter {
                                     .append(", ").append(String.format("%.0f", loc.getZ())).append("`");
                         }
                         sb.append("\n");
-                    });
+                    }
                 }
                 event.reply(sb.toString()).setEphemeral(true).queue();
             }
             case "allies" -> {
                 StringBuilder sb = new StringBuilder("**Alianças:**\n");
-                Set<UUID> allies = bridge.getAllies(team);
+                Set<UUID> allies = bridge.getAllyIds(team);
                 if (allies.isEmpty()) {
                     sb.append("_Nenhuma aliança._");
                 } else {
@@ -156,11 +158,11 @@ public final class TeamsDiscordListener extends ListenerAdapter {
                 String info = String.format(
                         "**Level do Time:**\n" +
                         "• Level: **%d**\n" +
-                        "• Score: **%.0f**\n" +
-                        "• Banco: **$%.2f**",
+                        "• Score: **%d**\n" +
+                        "• Banco: **$%s**",
                         bridge.getTeamLevel(team),
                         bridge.getTeamScore(team),
-                        bridge.getTeamMoney(team)
+                        bridge.getTeamBalance(team)
                 );
                 event.reply(info).setEphemeral(true).queue();
             }

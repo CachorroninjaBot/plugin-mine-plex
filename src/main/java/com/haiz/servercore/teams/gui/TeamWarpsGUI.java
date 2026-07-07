@@ -13,7 +13,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public final class TeamWarpsGUI {
 
@@ -21,7 +20,7 @@ public final class TeamWarpsGUI {
 
     public static void open(TeamsModule module, Player player, Object team) {
         TeamsBridge bridge = module.bridge();
-        Map<String, Object> warps = bridge.getWarps(team);
+        List<Object> warps = bridge.getWarps(team);
         boolean isOwner = bridge.isOwner(team, player.getUniqueId());
         boolean isAdmin = bridge.isAdmin(team, player.getUniqueId());
 
@@ -30,12 +29,13 @@ public final class TeamWarpsGUI {
         Inventory inv = Bukkit.createInventory(new WarpsHolder(team), rows * 9, "§8§lWarps do Time");
 
         int i = 0;
-        for (Map.Entry<String, Object> entry : warps.entrySet()) {
-            Location loc = bridge.getWarpLocation(entry.getValue());
+        for (Object warp : warps) {
+            String warpName = bridge.getWarpName(warp);
+            Location loc = bridge.getWarpLocation(warp);
             ItemStack item = new ItemStack(Material.ENDER_PEARL);
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
-                meta.setDisplayName("§e§l" + entry.getKey());
+                meta.setDisplayName("§e§l" + warpName);
                 List<String> lore = new ArrayList<>();
                 if (loc != null && loc.getWorld() != null) {
                     lore.add("§7Mundo: §f" + loc.getWorld().getName());
@@ -72,8 +72,9 @@ public final class TeamWarpsGUI {
         @Override
         public void handleClick(TeamsModule module, Player player, int slot, ClickType clickType) {
             TeamsBridge bridge = module.bridge();
-            Map<String, Object> warps = bridge.getWarps(team);
-            List<String> warpNames = new ArrayList<>(warps.keySet());
+        List<Object> warps = bridge.getWarps(team);
+            List<String> warpNames = new ArrayList<>();
+            for (Object w : warps) warpNames.add(bridge.getWarpName(w));
 
             int lastRowStart = (player.getOpenInventory().getTopInventory().getSize() / 9 - 1) * 9;
             if (slot == lastRowStart + 8) {
@@ -89,11 +90,15 @@ public final class TeamWarpsGUI {
             String warpName = warpNames.get(slot);
 
             if (clickType == ClickType.LEFT) {
-                Object warp = warps.get(warpName);
-                Location loc = bridge.getWarpLocation(warp);
-                if (loc != null) {
-                    player.teleport(loc);
-                    player.sendMessage("§aTeletransportado para o warp §f" + warpName + "§a!");
+                for (Object w : warps) {
+                    if (bridge.getWarpName(w).equals(warpName)) {
+                        Location loc = bridge.getWarpLocation(w);
+                        if (loc != null) {
+                            player.teleport(loc);
+                            player.sendMessage("§aTeletransportado para o warp §f" + warpName + "§a!");
+                        }
+                        break;
+                    }
                 }
             } else if (clickType == ClickType.RIGHT) {
                 if (bridge.isOwner(team, player.getUniqueId()) || bridge.isAdmin(team, player.getUniqueId())) {

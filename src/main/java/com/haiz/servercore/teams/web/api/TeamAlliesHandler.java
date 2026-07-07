@@ -51,7 +51,7 @@ public final class TeamAlliesHandler implements HttpHandler {
         JsonObject resp = new JsonObject();
         JsonArray allies = new JsonArray();
 
-        Set<UUID> allyIds = bridge.getAllies(team);
+        Set<UUID> allyIds = bridge.getAllyIds(team);
         for (UUID allyId : allyIds) {
             JsonObject allyJson = new JsonObject();
             allyJson.addProperty("id", allyId.toString());

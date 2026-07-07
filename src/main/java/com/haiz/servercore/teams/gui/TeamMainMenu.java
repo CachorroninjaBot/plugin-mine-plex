@@ -54,12 +54,12 @@ public final class TeamMainMenu {
                 "§7Aliados: §f" + bridge.getAllies(team).size()));
 
         inv.setItem(15, createItem(Material.GOLD_INGOT, "§e§lBanco",
-                "§7Saldo: §a$" + String.format("%.2f", bridge.getTeamMoney(team)),
+                "§7Saldo: §a$" + bridge.getTeamBalance(team),
                 "§7Clique para depositar/sacar"));
 
         inv.setItem(16, createItem(Material.EXPERIENCE_BOTTLE, "§e§lLevel",
                 "§7Level: §a" + bridge.getTeamLevel(team),
-                "§7Score: §a" + String.format("%.0f", bridge.getTeamScore(team))));
+                "§7Score: §a" + bridge.getTeamScore(team)));
 
         inv.setItem(22, createItem(Material.NAME_TAG, "§e§lTag",
                 "§7Tag atual: §f" + bridge.getTeamTag(team),

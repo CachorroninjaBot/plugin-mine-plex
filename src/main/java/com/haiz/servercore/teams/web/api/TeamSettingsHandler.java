@@ -53,10 +53,13 @@ public final class TeamSettingsHandler implements HttpHandler {
         boolean success = false;
 
         switch (setting) {
-            case "name" -> success = bridge.setTeamName(team, value);
+            case "name" -> {
+                org.bukkit.entity.Player source = org.bukkit.Bukkit.getPlayer(playerUUID);
+                success = source != null && bridge.setTeamName(team, value, source);
+            }
             case "tag" -> success = bridge.setTeamTag(team, value);
             case "description" -> success = bridge.setTeamDescription(team, value);
-            case "color" -> success = bridge.setTeamColor(team, value);
+            case "color" -> success = bridge.setTeamColorByName(team, value);
             case "open" -> success = bridge.setTeamOpen(team, Boolean.parseBoolean(value));
             case "pvp" -> success = bridge.setTeamPvp(team, Boolean.parseBoolean(value));
             default -> {

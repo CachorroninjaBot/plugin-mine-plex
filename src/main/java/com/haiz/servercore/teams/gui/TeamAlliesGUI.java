@@ -21,7 +21,7 @@ public final class TeamAlliesGUI {
 
     public static void open(TeamsModule module, Player player, Object team) {
         TeamsBridge bridge = module.bridge();
-        Set<UUID> allies = bridge.getAllies(team);
+        Set<UUID> allies = bridge.getAllyIds(team);
         boolean isOwner = bridge.isOwner(team, player.getUniqueId());
 
         int rows = Math.max(3, (int) Math.ceil((allies.size() + 2) / 9.0) + 1);
@@ -64,7 +64,7 @@ public final class TeamAlliesGUI {
         @Override
         public void handleClick(TeamsModule module, Player player, int slot, ClickType clickType) {
             TeamsBridge bridge = module.bridge();
-            List<UUID> allies = new ArrayList<>(bridge.getAllies(team));
+            List<UUID> allies = new ArrayList<>(bridge.getAllyIds(team));
 
             int lastRowStart = (player.getOpenInventory().getTopInventory().getSize() / 9 - 1) * 9;
             if (slot == lastRowStart + 8) {

@@ -9,7 +9,7 @@ import com.sun.net.httpserver.HttpHandler;
 import org.bukkit.Location;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 public final class TeamWarpsHandler implements HttpHandler {
@@ -48,11 +48,11 @@ public final class TeamWarpsHandler implements HttpHandler {
         JsonObject resp = new JsonObject();
         JsonArray warps = new JsonArray();
 
-        Map<String, Object> warpMap = bridge.getWarps(team);
-        for (Map.Entry<String, Object> entry : warpMap.entrySet()) {
-            Location loc = bridge.getWarpLocation(entry.getValue());
+        List<Object> warpList = bridge.getWarps(team);
+        for (Object warp : warpList) {
+            Location loc = bridge.getWarpLocation(warp);
             JsonObject warpJson = new JsonObject();
-            warpJson.addProperty("name", entry.getKey());
+            warpJson.addProperty("name", bridge.getWarpName(warp));
             if (loc != null && loc.getWorld() != null) {
                 warpJson.addProperty("world", loc.getWorld().getName());
                 warpJson.addProperty("x", loc.getX());

@@ -38,7 +38,7 @@ public final class TeamBankHandler implements HttpHandler {
         String method = exchange.getRequestMethod();
         if ("GET".equals(method)) {
             JsonObject resp = new JsonObject();
-            resp.addProperty("balance", bridge.getTeamMoney(team));
+            resp.addProperty("balance", bridge.getTeamBalance(team));
             resp.addProperty("score", bridge.getTeamScore(team));
             resp.addProperty("level", bridge.getTeamLevel(team));
             ApiUtils.sendJson(exchange, 200, resp);
@@ -83,7 +83,7 @@ public final class TeamBankHandler implements HttpHandler {
 
         JsonObject resp = new JsonObject();
         resp.addProperty("success", success);
-        resp.addProperty("balance", bridge.getTeamMoney(team));
+        resp.addProperty("balance", bridge.getTeamBalance(team));
         ApiUtils.sendJson(exchange, 200, resp);
     }
 }
