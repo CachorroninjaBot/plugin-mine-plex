@@ -1,6 +1,7 @@
 package com.haiz.servercore.vip;
 
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -85,6 +86,9 @@ public final class LinkManager {
         storage.saveLink(pending.discordId(), player.getUniqueId(), player.getName());
         storage.deleteCode(code.toUpperCase());
 
+        assignLinkedRole(pending.discordId());
+        runOnLinkCommands(player.getName());
+
         if (onLinkConfirmed != null) {
             try {
                 onLinkConfirmed.run();
@@ -94,6 +98,53 @@ public final class LinkManager {
         }
 
         return ConfirmResult.SUCCESS;
+    }
+
+    private void assignLinkedRole(String discordId) {
+        try {
+            var discord = ((com.haiz.servercore.HaizServerCore) plugin).discord();
+            if (discord == null || !discord.isOnline()) return;
+
+            String roleId = vipConfig.linkedRoleId();
+            if (roleId == null || roleId.isBlank()) return;
+
+            var guild = discord.guild();
+            if (guild == null) return;
+
+            var member = guild.getMemberById(discordId);
+            if (member == null) return;
+
+            var role = guild.getRoleById(roleId);
+            if (role == null) {
+                plugin.getLogger().warning("[Link] Cargo linked não encontrado: " + roleId);
+                return;
+            }
+
+            if (!member.getRoles().contains(role)) {
+                guild.addRoleToMember(member, role).queue(
+                    success -> plugin.getLogger().info("[Link] Cargo linked atribuído a " + member.getEffectiveName()),
+                    error -> plugin.getLogger().warning("[Link] Falha ao atribuir cargo linked: " + error.getMessage())
+                );
+            }
+        } catch (Exception e) {
+            plugin.getLogger().warning("[Link] Erro ao atribuir cargo linked: " + e.getMessage());
+        }
+    }
+
+    private void runOnLinkCommands(String playerName) {
+        List<String> commands = vipConfig.onLinkCommands();
+        if (commands == null || commands.isEmpty()) return;
+
+        for (String cmd : commands) {
+            String finalCmd = cmd.replace("%player%", playerName);
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                try {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), finalCmd);
+                } catch (Exception e) {
+                    plugin.getLogger().warning("[Link] Falha ao executar comando pós-link: " + e.getMessage());
+                }
+            });
+        }
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────

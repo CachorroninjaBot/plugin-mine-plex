@@ -74,6 +74,18 @@ public final class VipConfig {
         return Math.max(30, config.getInt("vip.purchase.confirm-timeout-seconds", 60));
     }
 
+    public String linkedRoleId() {
+        return config.getString("account-linking.linked-role-id", "");
+    }
+
+    public java.util.List<String> onLinkCommands() {
+        return config.getStringList("account-linking.on-link-commands");
+    }
+
+    public java.util.List<String> onUnlinkCommands() {
+        return config.getStringList("account-linking.on-unlink-commands");
+    }
+
     public String shopImageUrl() {
         return config.getString("vip.discord.shop-image-url",
                 "https://cdn.discordapp.com/attachments/1490081242937557177/1516646686209081424/d3678e7c-7dcd-4af5-af35-fdc15eb0c811.png");
