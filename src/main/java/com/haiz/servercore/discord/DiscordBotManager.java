@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 public final class DiscordBotManager {
     private final HaizServerCore plugin;
     private volatile JDA jda;
+    private volatile net.dv8tion.jda.api.entities.Guild cachedGuild;
     private volatile State state = State.DISABLED;
 
     public DiscordBotManager(HaizServerCore plugin) {
@@ -61,6 +62,10 @@ public final class DiscordBotManager {
                 JDA built = builder.build();
                 built.awaitReady();
                 this.jda = built;
+                String guildId = plugin.config().guildId();
+                this.cachedGuild = (guildId != null && !guildId.isBlank())
+                        ? built.getGuildById(guildId)
+                        : built.getGuilds().stream().findFirst().orElse(null);
                 state = State.ONLINE;
                 plugin.getLogger().info("Discord conectado como " + built.getSelfUser().getAsTag() + ".");
             } catch (Exception exception) {
@@ -96,10 +101,13 @@ public final class DiscordBotManager {
             current.shutdownNow();
         }
         jda = null;
+        cachedGuild = null;
         state = State.DISABLED;
     }
 
     public JDA jda() { return jda; }
+
+    public net.dv8tion.jda.api.entities.Guild guild() { return cachedGuild; }
 
     public boolean isOnline() { return state == State.ONLINE && jda != null; }
 

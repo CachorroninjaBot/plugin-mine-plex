@@ -37,7 +37,7 @@ public final class PurchaseManager {
     private final Map<String, PendingPurchase> pending = new ConcurrentHashMap<>();
     private final Map<UUID, VipCacheEntry> vipCache = new ConcurrentHashMap<>();
 
-    private static final List<String> VIP_GROUP_IDS = List.of("vip", "elite", "ultra", "midia", "famoso");
+    private static final List<String> VIP_GROUP_IDS = VipConfig.VIP_GROUP_IDS;
     private static final long CACHE_TTL_SECONDS = 300;
 
     public PurchaseManager(JavaPlugin plugin, MobCoinsHook mobCoins,
@@ -96,7 +96,8 @@ public final class PurchaseManager {
         }
 
         double balance = mobCoins.getBalance(p.uuid());
-        if (balance >= 0 && balance < p.tier().price()) return PurchaseResult.INSUFFICIENT_FUNDS;
+        if (balance < 0) return PurchaseResult.MOBCOINS_UNAVAILABLE;
+        if (balance < p.tier().price()) return PurchaseResult.INSUFFICIENT_FUNDS;
 
         boolean ok = mobCoins.withdraw(p.uuid(), p.tier().price());
         if (!ok) return PurchaseResult.MOBCOINS_UNAVAILABLE;
@@ -198,5 +199,5 @@ public final class PurchaseManager {
         return p;
     }
 
-    private long now() { return System.currentTimeMillis() / 1000L; }
+    private long now() { return com.haiz.servercore.utils.TimeUtils.nowSeconds(); }
 }

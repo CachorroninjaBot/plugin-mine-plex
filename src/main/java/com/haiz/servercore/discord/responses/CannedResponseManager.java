@@ -50,7 +50,9 @@ public final class CannedResponseManager extends ListenerAdapter {
                     }
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            plugin.getLogger().warning("[CannedResponses] Falha ao carregar respostas: " + e.getMessage());
+        }
     }
 
     @Override

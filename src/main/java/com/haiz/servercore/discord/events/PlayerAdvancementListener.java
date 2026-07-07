@@ -13,12 +13,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class PlayerAdvancementListener implements Listener {
     private final HaizServerCore plugin;
-    private final Map<String, String> webhookUrlCache = new HashMap<>();
+    private final Map<String, String> webhookUrlCache = new ConcurrentHashMap<>();
 
     public PlayerAdvancementListener(HaizServerCore plugin) {
         this.plugin = plugin;
@@ -68,7 +68,7 @@ public final class PlayerAdvancementListener implements Listener {
     private void sendViaBot(String channelId, String message, String color, String avatarUrl) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
-                Guild guild = plugin.discord().jda().getGuilds().stream().findFirst().orElse(null);
+                Guild guild = plugin.discord().guild();
                 if (guild == null) return;
                 TextChannel channel = guild.getTextChannelById(channelId);
                 if (channel == null) return;
@@ -102,7 +102,7 @@ public final class PlayerAdvancementListener implements Listener {
     private String getWebhookUrl(String channelId) {
         return webhookUrlCache.computeIfAbsent(channelId, id -> {
             try {
-                Guild guild = plugin.discord().jda().getGuilds().stream().findFirst().orElse(null);
+                Guild guild = plugin.discord().guild();
                 if (guild == null) return null;
                 TextChannel channel = guild.getTextChannelById(id);
                 if (channel == null) return null;

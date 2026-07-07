@@ -284,6 +284,10 @@ public final class ConfigManager {
         return plugin.getConfig().getStringList("console.blocked-commands");
     }
 
+    public List<String> consoleAllowedCommands() {
+        return plugin.getConfig().getStringList("console.allowed-commands");
+    }
+
     public String consoleFormat() {
         return plugin.getConfig().getString("console.format", "[{date} {level}] {message}");
     }

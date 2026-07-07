@@ -27,6 +27,7 @@ public final class WebhookUtil {
         }
 
         return CompletableFuture.supplyAsync(() -> {
+            HttpURLConnection conn = null;
             try {
                 JsonObject json = new JsonObject();
                 json.addProperty("username", username != null ? username : "HaizServerCore");
@@ -46,7 +47,7 @@ public final class WebhookUtil {
                 allowedMentions.add("parse", JsonParser.parseString("[]").getAsJsonArray());
                 json.add("allowed_mentions", allowedMentions);
 
-                HttpURLConnection conn = (HttpURLConnection) URI.create(webhookUrl).toURL().openConnection();
+                conn = (HttpURLConnection) URI.create(webhookUrl).toURL().openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 conn.setRequestProperty("User-Agent", "HaizServerCore/Webhook");
@@ -59,11 +60,13 @@ public final class WebhookUtil {
                     out.flush();
                 }
 
-                int code = conn.getResponseCode();
-                conn.disconnect();
-                return code;
+                return conn.getResponseCode();
             } catch (Exception e) {
                 return -1;
+            } finally {
+                if (conn != null) {
+                    conn.disconnect();
+                }
             }
         });
     }
@@ -71,30 +74,7 @@ public final class WebhookUtil {
     public static CompletableFuture<Integer> sendEmbed(String webhookUrl, String username, String avatarUrl,
                                                        String title, String description, String color,
                                                        String thumbnail, String footer) {
-        JsonObject embed = new JsonObject();
-
-        if (title != null) {
-            embed.addProperty("title", title);
-        }
-        if (description != null) {
-            embed.addProperty("description", description);
-        }
-        if (color != null) {
-            embed.addProperty("color", parseColor(color));
-        }
-        if (thumbnail != null) {
-            JsonObject thumbObj = new JsonObject();
-            thumbObj.addProperty("url", thumbnail);
-            embed.add("thumbnail", thumbObj);
-        }
-        if (footer != null) {
-            JsonObject footerObj = new JsonObject();
-            footerObj.addProperty("text", footer);
-            embed.add("footer", footerObj);
-        }
-
-        embed.addProperty("timestamp", java.time.Instant.now().toString());
-
+        JsonObject embed = buildEmbed(title, description, color, thumbnail, footer);
         return send(webhookUrl, username, avatarUrl, "", embed);
     }
 

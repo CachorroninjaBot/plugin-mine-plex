@@ -45,7 +45,7 @@ public final class VipStorage {
 
     public record VipSubscription(String tier, long purchasedAt, long expiresAt) {}
 
-    public synchronized void saveSubscription(UUID uuid, String tier, long purchasedAt, long expiresAt) {
+    public void saveSubscription(UUID uuid, String tier, long purchasedAt, long expiresAt) {
         exec("""
                 INSERT INTO vip_subscriptions(uuid,tier,purchased_at,expires_at)
                 VALUES(?,?,?,?)
@@ -54,7 +54,7 @@ public final class VipStorage {
                 """, uuid.toString(), tier, purchasedAt, expiresAt);
     }
 
-    public synchronized Optional<VipSubscription> getActiveSubscription(UUID uuid) {
+    public Optional<VipSubscription> getActiveSubscription(UUID uuid) {
         try (PreparedStatement ps = db.connection().prepareStatement(
                 "SELECT tier,purchased_at,expires_at FROM vip_subscriptions WHERE uuid=?")) {
             ps.setString(1, uuid.toString());
@@ -73,16 +73,16 @@ public final class VipStorage {
         return Optional.empty();
     }
 
-    public synchronized void renewSubscription(UUID uuid, long newExpiresAt) {
+    public void renewSubscription(UUID uuid, long newExpiresAt) {
         exec("UPDATE vip_subscriptions SET expires_at=? WHERE uuid=?",
                 newExpiresAt, uuid.toString());
     }
 
-    public synchronized void removeSubscription(UUID uuid) {
+    public void removeSubscription(UUID uuid) {
         exec("DELETE FROM vip_subscriptions WHERE uuid=?", uuid.toString());
     }
 
-    public synchronized java.util.List<ExpiringVip> getVipsExpiringBefore(long timestamp) {
+    public java.util.List<ExpiringVip> getVipsExpiringBefore(long timestamp) {
         java.util.List<ExpiringVip> list = new java.util.ArrayList<>();
         try (PreparedStatement ps = db.connection().prepareStatement(
                 "SELECT uuid,tier,expires_at FROM vip_subscriptions WHERE expires_at<=? AND expires_at>0")) {
@@ -103,7 +103,7 @@ public final class VipStorage {
 
     // ── Settings ──────────────────────────────────────────────────────────
 
-    public synchronized boolean getAutoRenew(UUID uuid) {
+    public boolean getAutoRenew(UUID uuid) {
         try (PreparedStatement ps = db.connection().prepareStatement(
                 "SELECT auto_renew FROM vip_settings WHERE uuid=?")) {
             ps.setString(1, uuid.toString());
@@ -114,14 +114,14 @@ public final class VipStorage {
         return false;
     }
 
-    public synchronized void setAutoRenew(UUID uuid, boolean enabled) {
+    public void setAutoRenew(UUID uuid, boolean enabled) {
         exec("""
                 INSERT INTO vip_settings(uuid,auto_renew) VALUES(?,?)
                 ON CONFLICT(uuid) DO UPDATE SET auto_renew=excluded.auto_renew
                 """, uuid.toString(), enabled ? 1 : 0);
     }
 
-    public synchronized boolean toggleAutoRenew(UUID uuid) {
+    public boolean toggleAutoRenew(UUID uuid) {
         boolean current = getAutoRenew(uuid);
         setAutoRenew(uuid, !current);
         return !current;
@@ -129,7 +129,7 @@ public final class VipStorage {
 
     // ── Auto Repair ──────────────────────────────────────────────────────
 
-    public synchronized boolean getAutoRepair(UUID uuid) {
+    public boolean getAutoRepair(UUID uuid) {
         try (PreparedStatement ps = db.connection().prepareStatement(
                 "SELECT auto_repair FROM vip_settings WHERE uuid=?")) {
             ps.setString(1, uuid.toString());
@@ -140,14 +140,14 @@ public final class VipStorage {
         return false;
     }
 
-    public synchronized void setAutoRepair(UUID uuid, boolean enabled) {
+    public void setAutoRepair(UUID uuid, boolean enabled) {
         exec("""
                 INSERT INTO vip_settings(uuid,auto_repair) VALUES(?,?)
                 ON CONFLICT(uuid) DO UPDATE SET auto_repair=excluded.auto_repair
                 """, uuid.toString(), enabled ? 1 : 0);
     }
 
-    public synchronized boolean toggleAutoRepair(UUID uuid) {
+    public boolean toggleAutoRepair(UUID uuid) {
         boolean current = getAutoRepair(uuid);
         setAutoRepair(uuid, !current);
         return !current;
@@ -155,7 +155,9 @@ public final class VipStorage {
 
     // ── Helpers ───────────────────────────────────────────────────────────
 
-    private synchronized void exec(String sql, Object... params) {
+    private long now() { return com.haiz.servercore.utils.TimeUtils.nowSeconds(); }
+
+    private void exec(String sql, Object... params) {
         try (PreparedStatement ps = db.connection().prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
                 Object p = params[i];
@@ -171,8 +173,6 @@ public final class VipStorage {
     private void warn(SQLException e) {
         plugin.getLogger().warning("[VipShop] VipStorage SQLite: " + e.getMessage());
     }
-
-    private long now() { return System.currentTimeMillis() / 1000L; }
 
     public static long durationSeconds() { return VIP_DURATION_SECONDS; }
 }

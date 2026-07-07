@@ -63,7 +63,7 @@ public final class LinkStorage {
 
     // ── Link codes ───────────────────────────────────────────────────────────
 
-    public synchronized void savePendingCode(String code, UUID uuid, String mcName, String discordId, long expiresAt) {
+    public void savePendingCode(String code, UUID uuid, String mcName, String discordId, long expiresAt) {
         exec("DELETE FROM link_codes WHERE uuid=? OR discord_id=?", uuid.toString(), discordId);
         exec("INSERT INTO link_codes(code,uuid,mc_name,discord_id,expires_at) VALUES(?,?,?,?,?)",
                 code, uuid.toString(), mcName, discordId, expiresAt);
@@ -71,7 +71,7 @@ public final class LinkStorage {
 
     public record PendingCode(String code, UUID uuid, String mcName, String discordId, long expiresAt) {}
 
-    public synchronized Optional<PendingCode> findCode(String code) {
+    public Optional<PendingCode> findCode(String code) {
         try (PreparedStatement ps = db.connection().prepareStatement(
                 "SELECT * FROM link_codes WHERE code=? AND expires_at>?")) {
             ps.setString(1, code);
@@ -88,17 +88,17 @@ public final class LinkStorage {
         return Optional.empty();
     }
 
-    public synchronized void deleteCode(String code) {
+    public void deleteCode(String code) {
         exec("DELETE FROM link_codes WHERE code=?", code);
     }
 
-    public synchronized void deleteCodeByUuid(UUID uuid) {
+    public void deleteCodeByUuid(UUID uuid) {
         exec("DELETE FROM link_codes WHERE uuid=?", uuid.toString());
     }
 
     // ── Pending code lookup by UUID (for /linkar command) ───────────────────
 
-    public synchronized Optional<PendingCode> findCodeByUuid(UUID uuid) {
+    public Optional<PendingCode> findCodeByUuid(UUID uuid) {
         try (PreparedStatement ps = db.connection().prepareStatement(
                 "SELECT * FROM link_codes WHERE uuid=? AND expires_at>?")) {
             ps.setString(1, uuid.toString());
@@ -117,7 +117,7 @@ public final class LinkStorage {
 
     // ── Discord links ────────────────────────────────────────────────────────
 
-    public synchronized void saveLink(String discordId, UUID uuid, String mcName) {
+    public void saveLink(String discordId, UUID uuid, String mcName) {
         exec("""
                 INSERT INTO discord_links(discord_id,uuid,mc_name,linked_at)
                 VALUES(?,?,?,?)
@@ -125,33 +125,33 @@ public final class LinkStorage {
                 """, discordId, uuid.toString(), mcName, now());
     }
 
-    public synchronized Optional<String> discordIdByUuid(UUID uuid) {
+    public Optional<String> discordIdByUuid(UUID uuid) {
         return queryString("SELECT discord_id FROM discord_links WHERE uuid=?", uuid.toString());
     }
 
-    public synchronized Optional<UUID> uuidByDiscordId(String discordId) {
+    public Optional<UUID> uuidByDiscordId(String discordId) {
         return queryString("SELECT uuid FROM discord_links WHERE discord_id=?", discordId)
                 .map(UUID::fromString);
     }
 
-    public synchronized Optional<String> mcNameByDiscordId(String discordId) {
+    public Optional<String> mcNameByDiscordId(String discordId) {
         return queryString("SELECT mc_name FROM discord_links WHERE discord_id=?", discordId);
     }
 
-    public synchronized boolean isLinked(String discordId) {
+    public boolean isLinked(String discordId) {
         return uuidByDiscordId(discordId).isPresent();
     }
 
     // ── Purchase log ─────────────────────────────────────────────────────────
 
-    public synchronized void logPurchase(String discordId, UUID uuid, String mcName, String tier, long price) {
+    public void logPurchase(String discordId, UUID uuid, String mcName, String tier, long price) {
         exec("INSERT INTO vip_purchases(discord_id,uuid,mc_name,vip_tier,price,purchased_at) VALUES(?,?,?,?,?,?)",
                 discordId, uuid.toString(), mcName, tier, price, now());
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
 
-    private synchronized Optional<String> queryString(String sql, String param) {
+    private Optional<String> queryString(String sql, String param) {
         try (PreparedStatement ps = db.connection().prepareStatement(sql)) {
             ps.setString(1, param);
             try (ResultSet rs = ps.executeQuery()) {
@@ -161,7 +161,7 @@ public final class LinkStorage {
         return Optional.empty();
     }
 
-    private synchronized void exec(String sql, Object... params) {
+    private void exec(String sql, Object... params) {
         try (PreparedStatement ps = db.connection().prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
                 Object p = params[i];
@@ -174,15 +174,19 @@ public final class LinkStorage {
         } catch (SQLException e) { warn(e); }
     }
 
-    private synchronized void addColumn(String table, String def) {
+    private void addColumn(String table, String def) {
         try (Statement st = db.connection().createStatement()) {
             st.executeUpdate("ALTER TABLE " + table + " ADD COLUMN " + def);
-        } catch (SQLException ignored) {}
+        } catch (SQLException e) {
+            if (e.getErrorCode() != 1) { // 1 = column already exists
+                warn(e);
+            }
+        }
     }
 
     private void warn(SQLException e) {
         plugin.getLogger().warning("[VipShop] SQLite: " + e.getMessage());
     }
 
-    private long now() { return System.currentTimeMillis() / 1000L; }
+    private long now() { return com.haiz.servercore.utils.TimeUtils.nowSeconds(); }
 }

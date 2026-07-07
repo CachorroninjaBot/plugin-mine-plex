@@ -184,6 +184,7 @@ public final class HaizServerCore extends JavaPlugin {
     }
 
     public void reloadEverything() {
+        stopDiscordModules();
         reloadConfig();
         configManager.reload();
         if (discordBotManager != null) {
@@ -203,4 +204,6 @@ public final class HaizServerCore extends JavaPlugin {
     public VipModule vip() { return vipModule; }
     public TeamsModule teams() { return teamsModule; }
     public SQLiteDatabase sqliteDatabase() { return sqliteDatabase; }
+    public GroupRoleSyncManager groupRoleSyncManager() { return groupRoleSyncManager; }
+    public NicknameSyncManager nicknameSyncManager() { return nicknameSyncManager; }
 }

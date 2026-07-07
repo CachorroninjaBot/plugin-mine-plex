@@ -26,11 +26,16 @@ public final class LinkManager {
     private final JavaPlugin plugin;
     private final LinkStorage storage;
     private final VipConfig vipConfig;
+    private Runnable onLinkConfirmed;
 
     public LinkManager(JavaPlugin plugin, LinkStorage storage, VipConfig vipConfig) {
         this.plugin = plugin;
         this.storage = storage;
         this.vipConfig = vipConfig;
+    }
+
+    public void setOnLinkConfirmed(Runnable callback) {
+        this.onLinkConfirmed = callback;
     }
 
     // ── Passo 3: Discord solicita link ───────────────────────────────────────
@@ -79,6 +84,15 @@ public final class LinkManager {
 
         storage.saveLink(pending.discordId(), player.getUniqueId(), player.getName());
         storage.deleteCode(code.toUpperCase());
+
+        if (onLinkConfirmed != null) {
+            try {
+                onLinkConfirmed.run();
+            } catch (Exception e) {
+                plugin.getLogger().warning("[Link] Erro ao sincronizar após link: " + e.getMessage());
+            }
+        }
+
         return ConfirmResult.SUCCESS;
     }
 
@@ -102,5 +116,5 @@ public final class LinkManager {
         return sb.toString();
     }
 
-    private long now() { return System.currentTimeMillis() / 1000L; }
+    private long now() { return com.haiz.servercore.utils.TimeUtils.nowSeconds(); }
 }

@@ -11,6 +11,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 public final class VipConfig {
 
+    public static final java.util.List<String> VIP_GROUP_IDS = java.util.List.of("vip", "elite", "ultra", "midia", "famoso");
+
     public record VipTier(
             String id,
             String displayName,

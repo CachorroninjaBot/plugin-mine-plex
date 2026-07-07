@@ -13,7 +13,7 @@ public final class VipRenewalTask {
 
     private static final long CHECK_INTERVAL_TICKS = 20L * 60 * 60;
     private static final long EXPIRY_WARNING_SECONDS = 24L * 60 * 60;
-    private static final List<String> VIP_GROUP_IDS = List.of("vip", "elite", "ultra", "midia", "famoso");
+    private static final List<String> VIP_GROUP_IDS = VipConfig.VIP_GROUP_IDS;
 
     private final JavaPlugin plugin;
     private final Logger log;
@@ -99,7 +99,11 @@ public final class VipRenewalTask {
         VipConfig.VipTier vipTier = tierOpt.get();
         double balance = mobCoins.getBalance(uuid);
 
-        if (balance >= 0 && balance < vipTier.price()) {
+        if (balance < 0) {
+            log.warning("[VipShop] MobCoins API indisponível para renovação: " + uuid);
+            return false;
+        }
+        if (balance < vipTier.price()) {
             notifyPlayer(uuid, "§eSeu VIP §f" + tier + " §eeá expirando, mas você não tem MobCoins suficientes para renovação automática (" + (int) vipTier.price() + " needed).");
             log.info("[VipShop] Renovação automática falhou (saldo insuficiente): " + uuid);
             return false;

@@ -82,31 +82,35 @@ public final class ServerStatusNotifier {
 
     private String http_request(String method, String urlStr, String body) throws Exception {
         HttpURLConnection conn = (HttpURLConnection) URI.create(urlStr).toURL().openConnection();
-        conn.setRequestMethod(method);
-        conn.setRequestProperty("User-Agent", "HaizServerCore");
-        conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-        conn.setRequestProperty("Accept", "application/json");
-        conn.setDoInput(true);
+        try {
+            conn.setRequestMethod(method);
+            conn.setRequestProperty("User-Agent", "HaizServerCore");
+            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setDoInput(true);
 
-        if (body != null && !body.isBlank()) {
-            conn.setDoOutput(true);
-            try (OutputStream out = conn.getOutputStream()) {
-                out.write(body.getBytes(StandardCharsets.UTF_8));
-                out.flush();
+            if (body != null && !body.isBlank()) {
+                conn.setDoOutput(true);
+                try (OutputStream out = conn.getOutputStream()) {
+                    out.write(body.getBytes(StandardCharsets.UTF_8));
+                    out.flush();
+                }
             }
-        }
 
-        int code = conn.getResponseCode();
-        java.io.InputStream stream = (code >= 400) ? conn.getErrorStream() : conn.getInputStream();
-        if (stream == null) return "";
+            int code = conn.getResponseCode();
+            java.io.InputStream stream = (code >= 400) ? conn.getErrorStream() : conn.getInputStream();
+            if (stream == null) return "";
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+                return sb.toString();
+            }
+        } finally {
+            conn.disconnect();
         }
-        reader.close();
-        return sb.toString();
     }
 }

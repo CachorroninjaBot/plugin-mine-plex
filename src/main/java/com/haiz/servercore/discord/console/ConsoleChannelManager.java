@@ -13,6 +13,8 @@ import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.logging.*;
 
 public final class ConsoleChannelManager extends ListenerAdapter {
@@ -32,7 +34,7 @@ public final class ConsoleChannelManager extends ListenerAdapter {
         String channelId = config.consoleChannelId();
         if (channelId == null || channelId.isBlank()) return;
 
-        Guild guild = plugin.discord().jda().getGuilds().stream().findFirst().orElse(null);
+        Guild guild = plugin.discord().guild();
         if (guild == null) return;
 
         channel = guild.getTextChannelById(channelId);
@@ -50,6 +52,7 @@ public final class ConsoleChannelManager extends ListenerAdapter {
 
     public void stop() {
         if (handler != null) {
+            Logger.getLogger("").removeHandler(handler);
             handler.close();
             handler = null;
         }
@@ -114,9 +117,11 @@ public final class ConsoleChannelManager extends ListenerAdapter {
         try {
             channel.sendMessage("```" + formatted + "```").queue(
                 msg -> {},
-                err -> {}
+                err -> plugin.getLogger().warning("[Console] Falha ao enviar log: " + err.getMessage())
             );
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            plugin.getLogger().warning("[Console] Falha ao enviar log: " + e.getMessage());
+        }
     }
 
     private void startCommandListener() {
@@ -143,10 +148,27 @@ public final class ConsoleChannelManager extends ListenerAdapter {
         String command = message.substring(prefix.length()).trim();
         if (command.isEmpty()) return;
 
-        List<String> blockedCommands = config.consoleBlockedCommands();
-        if (blockedCommands.contains(command.toLowerCase(java.util.Locale.ROOT))) {
-            event.getChannel().sendMessage("Comando bloqueado: `" + command + "`").queue();
-            return;
+        String rootCmd = command.split("\\s+")[0].toLowerCase(Locale.ROOT);
+
+        List<String> allowedCommands = config.consoleAllowedCommands();
+        if (!allowedCommands.isEmpty()) {
+            boolean allowed = false;
+            for (String allowedCmd : allowedCommands) {
+                if (rootCmd.equals(allowedCmd.toLowerCase(Locale.ROOT))) {
+                    allowed = true;
+                    break;
+                }
+            }
+            if (!allowed) {
+                event.getChannel().sendMessage("Comando não permitido: `" + command + "`").queue();
+                return;
+            }
+        } else {
+            List<String> blockedCommands = config.consoleBlockedCommands();
+            if (blockedCommands.contains(rootCmd)) {
+                event.getChannel().sendMessage("Comando bloqueado: `" + command + "`").queue();
+                return;
+            }
         }
 
         String finalCommand = command;

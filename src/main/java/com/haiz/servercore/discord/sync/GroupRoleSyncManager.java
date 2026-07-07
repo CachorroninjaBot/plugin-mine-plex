@@ -48,7 +48,7 @@ public final class GroupRoleSyncManager {
     public void syncAllOnlinePlayers() {
         if (!plugin.discord().isOnline()) return;
 
-        Guild guild = plugin.discord().jda().getGuilds().stream().findFirst().orElse(null);
+        Guild guild = plugin.discord().guild();
         if (guild == null) return;
 
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -136,7 +136,9 @@ public final class GroupRoleSyncManager {
                     }
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            plugin.getLogger().warning("[Sync] Falha ao carregar mapeamentos: " + e.getMessage());
+        }
         return mappings;
     }
 
@@ -150,7 +152,9 @@ public final class GroupRoleSyncManager {
             if (chat != null) {
                 return chat.getPrimaryGroup(null, player);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            plugin.getLogger().warning("[Sync] Falha ao obter grupo Vault: " + e.getMessage());
+        }
         return "player";
     }
 

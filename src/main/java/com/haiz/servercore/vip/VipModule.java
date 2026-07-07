@@ -32,6 +32,18 @@ public final class VipModule {
         this.vipConfig     = new VipConfig(plugin.getConfig());
         this.linkStorage   = new LinkStorage(plugin, plugin.sqliteDatabase());
         this.linkManager   = new LinkManager(plugin, linkStorage, vipConfig);
+        this.linkManager.setOnLinkConfirmed(() -> {
+            var grsm = plugin.groupRoleSyncManager();
+            var nsm = plugin.nicknameSyncManager();
+            if (grsm != null || nsm != null) {
+                Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                    for (var player : Bukkit.getOnlinePlayers()) {
+                        if (grsm != null) grsm.syncAllOnlinePlayers();
+                        if (nsm != null) nsm.syncAllOnlinePlayers();
+                    }
+                });
+            }
+        });
         this.mobCoins      = new MobCoinsHook(plugin);
         this.vipStorage    = new VipStorage(plugin, plugin.sqliteDatabase());
         this.purchaseManager = new PurchaseManager(plugin, mobCoins, linkStorage, vipConfig, vipStorage);

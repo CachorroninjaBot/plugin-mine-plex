@@ -44,7 +44,7 @@ public final class NicknameSyncManager {
     public void syncAllOnlinePlayers() {
         if (!plugin.discord().isOnline()) return;
 
-        Guild guild = plugin.discord().jda().getGuilds().stream().findFirst().orElse(null);
+        Guild guild = plugin.discord().guild();
         if (guild == null) return;
 
         for (Player player : Bukkit.getOnlinePlayers()) {
