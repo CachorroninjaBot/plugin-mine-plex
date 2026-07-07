@@ -4,10 +4,11 @@ import com.haiz.servercore.HaizServerCore;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public final class VipModule {
@@ -94,7 +95,6 @@ public final class VipModule {
         Bukkit.getScheduler().runTaskTimer(plugin, task -> {
             if (plugin.discord().isOnline()) {
                 registerDiscordListener();
-                registerDiscordSlashCommands();
                 task.cancel();
             } else if (!running) {
                 task.cancel();
@@ -182,34 +182,15 @@ public final class VipModule {
         plugin.discord().jda().addEventListener(discordListener);
     }
 
-    private void registerDiscordSlashCommands() {
-        if (!plugin.discord().isOnline()) return;
-        var jda = plugin.discord().jda();
-        String guildId = plugin.config().guildId();
+    public List<SlashCommandData> getSlashCommands() {
+        List<SlashCommandData> commands = new ArrayList<>();
 
-        var verificar = Commands.slash("verificar", "Vincule sua conta Minecraft ao Discord")
-                .addOption(OptionType.STRING, "nick", "Seu nick no servidor Minecraft", true);
+        commands.add(net.dv8tion.jda.api.interactions.commands.build.Commands.slash("verificar", "Vincule sua conta Minecraft ao Discord")
+                .addOption(OptionType.STRING, "nick", "Seu nick no servidor Minecraft", true));
 
-        var vipconfig = Commands.slash("vipconfig", "Veja as configurações do seu VIP");
+        commands.add(net.dv8tion.jda.api.interactions.commands.build.Commands.slash("vipconfig", "Veja as configurações do seu VIP"));
 
-        List<net.dv8tion.jda.api.interactions.commands.build.SlashCommandData> commands = List.of(verificar, vipconfig);
-
-        if (guildId != null && !guildId.isBlank()) {
-            Guild guild = jda.getGuildById(guildId);
-            if (guild != null) {
-                guild.updateCommands().addCommands(commands).queue(
-                    success -> plugin.getLogger().info("[VipShop] Comandos registrados na guild: " + guild.getName() + " (/verificar, /vipconfig)"),
-                    error -> plugin.getLogger().warning("[VipShop] Falha ao registrar comandos: " + error.getMessage())
-                );
-                return;
-            }
-            plugin.getLogger().warning("[VipShop] Guild ID " + guildId + " não encontrada. Registrando globalmente.");
-        }
-
-        jda.updateCommands().addCommands(commands).queue(
-            success -> plugin.getLogger().info("[VipShop] Comandos registrados globalmente (/verificar, /vipconfig)"),
-            error -> plugin.getLogger().warning("[VipShop] Falha ao registrar comandos: " + error.getMessage())
-        );
+        return commands;
     }
 
     // ── Getters ──────────────────────────────────────────────────────────────

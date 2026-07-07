@@ -17,9 +17,15 @@ import com.haiz.servercore.storage.SQLiteDatabase;
 import com.haiz.servercore.teams.TeamsModule;
 import com.haiz.servercore.vip.VipModule;
 
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class HaizServerCore extends JavaPlugin {
     private ConfigManager configManager;
@@ -125,6 +131,42 @@ public final class HaizServerCore extends JavaPlugin {
             cannedResponseManager = new CannedResponseManager(this);
             cannedResponseManager.start();
         }
+
+        registerAllSlashCommands();
+    }
+
+    private void registerAllSlashCommands() {
+        if (!discordBotManager.isOnline()) return;
+        var jda = discordBotManager.jda();
+        String guildId = configManager.guildId();
+
+        List<SlashCommandData> allCommands = new ArrayList<>();
+
+        if (vipModule != null && vipModule.isRunning()) {
+            allCommands.addAll(vipModule.getSlashCommands());
+        }
+        if (teamsModule != null && teamsModule.isRunning()) {
+            allCommands.addAll(teamsModule.getSlashCommands());
+        }
+
+        if (allCommands.isEmpty()) return;
+
+        if (guildId != null && !guildId.isBlank()) {
+            Guild guild = jda.getGuildById(guildId);
+            if (guild != null) {
+                guild.updateCommands().addCommands(allCommands).queue(
+                    success -> getLogger().info("[Discord] Comandos slash registrados na guild: " + guild.getName() + " (" + allCommands.size() + " comandos)"),
+                    error -> getLogger().warning("[Discord] Falha ao registrar comandos slash: " + error.getMessage())
+                );
+                return;
+            }
+            getLogger().warning("[Discord] Guild ID " + guildId + " não encontrada. Registrando globalmente.");
+        }
+
+        jda.updateCommands().addCommands(allCommands).queue(
+            success -> getLogger().info("[Discord] Comandos slash registrados globalmente (" + allCommands.size() + " comandos)"),
+            error -> getLogger().warning("[Discord] Falha ao registrar comandos slash: " + error.getMessage())
+        );
     }
 
     private void stopDiscordModules() {

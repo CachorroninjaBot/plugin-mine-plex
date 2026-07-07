@@ -2,12 +2,15 @@ package com.haiz.servercore.teams;
 
 import com.haiz.servercore.HaizServerCore;
 import com.haiz.servercore.teams.discord.TeamsDiscordListener;
-import com.haiz.servercore.teams.discord.TeamsSlashCommands;
 import com.haiz.servercore.teams.gui.TeamGUIListener;
 import com.haiz.servercore.teams.gui.TeamMainMenu;
 import com.haiz.servercore.teams.web.WebServer;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class TeamsModule {
 
@@ -85,12 +88,17 @@ public final class TeamsModule {
         Bukkit.getScheduler().runTaskTimer(plugin, task -> {
             if (plugin.discord().isOnline()) {
                 registerDiscordListener();
-                TeamsSlashCommands.register(plugin);
                 task.cancel();
             } else if (!running) {
                 task.cancel();
             }
         }, 20L, 40L);
+    }
+
+    public List<SlashCommandData> getSlashCommands() {
+        List<SlashCommandData> commands = new ArrayList<>();
+        commands.add(net.dv8tion.jda.api.interactions.commands.build.Commands.slash("time", "Gerencie seu time no Minecraft"));
+        return commands;
     }
 
     private void registerDiscordListener() {
