@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja - Minepex Legends</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <img src="https://images-ext-1.discordapp.net/external/IgdvU8AWENFQvxU80JjcWJ4M0Ka6U8OJuH93OXlFjCE/https/cdn.discordapp.com/icons/1375700384353484820/a66b5a142f5a32fdb1502785ca875a67.png?format=webp&quality=lossless&width=115&height=115" alt="Minepex Legends" class="logo-img">
+                <span class="logo-text">Minepex Legends</span>
+            </a>
+            <div class="nav-tabs">
+                <a href="/" class="nav-tab">Início</a>
+                <a href="/features" class="nav-tab">Features</a>
+                <a href="/ranks" class="nav-tab">Níveis</a>
+                <a href="/store" class="nav-tab active">Loja</a>
+                <a href="/discord" class="nav-tab">Discord</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-copy" onclick="copyIP()">Copiar IP</button>
+                <a href="https://discord.gg/minepex" target="_blank" class="btn-discord">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                    Discord
+                </a>
+            </div>
+            <button class="mobile-menu" onclick="toggleMenu()">☰</button>
+        </div>
+    </nav>
+
+    <div class="mobile-nav" id="mobileNav">
+        <a href="/" class="mobile-tab" onclick="closeMenu()">Início</a>
+        <a href="/features" class="mobile-tab" onclick="closeMenu()">Features</a>
+        <a href="/ranks" class="mobile-tab" onclick="closeMenu()">Níveis</a>
+        <a href="/store" class="mobile-tab" onclick="closeMenu()">Loja</a>
+        <a href="/discord" class="mobile-tab" onclick="closeMenu()">Discord</a>
+    </div>
+
+    <section class="section" style="padding-top: 8rem;">
+        <div class="container">
+            <h2 class="section-title">🛒 Loja</h2>
+
+            <!-- Player Name -->
+            <div class="player-bar">
+                <label for="playerName">🎮 Seu nick Minecraft:</label>
+                <input type="text" id="playerName" placeholder="Ex: Notch" maxlength="16">
+                <button onclick="setPlayerName()">Definir</button>
+                <span id="playerStatus">Defina seu nick para comprar</span>
+            </div>
+
+            <div class="store-tabs">
+                <button class="store-tab active" onclick="switchStoreTab('real')">💰 Dinheiro Real (Pix)</button>
+                <button class="store-tab" onclick="switchStoreTab('mobcoins')">🪙 MobCoins</button>
+            </div>
+
+            <!-- Real Money Store (Pix) -->
+            <div class="store-content" id="realMoneyStore">
+                <div class="pix-info-box">
+                    <h3>💳 Pagamento via Pix</h3>
+                    <p>Pagamento instantâneo e seguro. Após a confirmação, o rank é aplicado automaticamente!</p>
+                    <div class="pix-key-display">
+                        <span class="pix-label">Chave Pix:</span>
+                        <span class="pix-key">40b028d0-7ae8-4622-9f84-11cc4b2172e7</span>
+                        <button class="btn-copy-pix" onclick="copyPix()">📋 Copiar</button>
+                    </div>
+                </div>
+
+                <div class="store-grid">
+                    <div class="store-item">
+                        <div class="rank-badge">VIP</div>
+                        <div class="item-icon">⭐</div>
+                        <h3>Rank VIP</h3>
+                        <p class="item-duration">30 dias</p>
+                        <ul class="item-features">
+                            <li>Prefixo [VIP] colorido</li>
+                            <li>Kit VIP semanal</li>
+                            <li>Comandos exclusivos</li>
+                        </ul>
+                        <div class="item-price"><span class="price">R$ 15,00</span></div>
+                        <button class="btn-buy" onclick="buyWithPix('vip')">Comprar via Pix</button>
+                    </div>
+
+                    <div class="store-item">
+                        <div class="rank-badge elite">ELITE</div>
+                        <div class="item-icon">💎</div>
+                        <h3>Rank Elite</h3>
+                        <p class="item-duration">30 dias</p>
+                        <ul class="item-features">
+                            <li>Tudo do VIP</li>
+                            <li>Kit Elite semanal</li>
+                            <li>Voo em sobrevivência</li>
+                        </ul>
+                        <div class="item-price"><span class="price">R$ 35,00</span></div>
+                        <button class="btn-buy" onclick="buyWithPix('elite')">Comprar via Pix</button>
+                    </div>
+
+                    <div class="store-item">
+                        <div class="rank-badge ultra">ULTRA</div>
+                        <div class="item-icon">🔥</div>
+                        <h3>Rank Ultra</h3>
+                        <p class="item-duration">30 dias</p>
+                        <ul class="item-features">
+                            <li>Tudo do Elite</li>
+                            <li>Kit Ultra diário</li>
+                            <li>Regiões exclusivas</li>
+                        </ul>
+                        <div class="item-price"><span class="price">R$ 60,00</span></div>
+                        <button class="btn-buy" onclick="buyWithPix('ultra')">Comprar via Pix</button>
+                    </div>
+
+                    <div class="store-item">
+                        <div class="rank-badge midia">MÍDIA</div>
+                        <div class="item-icon">🎬</div>
+                        <h3>Rank Mídia</h3>
+                        <p class="item-duration">30 dias</p>
+                        <ul class="item-features">
+                            <li>Tag [Mídia] no chat</li>
+                            <li>Kit exclusivo de Mídia</li>
+                            <li>Para criadores de conteúdo</li>
+                        </ul>
+                        <div class="item-price"><span class="price">R$ 100,00</span></div>
+                        <button class="btn-buy" onclick="buyWithPix('media')">Comprar via Pix</button>
+                    </div>
+
+                    <div class="store-item">
+                        <div class="rank-badge famoso">FAMOSO</div>
+                        <div class="item-icon">👑</div>
+                        <h3>Rank Famoso</h3>
+                        <p class="item-duration">30 dias</p>
+                        <ul class="item-features">
+                            <li>Tudo do Ultra</li>
+                            <li>Tag [Famoso] dourada</li>
+                            <li>Kit Famoso premium diário</li>
+                            <li>Acesso antecipado</li>
+                        </ul>
+                        <div class="item-price"><span class="price">R$ 150,00</span></div>
+                        <button class="btn-buy" onclick="buyWithPix('famous')">Comprar via Pix</button>
+                    </div>
+                </div>
+
+                <div class="store-note">
+                    <p>⚡ Pagamento via Pix • Entrega automática • Suporte no Discord</p>
+                </div>
+            </div>
+
+            <!-- MobCoins Store -->
+            <div class="store-content hidden" id="mobcoinsStore">
+                <div class="mobcoins-info">
+                    <div class="mobcoins-balance">
+                        <h3>💰 Seus MobCoins</h3>
+                        <p class="balance-amount" id="mobcoinsBalance">-</p>
+                        <div class="balance-check">
+                            <input type="text" id="mcUsername" placeholder="Seu nick Minecraft" class="mc-input">
+                            <button class="btn-check" onclick="checkMobCoins()">Verificar Saldo</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="store-grid">
+                    <div class="store-item">
+                        <div class="item-icon">🔮</div>
+                        <h3>Estrela do Nether</h3>
+                        <p class="item-desc">x1 Estrela do Nether</p>
+                        <div class="item-price mobcoins-price"><span class="price">50,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyWithMobCoins('nether_star')">Comprar</button>
+                    </div>
+                    <div class="store-item">
+                        <div class="item-icon">🎁</div>
+                        <h3>Núcleo Pesado</h3>
+                        <p class="item-desc">x1 Núcleo Pesado</p>
+                        <div class="item-price mobcoins-price"><span class="price">100,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyWithMobCoins('heavy_core')">Comprar</button>
+                    </div>
+                    <div class="store-item">
+                        <div class="item-icon">🛡️</div>
+                        <h3>Totem da Imortalidade</h3>
+                        <p class="item-desc">x1 Totem da Imortalidade</p>
+                        <div class="item-price mobcoins-price"><span class="price">50,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyWithMobCoins('totem')">Comprar</button>
+                    </div>
+                    <div class="store-item">
+                        <div class="item-icon">🦋</div>
+                        <h3>Elytra</h3>
+                        <p class="item-desc">x1 Elytra</p>
+                        <div class="item-price mobcoins-price"><span class="price">5,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyWithMobCoins('elytra')">Comprar</button>
+                    </div>
+                    <div class="store-item">
+                        <div class="item-icon">🔱</div>
+                        <h3>Tridente</h3>
+                        <p class="item-desc">x1 Tridente</p>
+                        <div class="item-price mobcoins-price"><span class="price">10,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyWithMobCoins('trident')">Comprar</button>
+                    </div>
+                    <div class="store-item">
+                        <div class="item-icon">🍎</div>
+                        <h3>Maçã Dourada Encantada</h3>
+                        <p class="item-desc">x1 Maçã Dourada Encantada</p>
+                        <div class="item-price mobcoins-price"><span class="price">40,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyWithMobCoins('enchanted_apple')">Comprar</button>
+                    </div>
+                    <div class="store-item">
+                        <div class="item-icon">🃏</div>
+                        <h3>Carta da Sorte</h3>
+                        <p class="item-desc">x1 Carta da Sorte ✪</p>
+                        <div class="item-price mobcoins-price"><span class="price">600</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyWithMobCoins('lucky_card')">Comprar</button>
+                    </div>
+                    <div class="store-item">
+                        <div class="item-icon">💡</div>
+                        <h3>Bastão Super (64)</h3>
+                        <p class="item-desc">x64 Bastão Super</p>
+                        <div class="item-price mobcoins-price"><span class="price">12,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyWithMobCoins('super_stick')">Comprar</button>
+                    </div>
+                    <div class="store-item">
+                        <div class="item-icon">🎆</div>
+                        <h3>Sinalizador de Comboio</h3>
+                        <p class="item-desc">x1 Sinalizador</p>
+                        <div class="item-price mobcoins-price"><span class="price">8,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyWithMobCoins('flare')">Comprar</button>
+                    </div>
+                    <div class="store-item">
+                        <div class="rank-badge">VIP</div>
+                        <div class="item-icon">⭐</div>
+                        <h3>Rank VIP (30 dias)</h3>
+                        <div class="item-price mobcoins-price"><span class="price">50,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyWithMobCoins('vip_30d')">Comprar</button>
+                    </div>
+                    <div class="store-item">
+                        <div class="rank-badge elite">ELITE</div>
+                        <div class="item-icon">💎</div>
+                        <h3>Rank Elite (30 dias)</h3>
+                        <div class="item-price mobcoins-price"><span class="price">100,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyWithMobCoins('elite_30d')">Comprar</button>
+                    </div>
+                    <div class="store-item">
+                        <div class="rank-badge ultra">ULTRA</div>
+                        <div class="item-icon">🔥</div>
+                        <h3>Rank Ultra (30 dias)</h3>
+                        <div class="item-price mobcoins-price"><span class="price">150,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyWithMobCoins('ultra_30d')">Comprar</button>
+                    </div>
+                    <div class="store-item">
+                        <div class="rank-badge midia">MÍDIA</div>
+                        <div class="item-icon">🎬</div>
+                        <h3>Rank Mídia (30 dias)</h3>
+                        <div class="item-price mobcoins-price"><span class="price">200,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyWithMobCoins('media_30d')">Comprar</button>
+                    </div>
+                    <div class="store-item">
+                        <div class="rank-badge famoso">FAMOSO</div>
+                        <div class="item-icon">👑</div>
+                        <h3>Rank Famoso (30 dias)</h3>
+                        <div class="item-price mobcoins-price"><span class="price">250,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyWithMobCoins('famous_30d')">Comprar</button>
+                    </div>
+                </div>
+
+                <div class="mobcoins-earn">
+                    <h3>📈 Como Ganhar MobCoins</h3>
+                    <div class="earn-methods">
+                        <div class="earn-method"><span>🕷️</span><p>Matando mobs (5-40% chance)</p></div>
+                        <div class="earn-method"><span>⚔️</span><p>PvP e eventos do servidor</p></div>
+                        <div class="earn-method"><span>📅</span><p>Login diário e missões</p></div>
+                        <div class="earn-method"><span>🎉</span><p>Eventos especiais</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pix Modal -->
+    <div class="modal-overlay" id="pixModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closePixModal()">✕</button>
+            <h2>💳 Pagamento via Pix</h2>
+            <div class="modal-content" id="pixModalBody">
+                <p style="text-align:center;color:var(--text-gray);">Carregando...</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="https://images-ext-1.discordapp.net/external/IgdvU8AWENFQvxU80JjcWJ4M0Ka6U8OJuH93OXlFjCE/https/cdn.discordapp.com/icons/1375700384353484820/a66b5a142f5a32fdb1502785ca875a67.png?format=webp&quality=lossless&width=115&height=115" alt="Logo">
+                <p>Minepex Legends © 2026</p>
+            </div>
+            <div class="footer-links">
+                <a href="/">Início</a>
+                <a href="/features">Features</a>
+                <a href="/ranks">Níveis</a>
+                <a href="/store">Loja</a>
+                <a href="/discord">Discord</a>
+            </div>
+            <div class="footer-social"><a href="https://discord.gg/minepex" target="_blank">Discord</a></div>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+    <script src="/js/script.js"></script>
+</body>
+</html>

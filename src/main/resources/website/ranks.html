@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Níveis - Minepex Legends</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <img src="https://images-ext-1.discordapp.net/external/IgdvU8AWENFQvxU80JjcWJ4M0Ka6U8OJuH93OXlFjCE/https/cdn.discordapp.com/icons/1375700384353484820/a66b5a142f5a32fdb1502785ca875a67.png?format=webp&quality=lossless&width=115&height=115" alt="Minepex Legends" class="logo-img">
+                <span class="logo-text">Minepex Legends</span>
+            </a>
+            <div class="nav-tabs">
+                <a href="/" class="nav-tab">Início</a>
+                <a href="/features" class="nav-tab">Features</a>
+                <a href="/ranks" class="nav-tab active">Níveis</a>
+                <a href="/store" class="nav-tab">Loja</a>
+                <a href="/discord" class="nav-tab">Discord</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-copy" onclick="copyIP()">Copiar IP</button>
+                <a href="https://discord.gg/minepex" target="_blank" class="btn-discord">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                    Discord
+                </a>
+            </div>
+            <button class="mobile-menu" onclick="toggleMenu()">☰</button>
+        </div>
+    </nav>
+
+    <div class="mobile-nav" id="mobileNav">
+        <a href="/" class="mobile-tab" onclick="closeMenu()">Início</a>
+        <a href="/features" class="mobile-tab" onclick="closeMenu()">Features</a>
+        <a href="/ranks" class="mobile-tab" onclick="closeMenu()">Níveis</a>
+        <a href="/store" class="mobile-tab" onclick="closeMenu()">Loja</a>
+        <a href="/discord" class="mobile-tab" onclick="closeMenu()">Discord</a>
+    </div>
+
+    <section class="section section-alt" style="padding-top: 8rem;">
+        <div class="container">
+            <h2 class="section-title">⭐ Sistema de Níveis</h2>
+            <p class="section-subtitle">Suba de nível desbloqueando vantagens exclusivas. Cada nível requer dinheiro, tempo de jogo e XP.</p>
+
+            <div class="ranks-table">
+                <div class="rank-row header"><span>Nível</span><span>Dinheiro</span><span>Tempo</span><span>XP</span><span>Principais Vantagens</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 1</span><span>100k</span><span>5h</span><span>5</span><span>2 profissões, 3 leilões, /heal 5d</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 2</span><span>200k</span><span>10h</span><span>10</span><span>2 pwarp, chaves raras, /ec 5d</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 3</span><span>300k</span><span>20h</span><span>15</span><span>3 profissões, 6 leilões, /heal 7d</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 4</span><span>400k</span><span>25h</span><span>20</span><span>3 pwarp, Elytra, 2 missões</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 5</span><span>500k</span><span>30h</span><span>25</span><span>4 profissões, 9 leilões, /heal 15d</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 6</span><span>600k</span><span>35h</span><span>30</span><span>4 pwarp, chaves raras, /ec 7d</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 7</span><span>700k</span><span>40h</span><span>35</span><span>5 profissões, /ptime, Essência</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 8</span><span>800k</span><span>45h</span><span>40</span><span>5 pwarp, chaves dinheiro, 4 missões</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 9</span><span>900k</span><span>50h</span><span>45</span><span>6 profissões, /ptime 7d, Núcleo Fundido</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 10</span><span>1M</span><span>55h</span><span>50</span><span>10 lacaios, chaves dinheiro, /ec 15d</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 11</span><span>1.1M</span><span>60h</span><span>55</span><span>7 profissões, /ptime 15d</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 12</span><span>1.2M</span><span>65h</span><span>60</span><span>7 pwarp, chaves dinheiro, 6 missões</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 13</span><span>1.3M</span><span>70h</span><span>65</span><span>8 profissões, /fly 5d, Núcleo Fundido</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 14</span><span>1.4M</span><span>75h</span><span>70</span><span>8 pwarp, chaves spawner, 8 missões</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 15</span><span>1.5M</span><span>80h</span><span>75</span><span>9 profissões, /fly 7d</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 16</span><span>1.6M</span><span>85h</span><span>80</span><span>10 pwarp, chaves spawner, Bloco Congelado</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 17</span><span>1.7M</span><span>90h</span><span>85</span><span>11 profissões, /fly 15d</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 18</span><span>1.8M</span><span>95h</span><span>90</span><span>12 pwarp, chaves spawner, 12 missões</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 19</span><span>1.9M</span><span>100h</span><span>95</span><span>12 profissões, /ptime, Bloco Congelado</span></div>
+                <div class="rank-row highlight"><span class="rank-name">⭐ 20</span><span>2M</span><span>110h</span><span>100</span><span>10 chaves lendárias, ULTRA 30d, /fly, /nick</span></div>
+            </div>
+
+            <div class="rank-rewards">
+                <h3>🏆 Recompensas por Nível</h3>
+                <div class="rewards-grid">
+                    <div class="reward-item"><span>🔑</span><p>Chaves de Crate</p></div>
+                    <div class="reward-item"><span>🍎</span><p>Maçãs Douradas</p></div>
+                    <div class="reward-item"><span>🪨</span><p>Blocos de Essência</p></div>
+                    <div class="reward-item"><span>🗺️</span><p>Blocos de Reivindicação</p></div>
+                    <div class="reward-item"><span>🧱</span><p>Núcleo Fundido</p></div>
+                    <div class="reward-item"><span>❄️</span><p>Bloco Congelado</p></div>
+                    <div class="reward-item"><span>🪄</span><p>Elytra</p></div>
+                    <div class="reward-item"><span>👑</span><p>ULTRA VIP 30d</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="https://images-ext-1.discordapp.net/external/IgdvU8AWENFQvxU80JjcWJ4M0Ka6U8OJuH93OXlFjCE/https/cdn.discordapp.com/icons/1375700384353484820/a66b5a142f5a32fdb1502785ca875a67.png?format=webp&quality=lossless&width=115&height=115" alt="Logo">
+                <p>Minepex Legends © 2026</p>
+            </div>
+            <div class="footer-links">
+                <a href="/">Início</a>
+                <a href="/features">Features</a>
+                <a href="/ranks">Níveis</a>
+                <a href="/store">Loja</a>
+                <a href="/discord">Discord</a>
+            </div>
+            <div class="footer-social"><a href="https://discord.gg/minepex" target="_blank">Discord</a></div>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+    <script src="/js/script.js"></script>
+</body>
+</html>

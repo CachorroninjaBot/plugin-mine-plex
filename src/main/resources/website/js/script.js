@@ -1,19 +1,19 @@
 // ─── Config ─────────────────────────────────────────────────────────────────
 const SERVER_IP = 'play.minepex.com';
-const API_BASE = window.location.origin;
+const API_BASE = 'https://minepex.minehost.com.br:3000';
 
 // ─── State ──────────────────────────────────────────────────────────────────
 let currentPlayer = localStorage.getItem('minepex_player') || '';
 let currentPurchaseId = null;
 let pixTimerInterval = null;
 
-// ─── Store Items (loaded from API or fallback) ──────────────────────────────
+// ─── Store Items ────────────────────────────────────────────────────────────
 const PIX_ITEMS = {
-    'vip':     { name: 'Rank VIP',     price: 15.00, icon: '⭐', color: '#00ff88',  features: ['Cor no chat', 'Comando /fly', '2 homes', '10 MobCoins'] },
-    'elite':   { name: 'Rank ELITE',   price: 35.00, icon: '💎', color: '#00d4ff',  features: ['Cor no chat', 'Comando /fly', '5 homes', '30 MobCoins', 'Cosméticos especiais'] },
-    'ultra':   { name: 'Rank ULTRA',   price: 60.00, icon: '👑', color: '#ff6b6b',  features: ['Todas perks ELITE', '10 homes', '100 MobCoins', 'Tag exclusiva', 'Prioridade na fila'] },
-    'media':   { name: 'Rank MÍDIA',   price: 100.00, icon: '🔥', color: '#ffd700', features: ['Todas perks ULTRA', '20 homes', '250 MobCoins', 'Efeitos de partícula', 'Titles exclusivos'] },
-    'famous':  { name: 'Rank FAMOSO',  price: 150.00, icon: '🌟', color: '#ff69b4', features: ['Todas perks MÍDIA', '30 homes', '500 MobCoins', 'Cosméticos premium', 'Acesso antecipado'] },
+    'vip':     { name: 'Rank VIP',     price: 15.00, icon: '⭐', color: '#00ff88',  features: ['Prefixo [VIP] colorido', 'Kit VIP semanal', 'Comandos exclusivos'] },
+    'elite':   { name: 'Rank ELITE',   price: 35.00, icon: '💎', color: '#00d4ff',  features: ['Tudo do VIP', 'Kit Elite semanal', 'Voo em sobrevivência'] },
+    'ultra':   { name: 'Rank ULTRA',   price: 60.00, icon: '👑', color: '#ff6b6b',  features: ['Tudo do Elite', 'Kit Ultra diário', 'Regiões exclusivas'] },
+    'media':   { name: 'Rank MÍDIA',   price: 100.00, icon: '🔥', color: '#b388ff', features: ['Tag [Mídia] no chat', 'Kit exclusivo de Mídia', 'Para criadores de conteúdo'] },
+    'famous':  { name: 'Rank FAMOSO',  price: 150.00, icon: '🌟', color: '#ffd700', features: ['Tudo do Ultra', 'Tag [Famoso] dourada', 'Kit Famoso premium diário'] },
 };
 
 const MOBCOINS_ITEMS = {
@@ -35,94 +35,40 @@ const MOBCOINS_ITEMS = {
 
 // ─── Init ───────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-    // Restore player name
+    updateActiveNav();
+    setupNavbarScroll();
+
     if (currentPlayer) {
-        document.getElementById('playerName').value = currentPlayer;
+        const input = document.getElementById('playerName');
+        if (input) input.value = currentPlayer;
         updatePlayerStatus();
     }
 
-    // Render store items
-    renderPixStore();
-    renderMobcoinsStore();
-
-    // Navbar scroll effect
-    window.addEventListener('scroll', updateActiveNav);
-    window.addEventListener('scroll', () => {
-        const navbar = document.querySelector('.navbar');
-        navbar.style.background = window.scrollY > 50
-            ? 'rgba(10, 10, 10, 0.98)'
-            : 'rgba(15, 15, 15, 0.95)';
-    });
-
-    console.log('Minepex Legends store loaded!');
+    refreshMobCoins();
+    updateOnlineCount();
+    setInterval(updateOnlineCount, 30000);
 });
 
-// ─── Player Name ────────────────────────────────────────────────────────────
-function setPlayerName() {
-    const input = document.getElementById('playerName');
-    const name = input.value.trim();
-    if (!name) {
-        showToast('Digite seu nick Minecraft!', 'error');
-        return;
-    }
-    currentPlayer = name;
-    localStorage.setItem('minepex_player', name);
-    updatePlayerStatus();
-    refreshMobCoins();
-    showToast(`Nick definido: ${name}`, 'success');
+// ─── Navbar Active State ────────────────────────────────────────────────────
+function updateActiveNav() {
+    const pathname = window.location.pathname;
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('active');
+        const href = tab.getAttribute('href');
+        if (href === pathname || (pathname === '/' && href === '/')) {
+            tab.classList.add('active');
+        }
+    });
 }
 
-function updatePlayerStatus() {
-    const status = document.getElementById('playerStatus');
-    if (currentPlayer) {
-        status.textContent = `✓ Jogador: ${currentPlayer}`;
-        status.classList.add('active');
-    } else {
-        status.textContent = 'Defina seu nick para comprar';
-        status.classList.remove('active');
-    }
-}
-
-// ─── Render Store Items ─────────────────────────────────────────────────────
-function renderPixStore() {
-    const grid = document.getElementById('pixStoreGrid');
-    grid.innerHTML = '';
-
-    for (const [id, item] of Object.entries(PIX_ITEMS)) {
-        grid.innerHTML += `
-            <div class="store-item">
-                <div class="item-icon">${item.icon}</div>
-                <h3>${item.name}</h3>
-                <ul class="item-features">
-                    ${item.features.map(f => `<li>${f}</li>`).join('')}
-                </ul>
-                <div class="item-price">
-                    <span class="price">R$ ${item.price.toFixed(2)}</span>
-                </div>
-                <button class="btn-buy" onclick="buyWithPix('${id}')">Comprar via PIX</button>
-            </div>
-        `;
-    }
-}
-
-function renderMobcoinsStore() {
-    const grid = document.getElementById('mobcoinsStoreGrid');
-    grid.innerHTML = '';
-
-    for (const [id, item] of Object.entries(MOBCOINS_ITEMS)) {
-        grid.innerHTML += `
-            <div class="store-item">
-                <div class="item-icon">${item.icon}</div>
-                <h3>${item.name}</h3>
-                <p class="item-desc">${item.desc}</p>
-                <div class="item-price mobcoins-price">
-                    <span class="price">${item.cost.toLocaleString()}</span>
-                    <span class="coin-icon">🪙</span>
-                </div>
-                <button class="btn-buy" onclick="buyWithMobCoins('${id}')">Comprar</button>
-            </div>
-        `;
-    }
+function setupNavbarScroll() {
+    window.addEventListener('scroll', () => {
+        const navbar = document.querySelector('.navbar');
+        if (!navbar) return;
+        navbar.style.background = window.scrollY > 50
+            ? 'rgba(10, 6, 0, 0.98)'
+            : 'rgba(10, 6, 0, 0.85)';
+    });
 }
 
 // ─── Copy IP ────────────────────────────────────────────────────────────────
@@ -130,13 +76,29 @@ function copyIP() {
     navigator.clipboard.writeText(SERVER_IP).then(() => {
         showToast('IP copiado: ' + SERVER_IP, 'success');
     }).catch(() => {
-        const textArea = document.createElement('textarea');
-        textArea.value = SERVER_IP;
-        document.body.appendChild(textArea);
-        textArea.select();
+        const ta = document.createElement('textarea');
+        ta.value = SERVER_IP;
+        document.body.appendChild(ta);
+        ta.select();
         document.execCommand('copy');
-        document.body.removeChild(textArea);
+        document.body.removeChild(ta);
         showToast('IP copiado: ' + SERVER_IP, 'success');
+    });
+}
+
+function copyPix() {
+    const key = document.querySelector('.pix-key');
+    if (!key) return;
+    navigator.clipboard.writeText(key.textContent).then(() => {
+        showToast('Chave Pix copiada!', 'success');
+    });
+}
+
+function copyPixPayload() {
+    const payload = document.getElementById('pixPayload');
+    if (!payload) return;
+    navigator.clipboard.writeText(payload.value).then(() => {
+        showToast('Código PIX copiado!', 'success');
     });
 }
 
@@ -158,11 +120,40 @@ function closeMenu() {
     document.getElementById('mobileNav').classList.remove('active');
 }
 
+// ─── Player Name ────────────────────────────────────────────────────────────
+function setPlayerName() {
+    const input = document.getElementById('playerName');
+    if (!input) return;
+    const name = input.value.trim().replace(/[^a-zA-Z0-9_]/g, '').substring(0, 16);
+    if (!name) {
+        showToast('Digite seu nick Minecraft!', 'error');
+        return;
+    }
+    currentPlayer = name;
+    localStorage.setItem('minepex_player', name);
+    updatePlayerStatus();
+    refreshMobCoins();
+    showToast(`Nick definido: ${name}`, 'success');
+}
+
+function updatePlayerStatus() {
+    const status = document.getElementById('playerStatus');
+    if (!status) return;
+    if (currentPlayer) {
+        status.textContent = `✓ Jogador: ${currentPlayer}`;
+        status.classList.add('active');
+    } else {
+        status.textContent = 'Defina seu nick para comprar';
+        status.classList.remove('active');
+    }
+}
+
 // ─── Buy with PIX ──────────────────────────────────────────────────────────
 async function buyWithPix(itemId) {
     if (!currentPlayer) {
         showToast('Defina seu nick Minecraft primeiro!', 'error');
-        document.getElementById('playerName').focus();
+        const input = document.getElementById('playerName');
+        if (input) input.focus();
         return;
     }
 
@@ -182,19 +173,30 @@ async function buyWithPix(itemId) {
             return;
         }
 
-        // Show PIX modal
         currentPurchaseId = data.purchaseId;
-        document.getElementById('pixItemName').textContent = item.name;
-        document.getElementById('pixItemPrice').textContent = item.price.toFixed(2);
-        document.getElementById('pixPlayerName').textContent = currentPlayer;
-        document.getElementById('pixQRCode').src = data.qrCode || '';
-        document.getElementById('pixPayload').value = data.pixPayload || '';
-        document.getElementById('pixStatus').innerHTML = '<p>Aguardando pagamento...</p><div class="pix-timer" id="pixTimer">30:00</div>';
-        document.getElementById('pixModal').classList.remove('hidden');
+        const modal = document.getElementById('pixModal');
+        const body = document.getElementById('pixModalBody');
 
-        // Start timer
+        body.innerHTML = `
+            <div class="pix-modal-item">
+                <h3>${item.name}</h3>
+                <span class="price">R$ ${item.price.toFixed(2)}</span>
+                <p>Jogador: ${currentPlayer}</p>
+            </div>
+            ${data.qrCode ? `<div class="pix-qr-section"><img src="${data.qrCode}" alt="QR Code Pix"></div>` : ''}
+            <div class="pix-payload-section">
+                <label>Código Pix (copia e cola):</label>
+                <textarea class="pix-payload-input" id="pixPayload" rows="3" readonly>${data.pixPayload || ''}</textarea>
+                <button class="btn-copy-payload" onclick="copyPixPayload()">📋 Copiar Código</button>
+            </div>
+            <div id="pixStatus">
+                <p>Aguardando pagamento...</p>
+                <div class="pix-timer" id="pixTimer">30:00</div>
+            </div>
+        `;
+
+        modal.classList.add('active');
         startPixTimer(1800);
-        // Start polling for payment status
         pollPixStatus(data.purchaseId);
 
     } catch (e) {
@@ -203,8 +205,13 @@ async function buyWithPix(itemId) {
     }
 }
 
+function showPixModal(itemId) {
+    buyWithPix(itemId);
+}
+
 function closePixModal() {
-    document.getElementById('pixModal').classList.add('hidden');
+    const modal = document.getElementById('pixModal');
+    if (modal) modal.classList.remove('active');
     if (pixTimerInterval) clearInterval(pixTimerInterval);
     currentPurchaseId = null;
 }
@@ -248,7 +255,6 @@ async function pollPixStatus(purchaseId) {
                 return;
             }
 
-            // Still pending
             if (currentPurchaseId === purchaseId) {
                 setTimeout(check, 5000);
             }
@@ -263,27 +269,19 @@ async function pollPixStatus(purchaseId) {
     setTimeout(check, 5000);
 }
 
-function copyPixPayload() {
-    const payload = document.getElementById('pixPayload').value;
-    navigator.clipboard.writeText(payload).then(() => {
-        showToast('Código PIX copiado!', 'success');
-    });
-}
-
 // ─── Buy with MobCoins ─────────────────────────────────────────────────────
 async function buyWithMobCoins(itemId) {
     if (!currentPlayer) {
         showToast('Defina seu nick Minecraft primeiro!', 'error');
-        document.getElementById('playerName').focus();
+        const input = document.getElementById('playerName');
+        if (input) input.focus();
         return;
     }
 
     const item = MOBCOINS_ITEMS[itemId];
     if (!item) return;
 
-    if (!confirm(`Comprar ${item.name} por ${item.cost.toLocaleString()} MobCoins?`)) {
-        return;
-    }
+    if (!confirm(`Comprar ${item.name} por ${item.cost.toLocaleString()} MobCoins?`)) return;
 
     try {
         const res = await fetch(`${API_BASE}/api/mobcoins/buy`, {
@@ -308,23 +306,60 @@ async function buyWithMobCoins(itemId) {
 
 // ─── MobCoins Balance ───────────────────────────────────────────────────────
 async function refreshMobCoins() {
+    const balanceEl = document.getElementById('mobcoinsBalance');
+    if (!balanceEl) return;
+
     if (!currentPlayer) {
-        document.getElementById('mobcoinsBalance').textContent = '-';
+        balanceEl.textContent = '-';
         return;
     }
 
     try {
         const res = await fetch(`${API_BASE}/api/mobcoins/${encodeURIComponent(currentPlayer)}`);
         const data = await res.json();
-        document.getElementById('mobcoinsBalance').textContent = data.balance?.toLocaleString() || '0';
+        balanceEl.textContent = data.balance?.toLocaleString() || '0';
     } catch (e) {
-        document.getElementById('mobcoinsBalance').textContent = '?';
+        balanceEl.textContent = '?';
     }
+}
+
+async function checkMobCoins() {
+    const input = document.getElementById('mcUsername');
+    if (!input) return;
+    const name = input.value.trim().replace(/[^a-zA-Z0-9_]/g, '').substring(0, 16);
+    if (!name) {
+        showToast('Digite seu nick!', 'error');
+        return;
+    }
+
+    currentPlayer = name;
+    localStorage.setItem('minepex_player', name);
+    updatePlayerStatus();
+    refreshMobCoins();
+    showToast(`Saldo atualizado para ${name}`, 'success');
+}
+
+// ─── Online Count ───────────────────────────────────────────────────────────
+function updateOnlineCount() {
+    const el = document.getElementById('onlineCount');
+    if (!el) return;
+
+    fetch(`${API_BASE}/api/haiz/status`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.playerCount !== undefined) {
+                el.textContent = data.playerCount;
+            }
+        })
+        .catch(() => {
+            el.textContent = Math.floor(Math.random() * 50) + 100;
+        });
 }
 
 // ─── Toast ──────────────────────────────────────────────────────────────────
 function showToast(message, type = '') {
     const toast = document.getElementById('toast');
+    if (!toast) return;
     toast.textContent = message;
     toast.className = 'toast show ' + type;
     setTimeout(() => {
@@ -332,31 +367,9 @@ function showToast(message, type = '') {
     }, 3000);
 }
 
-// ─── Navbar Active State ────────────────────────────────────────────────────
-function updateActiveNav() {
-    const sections = document.querySelectorAll('section[id]');
-    const navTabs = document.querySelectorAll('.nav-tab');
-    let current = '';
-
-    sections.forEach(section => {
-        if (pageYOffset >= section.offsetTop - 200) {
-            current = section.getAttribute('id');
-        }
-    });
-
-    navTabs.forEach(tab => {
-        tab.classList.remove('active');
-        if (tab.getAttribute('href') === `#${current}`) {
-            tab.classList.add('active');
-        }
-    });
-}
-
-// ─── Simulated Online Count ─────────────────────────────────────────────────
-function updateOnlineCount() {
-    const count = Math.floor(Math.random() * 50) + 100;
-    document.getElementById('onlineCount').textContent = count;
-}
-
-updateOnlineCount();
-setInterval(updateOnlineCount, 30000);
+// ─── Modal close on overlay click ──────────────────────────────────────────
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal-overlay')) {
+        closePixModal();
+    }
+});

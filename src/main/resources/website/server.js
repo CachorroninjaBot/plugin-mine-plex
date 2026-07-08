@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
@@ -15,6 +16,20 @@ const HAIZ_API_HOST = process.env.HAIZ_API_HOST || 'localhost';
 const HAIZ_API_PORT = parseInt(process.env.HAIZ_API_PORT || '8080');
 const HAIZ_API_URL = `http://${HAIZ_API_HOST}:${HAIZ_API_PORT}`;
 const SERVER_IP = 'play.minepex.com';
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'https://site-minepex.vercel.app';
+
+// ─── Security ───────────────────────────────────────────────────────────────
+function sanitize(str) {
+    return String(str).replace(/[^a-zA-Z0-9_]/g, '').substring(0, 16);
+}
+
+const purchaseLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    message: { error: 'Muitas tentativas. Tente novamente mais tarde.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
 
 // ─── Database ───────────────────────────────────────────────────────────────
 let storeDb = null;
@@ -172,9 +187,21 @@ function crc16CCITT(str) {
 
 // ─── Express App ────────────────────────────────────────────────────────────
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: [ALLOWED_ORIGIN],
+    methods: ['GET', 'POST'],
+    credentials: false
+}));
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
+
+// Security headers
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    next();
+});
 
 // API: Get store items
 app.get('/api/items', (req, res) => {
@@ -200,8 +227,9 @@ app.get('/api/mobcoins/:playerName', (req, res) => {
 });
 
 // API: Create PIX payment
-app.post('/api/pix/create', async (req, res) => {
-  const { playerName, itemId } = req.body;
+app.post('/api/pix/create', purchaseLimiter, async (req, res) => {
+  const playerName = sanitize(req.body.playerName);
+  const itemId = sanitize(req.body.itemId);
 
   if (!playerName || !itemId) {
     return res.status(400).json({ error: 'Nome do jogador e item são obrigatórios' });
@@ -280,8 +308,9 @@ app.post('/api/pix/confirm/:purchaseId', (req, res) => {
 });
 
 // API: Buy with MobCoins
-app.post('/api/mobcoins/buy', (req, res) => {
-  const { playerName, itemId } = req.body;
+app.post('/api/mobcoins/buy', purchaseLimiter, (req, res) => {
+  const playerName = sanitize(req.body.playerName);
+  const itemId = sanitize(req.body.itemId);
 
   if (!playerName || !itemId) {
     return res.status(400).json({ error: 'Nome do jogador e item são obrigatórios' });

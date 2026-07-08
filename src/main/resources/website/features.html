@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Features - Minepex Legends</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <img src="https://images-ext-1.discordapp.net/external/IgdvU8AWENFQvxU80JjcWJ4M0Ka6U8OJuH93OXlFjCE/https/cdn.discordapp.com/icons/1375700384353484820/a66b5a142f5a32fdb1502785ca875a67.png?format=webp&quality=lossless&width=115&height=115" alt="Minepex Legends" class="logo-img">
+                <span class="logo-text">Minepex Legends</span>
+            </a>
+            <div class="nav-tabs">
+                <a href="/" class="nav-tab">Início</a>
+                <a href="/features" class="nav-tab active">Features</a>
+                <a href="/ranks" class="nav-tab">Níveis</a>
+                <a href="/store" class="nav-tab">Loja</a>
+                <a href="/discord" class="nav-tab">Discord</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-copy" onclick="copyIP()">Copiar IP</button>
+                <a href="https://discord.gg/minepex" target="_blank" class="btn-discord">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                    Discord
+                </a>
+            </div>
+            <button class="mobile-menu" onclick="toggleMenu()">☰</button>
+        </div>
+    </nav>
+
+    <div class="mobile-nav" id="mobileNav">
+        <a href="/" class="mobile-tab" onclick="closeMenu()">Início</a>
+        <a href="/features" class="mobile-tab" onclick="closeMenu()">Features</a>
+        <a href="/ranks" class="mobile-tab" onclick="closeMenu()">Níveis</a>
+        <a href="/store" class="mobile-tab" onclick="closeMenu()">Loja</a>
+        <a href="/discord" class="mobile-tab" onclick="closeMenu()">Discord</a>
+    </div>
+
+    <section class="section" style="padding-top: 8rem;">
+        <div class="container">
+            <h2 class="section-title">⚡ Funcionalidades</h2>
+            <p class="section-subtitle">O Minepex Legends oferece dezenas de sistemas únicos para sua jogatina</p>
+
+            <!-- Skills -->
+            <div class="feature-block">
+                <div class="feature-header">
+                    <span class="feature-big-icon">🎯</span>
+                    <div><h3>Sistema de Skills</h3><p>11 habilidades para evoluir até o nível 100</p></div>
+                </div>
+                <div class="skills-grid">
+                    <div class="skill-item"><span>🌾</span><strong>Farming</strong><small>Colheitas e agricultura</small></div>
+                    <div class="skill-item"><span>🪓</span><strong>Foraging</strong><small>Corte de madeira</small></div>
+                    <div class="skill-item"><span>⛏️</span><strong>Mining</strong><small>Mineração</small></div>
+                    <div class="skill-item"><span>🎣</span><strong>Fishing</strong><small>Pesca</small></div>
+                    <div class="skill-item"><span>🏗️</span><strong>Excavation</strong><small>Escavação</small></div>
+                    <div class="skill-item"><span>🏹</span><strong>Archery</strong><small>Arco e flecha</small></div>
+                    <div class="skill-item"><span>🛡️</span><strong>Defense</strong><small>Defesa</small></div>
+                    <div class="skill-item"><span>⚔️</span><strong>Fighting</strong><small>Combate corpo a corpo</small></div>
+                    <div class="skill-item"><span>🏃</span><strong>Agility</strong><small>Agilidade</small></div>
+                    <div class="skill-item"><span>🧪</span><strong>Alchemy</strong><small>Poções</small></div>
+                    <div class="skill-item"><span>✨</span><strong>Enchanting</strong><small>Encantamentos</small></div>
+                </div>
+                <div class="skill-abilities">
+                    <h4>Habilidades Desbloqueáveis:</h4>
+                    <div class="abilities-list">
+                        <span class="ability-tag">Bountiful Harvest</span>
+                        <span class="ability-tag">Lucky Miner</span>
+                        <span class="ability-tag">Treecapitator</span>
+                        <span class="ability-tag">Sharp Hook</span>
+                        <span class="ability-tag">Terraform</span>
+                        <span class="ability-tag">Charged Shot</span>
+                        <span class="ability-tag">Absorption</span>
+                        <span class="ability-tag">Lightning Blade</span>
+                        <span class="ability-tag">Speed Mine</span>
+                        <span class="ability-tag">Replenish</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Minions -->
+            <div class="feature-block">
+                <div class="feature-header">
+                    <span class="feature-big-icon">🤖</span>
+                    <div><h3>Sistema de Minions</h3><p>Automação com minions que trabalham para você</p></div>
+                </div>
+                <div class="minions-grid">
+                    <div class="minion-card slayer"><span>⚔️</span><strong>Slayer</strong><p>Elimina mobs ao redor</p></div>
+                    <div class="minion-card seller"><span>💰</span><strong>Seller</strong><p>Vende itens automaticamente</p></div>
+                    <div class="minion-card lumber"><span>🪓</span><strong>Lumberjack</strong><p>Corta madeira e replanta</p></div>
+                    <div class="minion-card fisher"><span>🎣</span><strong>Fisher</strong><p>Pesca automaticamente</p></div>
+                    <div class="minion-card farmer"><span>🌾</span><strong>Farmer</strong><p>Colhe e replanta crops</p></div>
+                    <div class="minion-card crafter"><span>🔨</span><strong>Crafter</strong><p>Crafta itens</p></div>
+                    <div class="minion-card collector"><span>🧲</span><strong>Collector</strong><p>Coleta itens ao redor</p></div>
+                </div>
+            </div>
+
+            <!-- Teams -->
+            <div class="feature-block">
+                <div class="feature-header">
+                    <span class="feature-big-icon">👥</span>
+                    <div><h3>Sistema de Times</h3><p>Crie times, recrute membros e domine o servidor</p></div>
+                </div>
+                <div class="team-features">
+                    <div class="team-feature"><span>🏠</span><strong>Team Home</strong><p>Teleporte para base do time</p></div>
+                    <div class="team-feature"><span>🏦</span><strong>Banco do Time</strong><p>Dinheiro compartilhado</p></div>
+                    <div class="team-feature"><span>📍</span><strong>Warps</strong><p>Locais de teleporte do time</p></div>
+                    <div class="team-feature"><span>🤝</span><strong>Alianças</strong><p>Até 5 times aliados</p></div>
+                    <div class="team-feature"><span>📦</span><strong>Chest Claims</strong><p>Proteja seus baús</p></div>
+                    <div class="team-feature"><span>📊</span><strong>Score System</strong><p>Pontuação por kills</p></div>
+                </div>
+            </div>
+
+            <!-- Crates -->
+            <div class="feature-block">
+                <div class="feature-header">
+                    <span class="feature-big-icon">🎁</span>
+                    <div><h3>Crates & Chaves</h3><p>Abra crates com chaves para receber recompensas</p></div>
+                </div>
+                <div class="crates-grid">
+                    <div class="crate-card legendary"><span>🌟</span><strong>Legendary</strong><p>Espadas lendárias, arcos épicos, minions, livros encantados</p></div>
+                    <div class="crate-card rare"><span>💎</span><strong>Rare</strong><p>Itens raros e encantamentos especiais</p></div>
+                    <div class="crate-card spawner"><span>🧟</span><strong>Spawner</strong><p>Spawners de mobs</p></div>
+                    <div class="crate-card money"><span>💵</span><strong>Money</strong><p>Dinheiro e recompensas</p></div>
+                    <div class="crate-card vote"><span>🗳️</span><strong>Vote</strong><p>Vote e ganhe recompensas</p></div>
+                </div>
+            </div>
+
+            <!-- Pets -->
+            <div class="feature-block">
+                <div class="feature-header">
+                    <span class="feature-big-icon">🐾</span>
+                    <div><h3>Sistema de Pets</h3><p>Companheiros fiéis que te acompanham</p></div>
+                </div>
+                <div class="pets-features">
+                    <div class="pet-feature"><span>🐎</span><strong>Mount</strong><p>Monte seus pets</p></div>
+                    <div class="pet-feature"><span>🎩</span><strong>Hat</strong><p>Use como chapéu</p></div>
+                    <div class="pet-feature"><span>✏️</span><strong>Renomeie</strong><p>Personalize o nome</p></div>
+                    <div class="pet-feature"><span>✨</span><strong>Partículas</strong><p>Efeitos visuais</p></div>
+                </div>
+            </div>
+
+            <!-- Other -->
+            <div class="feature-block">
+                <div class="feature-header">
+                    <span class="feature-big-icon">🎮</span>
+                    <div><h3>Outras Funcionalidades</h3><p>Ainda mais conteúdo para explorar</p></div>
+                </div>
+                <div class="other-features-grid">
+                    <div class="other-feature"><span>💼</span><strong>Jobs</strong><p>Ganhe dinheiro trabalhando</p></div>
+                    <div class="other-feature"><span>🏪</span><strong>Leilões</strong><p>Compre e venda itens</p></div>
+                    <div class="other-feature"><span>🎯</span><strong>Quests</strong><p>Missões com recompensas</p></div>
+                    <div class="other-feature"><span>⚔️</span><strong>Duelos</strong><p>1v1 contra outros jogadores</p></div>
+                    <div class="other-feature"><span>🪙</span><strong>MobCoins</strong><p>Moeda especial do servidor</p></div>
+                    <div class="other-feature"><span>🗳️</span><strong>Votes</strong><p>Vote e ganhe chaves</p></div>
+                    <div class="other-feature"><span>🌟</span><strong>Custom Enchants</strong><p>Encantamentos únicos</p></div>
+                    <div class="other-feature"><span>🪑</span><strong>GSit</strong><p>Sente em qualquer lugar</p></div>
+                    <div class="other-feature"><span>🎰</span><strong>Slot Machine</strong><p>Aposte e ganhe prêmios</p></div>
+                    <div class="other-feature"><span>🍀</span><strong>Lucky Block</strong><p>Blocos da sorte</p></div>
+                    <div class="other-feature"><span>🏷️</span><strong>Tags</strong><p>Tags personalizadas</p></div>
+                    <div class="other-feature"><span>💬</span><strong>Chat Games</strong><p>Jogos no chat</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="https://images-ext-1.discordapp.net/external/IgdvU8AWENFQvxU80JjcWJ4M0Ka6U8OJuH93OXlFjCE/https/cdn.discordapp.com/icons/1375700384353484820/a66b5a142f5a32fdb1502785ca875a67.png?format=webp&quality=lossless&width=115&height=115" alt="Logo">
+                <p>Minepex Legends © 2026</p>
+            </div>
+            <div class="footer-links">
+                <a href="/">Início</a>
+                <a href="/features">Features</a>
+                <a href="/ranks">Níveis</a>
+                <a href="/store">Loja</a>
+                <a href="/discord">Discord</a>
+            </div>
+            <div class="footer-social"><a href="https://discord.gg/minepex" target="_blank">Discord</a></div>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+    <script src="/js/script.js"></script>
+</body>
+</html>
