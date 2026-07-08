@@ -32,6 +32,9 @@ public final class StorePoller {
     public void start() {
         if (taskId != -1) return;
 
+        plugin.getLogger().info("[Store] Iniciando Poller...");
+        plugin.getLogger().info("[Store] API URL: " + apiUrl);
+
         taskId = new BukkitRunnable() {
             @Override
             public void run() {
@@ -39,7 +42,8 @@ public final class StorePoller {
             }
         }.runTaskTimerAsynchronously(plugin, 20L * 5, 20L * 5).getTaskId(); // 5 seconds
 
-        plugin.getLogger().info("[Store] Poller iniciado. Verificando compras pendentes a cada 5s.");
+        plugin.getLogger().info("[Store] Poller iniciado! Verificando compras pendentes a cada 5s.");
+        plugin.getLogger().info("[Store] Primeira verificação em 5 segundos...");
     }
 
     public void stop() {
@@ -53,13 +57,19 @@ public final class StorePoller {
     private void pollPendingPurchases() {
         try {
             String url = apiUrl + "/api/pending";
+            plugin.getLogger().info("[Store] Verificando compras pendentes em: " + url);
+
             HttpURLConnection conn = (HttpURLConnection) URI.create(url).toURL().openConnection();
             conn.setRequestMethod("GET");
-            conn.setConnectTimeout(5000);
-            conn.setReadTimeout(5000);
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(10000);
             conn.setRequestProperty("Accept", "application/json");
 
-            if (conn.getResponseCode() != 200) {
+            int responseCode = conn.getResponseCode();
+            plugin.getLogger().info("[Store] Resposta da API: " + responseCode);
+
+            if (responseCode != 200) {
+                plugin.getLogger().warning("[Store] API retornou código: " + responseCode);
                 conn.disconnect();
                 return;
             }
@@ -71,6 +81,9 @@ public final class StorePoller {
             conn.disconnect();
 
             JsonArray pending = response.getAsJsonArray("pending");
+            int count = pending != null ? pending.size() : 0;
+            plugin.getLogger().info("[Store] Compras pendentes encontradas: " + count);
+
             if (pending == null || pending.isEmpty()) return;
 
             for (JsonElement elem : pending) {
@@ -78,8 +91,13 @@ public final class StorePoller {
                 processPurchase(purchase);
             }
 
+        } catch (java.net.ConnectException e) {
+            plugin.getLogger().warning("[Store] Não foi possível conectar à API: " + apiUrl);
+            plugin.getLogger().warning("[Store] Erro: " + e.getMessage());
+        } catch (java.net.SocketTimeoutException e) {
+            plugin.getLogger().warning("[Store] Timeout ao conectar à API: " + apiUrl);
         } catch (Exception e) {
-            plugin.getLogger().log(Level.FINE, "[Store] Polling error: " + e.getMessage());
+            plugin.getLogger().warning("[Store] Polling error: " + e.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
@@ -89,6 +107,8 @@ public final class StorePoller {
         String itemId = purchase.get("item_id").getAsString();
         String type = purchase.has("type") ? purchase.get("type").getAsString() : "pix";
 
+        plugin.getLogger().info("[Store] Processando compra: id=" + id + ", player=" + playerName + ", item=" + itemId + ", type=" + type);
+
         StoreItems.Item item;
         if ("mobcoins".equals(type)) {
             item = StoreItems.getMobCoins(itemId);
@@ -97,16 +117,23 @@ public final class StorePoller {
         }
 
         if (item == null) {
-            plugin.getLogger().warning("[Store] Item desconhecido: " + itemId);
+            plugin.getLogger().warning("[Store] Item desconhecido no catálogo: " + itemId);
+            plugin.getLogger().warning("[Store] Itens Pix disponíveis: " + StoreItems.PIX.keySet());
+            plugin.getLogger().warning("[Store] Itens MobCoins disponíveis: " + StoreItems.MOBCOINS.keySet());
             return;
         }
 
         String command = item.command().replace("%player%", playerName);
+        plugin.getLogger().info("[Store] Executando comando: " + command);
 
         // Execute command on main thread
         Bukkit.getScheduler().runTask(plugin, () -> {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-            plugin.getLogger().info("[Store] Entregue " + item.name() + " para " + playerName);
+            try {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+                plugin.getLogger().info("[Store] ✅ Entregue " + item.name() + " para " + playerName);
+            } catch (Exception e) {
+                plugin.getLogger().severe("[Store] ❌ Erro ao executar comando: " + e.getMessage());
+            }
 
             // Mark as delivered (async)
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
