@@ -18,16 +18,15 @@
             </a>
             <div class="nav-tabs">
                 <a href="#home" class="nav-tab active">Início</a>
-                <a href="#server" class="nav-tab">Servidor</a>
+                <a href="#features" class="nav-tab">Features</a>
+                <a href="#ranks" class="nav-tab">Níveis</a>
                 <a href="#store" class="nav-tab">Loja</a>
                 <a href="#discord" class="nav-tab">Discord</a>
             </div>
             <div class="nav-actions">
                 <button class="btn-copy" onclick="copyIP()">Copiar IP</button>
                 <a href="https://discord.gg/minepex" target="_blank" class="btn-discord">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
-                    </svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
                     Discord
                 </a>
             </div>
@@ -38,7 +37,8 @@
     <!-- Mobile Menu -->
     <div class="mobile-nav" id="mobileNav">
         <a href="#home" class="mobile-tab" onclick="closeMenu()">Início</a>
-        <a href="#server" class="mobile-tab" onclick="closeMenu()">Servidor</a>
+        <a href="#features" class="mobile-tab" onclick="closeMenu()">Features</a>
+        <a href="#ranks" class="mobile-tab" onclick="closeMenu()">Níveis</a>
         <a href="#store" class="mobile-tab" onclick="closeMenu()">Loja</a>
         <a href="#discord" class="mobile-tab" onclick="closeMenu()">Discord</a>
     </div>
@@ -52,7 +52,7 @@
             <p class="hero-subtitle">A melhor experiência de Minecraft PvP</p>
             <div class="hero-ip">
                 <span class="ip-label">IP do Servidor:</span>
-                <span class="ip-address" id="serverIP">play.minepex.com</span>
+                <span class="ip-address">play.minepex.com</span>
                 <button class="btn-copy-hero" onclick="copyIP()">📋 Copiar</button>
             </div>
             <div class="hero-buttons">
@@ -60,9 +60,7 @@
                 <a href="#store" class="btn-secondary">Ver Loja</a>
             </div>
         </div>
-        <div class="scroll-indicator">
-            <span>↓</span>
-        </div>
+        <div class="scroll-indicator"><span>↓</span></div>
     </section>
 
     <!-- Server Section -->
@@ -90,26 +88,208 @@
             <div class="server-features">
                 <h3>Modos de Jogo</h3>
                 <div class="features-grid">
-                    <div class="feature-card">
-                        <span class="feature-icon">⚔️</span>
-                        <h4>PvP</h4>
-                        <p>Batalhe contra outros jogadores</p>
+                    <div class="feature-card"><span class="feature-icon">⚔️</span><h4>PvP</h4><p>Batalhe contra outros jogadores</p></div>
+                    <div class="feature-card"><span class="feature-icon">🏰</span><h4>SkyWars</h4><p>Ilhas flutuantes com loot</p></div>
+                    <div class="feature-card"><span class="feature-icon">🏗️</span><h4>Creative</h4><p>Construa seus sonhos</p></div>
+                    <div class="feature-card"><span class="feature-icon">🎪</span><h4>Mini Games</h4><p>Diversão para todos</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section features-section">
+        <div class="container">
+            <h2 class="section-title">⚡ Funcionalidades</h2>
+            <p class="section-subtitle">O Minepex Legends oferece dezenas de sistemas únicos para sua jogatina</p>
+
+            <!-- Skills -->
+            <div class="feature-block">
+                <div class="feature-header">
+                    <span class="feature-big-icon">🎯</span>
+                    <div>
+                        <h3>Sistema de Skills</h3>
+                        <p>11 habilidades para evoluir até o nível 100</p>
                     </div>
-                    <div class="feature-card">
-                        <span class="feature-icon">🏰</span>
-                        <h4>SkyWars</h4>
-                        <p>Ilhas flutuantes com loot</p>
+                </div>
+                <div class="skills-grid">
+                    <div class="skill-item"><span>🌾</span><strong>Farming</strong><small>Colheitas e agricultura</small></div>
+                    <div class="skill-item"><span>🪓</span><strong>Foraging</strong><small>Corte de madeira</small></div>
+                    <div class="skill-item"><span>⛏️</span><strong>Mining</strong><small>Mineração</small></div>
+                    <div class="skill-item"><span>🎣</span><strong>Fishing</strong><small>Pesca</small></div>
+                    <div class="skill-item"><span>🏗️</span><strong>Excavation</strong><small>Escavação</small></div>
+                    <div class="skill-item"><span>🏹</span><strong>Archery</strong><small>Arco e flecha</small></div>
+                    <div class="skill-item"><span>🛡️</span><strong>Defense</strong><small>Defesa</small></div>
+                    <div class="skill-item"><span>⚔️</span><strong>Fighting</strong><small>Combate corpo a corpo</small></div>
+                    <div class="skill-item"><span>🏃</span><strong>Agility</strong><small>Agilidade</small></div>
+                    <div class="skill-item"><span>🧪</span><strong>Alchemy</strong><small>Poções</small></div>
+                    <div class="skill-item"><span>✨</span><strong>Enchanting</strong><small>Encantamentos</small></div>
+                </div>
+                <div class="skill-abilities">
+                    <h4>Habilidades Desbloqueáveis:</h4>
+                    <div class="abilities-list">
+                        <span class="ability-tag">Bountiful Harvest</span>
+                        <span class="ability-tag">Lucky Miner</span>
+                        <span class="ability-tag">Treecapitator</span>
+                        <span class="ability-tag">Sharp Hook</span>
+                        <span class="ability-tag">Terraform</span>
+                        <span class="ability-tag">Charged Shot</span>
+                        <span class="ability-tag">Absorption</span>
+                        <span class="ability-tag">Lightning Blade</span>
+                        <span class="ability-tag">Speed Mine</span>
+                        <span class="ability-tag">Replenish</span>
                     </div>
-                    <div class="feature-card">
-                        <span class="feature-icon">🏗️</span>
-                        <h4>Creative</h4>
-                        <p>Construa seus sonhos</p>
+                </div>
+            </div>
+
+            <!-- Minions -->
+            <div class="feature-block">
+                <div class="feature-header">
+                    <span class="feature-big-icon">🤖</span>
+                    <div>
+                        <h3>Sistema de Minions</h3>
+                        <p>Automação com minions que trabalham para você</p>
                     </div>
-                    <div class="feature-card">
-                        <span class="feature-icon">🎪</span>
-                        <h4>Mini Games</h4>
-                        <p>Diversão para todos</p>
+                </div>
+                <div class="minions-grid">
+                    <div class="minion-card slayer"><span>⚔️</span><strong>Slayer</strong><p>Elimina mobs ao redor</p></div>
+                    <div class="minion-card seller"><span>💰</span><strong>Seller</strong><p>Vende itens automaticamente</p></div>
+                    <div class="minion-card lumber"><span>🪓</span><strong>Lumberjack</strong><p>Corta madeira e replanta</p></div>
+                    <div class="minion-card fisher"><span>🎣</span><strong>Fisher</strong><p>Pesca automaticamente</p></div>
+                    <div class="minion-card farmer"><span>🌾</span><strong>Farmer</strong><p>Colhe e replanta crops</p></div>
+                    <div class="minion-card crafter"><span>🔨</span><strong>Crafter</strong><p>Crafta itens</p></div>
+                    <div class="minion-card collector"><span>🧲</span><strong>Collector</strong><p>Coleta itens ao redor</p></div>
+                </div>
+            </div>
+
+            <!-- Teams -->
+            <div class="feature-block">
+                <div class="feature-header">
+                    <span class="feature-big-icon">👥</span>
+                    <div>
+                        <h3>Sistema de Times</h3>
+                        <p>Crie times, recrute membrios e domine o servidor</p>
                     </div>
+                </div>
+                <div class="team-features">
+                    <div class="team-feature"><span>🏠</span><strong>Team Home</strong><p>Teleporte para base do time</p></div>
+                    <div class="team-feature"><span>🏦</span><strong>Banco do Time</strong><p>Dinheiro compartilhado</p></div>
+                    <div class="team-feature"><span>📍</span><strong>Warps</strong><p>Locais de teleporte do time</p></div>
+                    <div class="team-feature"><span>🤝</span><strong>Alianças</strong><p>Até 5 times aliados</p></div>
+                    <div class="team-feature"><span>📦</span><strong>Chest Claims</strong><p>Proteja seus baús</p></div>
+                    <div class="team-feature"><span>📊</span><strong>Score System</strong><p>Pontuação por kills</p></div>
+                </div>
+            </div>
+
+            <!-- Crates -->
+            <div class="feature-block">
+                <div class="feature-header">
+                    <span class="feature-big-icon">🎁</span>
+                    <div>
+                        <h3>Crates & Chaves</h3>
+                        <p>Abra crates com chaves para receber recompensas</p>
+                    </div>
+                </div>
+                <div class="crates-grid">
+                    <div class="crate-card legendary"><span>🌟</span><strong>Legendary</strong><p>Espadas lendárias, arcos épicos, minions, livros encantados</p></div>
+                    <div class="crate-card rare"><span>💎</span><strong>Rare</strong><p>Itens raros e encantamentos especiais</p></div>
+                    <div class="crate-card spawner"><span>🧟</span><strong>Spawner</strong><p>Spawners de mobs</p></div>
+                    <div class="crate-card money"><span>💵</span><strong>Money</strong><p>Dinheiro e recompensas</p></div>
+                    <div class="crate-card vote"><span>🗳️</span><strong>Vote</strong><p>Vote e ganhe recompensas</p></div>
+                </div>
+            </div>
+
+            <!-- Pets -->
+            <div class="feature-block">
+                <div class="feature-header">
+                    <span class="feature-big-icon">🐾</span>
+                    <div>
+                        <h3>Sistema de Pets</h3>
+                        <p>Companheiros fiéis que te acompanham</p>
+                    </div>
+                </div>
+                <div class="pets-features">
+                    <div class="pet-feature"><span>🐎</span><strong>Mount</strong><p>Monte seus pets</p></div>
+                    <div class="pet-feature"><span>🎩</span><strong>Hat</strong><p>Use como chapéu</p></div>
+                    <div class="pet-feature"><span>✏️</span><strong>Renomeie</strong><p>Personalize o nome</p></div>
+                    <div class="pet-feature"><span>✨</span><strong>Partículas</strong><p>Efeitos visuais</p></div>
+                </div>
+            </div>
+
+            <!-- Other Features -->
+            <div class="feature-block">
+                <div class="feature-header">
+                    <span class="feature-big-icon">🎮</span>
+                    <div>
+                        <h3>Outras Funcionalidades</h3>
+                        <p>Ainda mais conteúdo para explorar</p>
+                    </div>
+                </div>
+                <div class="other-features-grid">
+                    <div class="other-feature"><span>💼</span><strong>Jobs</strong><p>Ganhe dinheiro trabalhando</p></div>
+                    <div class="other-feature"><span>🏪</span><strong>Leilões</strong><p>Compre e venda itens</p></div>
+                    <div class="other-feature"><span>🎯</span><strong>Quests</strong><p>Missões com recompensas</p></div>
+                    <div class="other-feature"><span>⚔️</span><strong>Duelos</strong><p>1v1 contra outros jogadores</p></div>
+                    <div class="other-feature"><span>🪙</span><strong>MobCoins</strong><p>Moeda especial do servidor</p></div>
+                    <div class="other-feature"><span>🗳️</span><strong>Votes</strong><p>Vote e ganhe chaves</p></div>
+                    <div class="other-feature"><span>🌟</span><strong>Custom Enchants</strong><p>Encantamentos únicos</p></div>
+                    <div class="other-feature"><span>🪑</span><strong>GSit</strong><p>Sente em qualquer lugar</p></div>
+                    <div class="other-feature"><span>🎰</span><strong>Slot Machine</strong><p>Aposte e ganhe prêmios</p></div>
+                    <div class="other-feature"><span>🍀</span><strong>Lucky Block</strong><p>Blocos da sorte</p></div>
+                    <div class="other-feature"><span>🏷️</span><strong>Tags</strong><p>Tags personalizadas</p></div>
+                    <div class="other-feature"><span>💬</span><strong>Chat Games</strong><p>Jogos no chat</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ranks Section -->
+    <section id="ranks" class="section ranks-section">
+        <div class="container">
+            <h2 class="section-title">⭐ Sistema de Níveis</h2>
+            <p class="section-subtitle">Suba de nível desbloqueando vantagens exclusivas. Cada nível requer dinheiro, tempo de jogo e XP.</p>
+
+            <div class="ranks-table">
+                <div class="rank-row header">
+                    <span>Nível</span>
+                    <span>Dinheiro</span>
+                    <span>Tempo</span>
+                    <span>XP</span>
+                    <span>Principais Vantagens</span>
+                </div>
+                <div class="rank-row"><span class="rank-name">⭐ 1</span><span>100k</span><span>5h</span><span>5</span><span>2 profissões, 3 leilões, /heal 5d</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 2</span><span>200k</span><span>10h</span><span>10</span><span>2 pwarp, chaves raras, /ec 5d</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 3</span><span>300k</span><span>20h</span><span>15</span><span>3 profissões, 6 leilões, /heal 7d</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 4</span><span>400k</span><span>25h</span><span>20</span><span>3 pwarp, Elytra, 2 missões</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 5</span><span>500k</span><span>30h</span><span>25</span><span>4 profissões, 9 leilões, /heal 15d</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 6</span><span>600k</span><span>35h</span><span>30</span><span>4 pwarp, chaves raras, /ec 7d</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 7</span><span>700k</span><span>40h</span><span>35</span><span>5 profissões, /ptime, Essência</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 8</span><span>800k</span><span>45h</span><span>40</span><span>5 pwarp, chaves dinheiro, 4 missões</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 9</span><span>900k</span><span>50h</span><span>45</span><span>6 profissões, /ptime 7d, Núcleo Fundido</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 10</span><span>1M</span><span>55h</span><span>50</span><span>10 lacaios, chaves dinheiro, /ec 15d</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 11</span><span>1.1M</span><span>60h</span><span>55</span><span>7 profissões, /ptime 15d</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 12</span><span>1.2M</span><span>65h</span><span>60</span><span>7 pwarp, chaves dinheiro, 6 missões</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 13</span><span>1.3M</span><span>70h</span><span>65</span><span>8 profissões, /fly 5d, Núcleo Fundido</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 14</span><span>1.4M</span><span>75h</span><span>70</span><span>8 pwarp, chaves spawner, 8 missões</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 15</span><span>1.5M</span><span>80h</span><span>75</span><span>9 profissões, /fly 7d</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 16</span><span>1.6M</span><span>85h</span><span>80</span><span>10 pwarp, chaves spawner, Bloco Congelado</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 17</span><span>1.7M</span><span>90h</span><span>85</span><span>11 profissões, /fly 15d</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 18</span><span>1.8M</span><span>95h</span><span>90</span><span>12 pwarp, chaves spawner, 12 missões</span></div>
+                <div class="rank-row"><span class="rank-name">⭐ 19</span><span>1.9M</span><span>100h</span><span>95</span><span>12 profissões, /ptime, Bloco Congelado</span></div>
+                <div class="rank-row highlight"><span class="rank-name">⭐ 20</span><span>2M</span><span>110h</span><span>100</span><span>10 chaves lendárias, ULTRA 30d, /fly, /nick</span></div>
+            </div>
+
+            <div class="rank-rewards">
+                <h3>🏆 Recompensas por Nível</h3>
+                <div class="rewards-grid">
+                    <div class="reward-item"><span>🔑</span><p>Chaves de Crate</p></div>
+                    <div class="reward-item"><span>🍎</span><p>Maçãs Douradas</p></div>
+                    <div class="reward-item"><span>🪨</span><p>Blocos de Essência</p></div>
+                    <div class="reward-item"><span>🗺️</span><p>Blocos de Reivindicação</p></div>
+                    <div class="reward-item"><span>🧱</span><p>Núcleo Fundido</p></div>
+                    <div class="reward-item"><span>❄️</span><p>Bloco Congelado</p></div>
+                    <div class="reward-item"><span>🪄</span><p>Elytra</p></div>
+                    <div class="reward-item"><span>👑</span><p>ULTRA VIP 30d</p></div>
                 </div>
             </div>
         </div>
@@ -120,86 +300,98 @@
         <div class="container">
             <h2 class="section-title">🛒 Loja</h2>
             
-            <!-- Store Tabs -->
             <div class="store-tabs">
-                <button class="store-tab active" onclick="switchStoreTab('real')">💰 Dinheiro Real</button>
+                <button class="store-tab active" onclick="switchStoreTab('real')">💰 Dinheiro Real (Pix)</button>
                 <button class="store-tab" onclick="switchStoreTab('mobcoins')">🪙 MobCoins</button>
             </div>
 
-            <!-- Real Money Store -->
+            <!-- Real Money Store (Pix) -->
             <div class="store-content" id="realMoneyStore">
+                <div class="pix-info-box">
+                    <h3>💳 Pagamento via Pix</h3>
+                    <p>Pagamento instantâneo e seguro. Após a confirmação, o rank é aplicado automaticamente via RCON!</p>
+                    <div class="pix-key-display">
+                        <span class="pix-label">Chave Pix:</span>
+                        <span class="pix-key">40b028d0-7ae8-4622-9f84-11cc4b2172e7</span>
+                        <button class="btn-copy-pix" onclick="copyPix()">📋 Copiar</button>
+                    </div>
+                </div>
+
                 <div class="store-grid">
-                    <!-- Ranks -->
                     <div class="store-item rank-vip">
                         <div class="rank-badge">VIP</div>
                         <div class="item-icon">⭐</div>
                         <h3>Rank VIP</h3>
+                        <p class="item-duration">30 dias</p>
                         <ul class="item-features">
-                            <li>Cor no chat</li>
-                            <li>Comando /fly</li>
-                            <li>2 homes</li>
-                            <li>10 MobCoins</li>
+                            <li>Prefixo [VIP] colorido</li>
+                            <li>Kit VIP semanal</li>
+                            <li>Comandos exclusivos</li>
                         </ul>
-                        <div class="item-price">
-                            <span class="price">R$ 15,00</span>
-                        </div>
-                        <button class="btn-buy">Comprar</button>
+                        <div class="item-price"><span class="price">R$ 15,00</span></div>
+                        <button class="btn-buy" onclick="showPixModal('vip')">Comprar via Pix</button>
                     </div>
 
-                    <div class="store-item rank-mvp">
-                        <div class="rank-badge mvp">MVP</div>
+                    <div class="store-item rank-elite">
+                        <div class="rank-badge elite">ELITE</div>
                         <div class="item-icon">💎</div>
-                        <h3>Rank MVP</h3>
+                        <h3>Rank Elite</h3>
+                        <p class="item-duration">30 dias</p>
                         <ul class="item-features">
-                            <li>Cor no chat</li>
-                            <li>Comando /fly</li>
-                            <li>5 homes</li>
-                            <li>30 MobCoins</li>
-                            <li>Cosméticos especiais</li>
+                            <li>Tudo do VIP</li>
+                            <li>Kit Elite semanal</li>
+                            <li>Voo em sobrevivência</li>
                         </ul>
-                        <div class="item-price">
-                            <span class="price">R$ 35,00</span>
-                        </div>
-                        <button class="btn-buy">Comprar</button>
+                        <div class="item-price"><span class="price">R$ 35,00</span></div>
+                        <button class="btn-buy" onclick="showPixModal('elite')">Comprar via Pix</button>
                     </div>
 
-                    <div class="store-item rank-legend">
-                        <div class="rank-badge legend">LEGEND</div>
-                        <div class="item-icon">👑</div>
-                        <h3>Rank LEGEND</h3>
-                        <ul class="item-features">
-                            <li>Todas perks MVP</li>
-                            <li>10 homes</li>
-                            <li>100 MobCoins</li>
-                            <li>Tag exclusiva</li>
-                            <li>Prioridade na fila</li>
-                        </ul>
-                        <div class="item-price">
-                            <span class="price">R$ 60,00</span>
-                        </div>
-                        <button class="btn-buy">Comprar</button>
-                    </div>
-
-                    <div class="store-item rank-mythic">
-                        <div class="rank-badge mythic">MYTHIC</div>
+                    <div class="store-item rank-ultra">
+                        <div class="rank-badge ultra">ULTRA</div>
                         <div class="item-icon">🔥</div>
-                        <h3>Rank MYTHIC</h3>
+                        <h3>Rank Ultra</h3>
+                        <p class="item-duration">30 dias</p>
                         <ul class="item-features">
-                            <li>Todas perks Legend</li>
-                            <li>20 homes</li>
-                            <li>250 MobCoins</li>
-                            <li>Efeitos de_partícula</li>
-                            <li>Titles exclusivos</li>
+                            <li>Tudo do Elite</li>
+                            <li>Kit Ultra diário</li>
+                            <li>Regiões exclusivas</li>
                         </ul>
-                        <div class="item-price">
-                            <span class="price">R$ 100,00</span>
-                        </div>
-                        <button class="btn-buy">Comprar</button>
+                        <div class="item-price"><span class="price">R$ 60,00</span></div>
+                        <button class="btn-buy" onclick="showPixModal('ultra')">Comprar via Pix</button>
+                    </div>
+
+                    <div class="store-item rank-midia">
+                        <div class="rank-badge midia">MÍDIA</div>
+                        <div class="item-icon">🎬</div>
+                        <h3>Rank Mídia</h3>
+                        <p class="item-duration">30 dias</p>
+                        <ul class="item-features">
+                            <li>Tag [Mídia] no chat</li>
+                            <li>Kit exclusivo de Mídia</li>
+                            <li>Para criadores de conteúdo</li>
+                        </ul>
+                        <div class="item-price"><span class="price">R$ 100,00</span></div>
+                        <button class="btn-buy" onclick="showPixModal('media')">Comprar via Pix</button>
+                    </div>
+
+                    <div class="store-item rank-famoso">
+                        <div class="rank-badge famoso">FAMOSO</div>
+                        <div class="item-icon">👑</div>
+                        <h3>Rank Famoso</h3>
+                        <p class="item-duration">30 dias</p>
+                        <ul class="item-features">
+                            <li>Tudo do Ultra</li>
+                            <li>Tag [Famoso] dourada</li>
+                            <li>Kit Famoso premium diário</li>
+                            <li>Acesso antecipado</li>
+                        </ul>
+                        <div class="item-price"><span class="price">R$ 150,00</span></div>
+                        <button class="btn-buy" onclick="showPixModal('famous')">Comprar via Pix</button>
                     </div>
                 </div>
 
                 <div class="store-note">
-                    <p>💳 Pagamento via Mercado Pago • Entrega instantânea • Suporte 24h</p>
+                    <p>⚡ Pagamento via Pix • Entrega automática via RCON • Suporte no Discord</p>
                 </div>
             </div>
 
@@ -208,98 +400,128 @@
                 <div class="mobcoins-info">
                     <div class="mobcoins-balance">
                         <h3>💰 Seus MobCoins</h3>
-                        <p class="balance-amount" id="mobcoinsBalance">0 MobCoins</p>
-                        <p class="balance-note">Ganhe MobCoins jogando ou compre na loja!</p>
+                        <p class="balance-amount" id="mobcoinsBalance">Verificando...</p>
+                        <div class="balance-check">
+                            <input type="text" id="mcUsername" placeholder="Seu nick Minecraft" class="mc-input">
+                            <button class="btn-check" onclick="checkMobCoins()">Verificar Saldo</button>
+                        </div>
                     </div>
                 </div>
 
                 <div class="store-grid">
                     <div class="store-item">
-                        <div class="item-icon">🎨</div>
-                        <h3>Cosmético de Arma</h3>
-                        <p class="item-desc">Visual personalizado para suas armas</p>
-                        <div class="item-price mobcoins-price">
-                            <span class="price">50</span>
-                            <span class="coin-icon">🪙</span>
-                        </div>
-                        <button class="btn-buy">Comprar</button>
-                    </div>
-
-                    <div class="store-item">
-                        <div class="item-icon">✨</div>
-                        <h3>Efeito de Partícula</h3>
-                        <p class="item-desc">Fogos de artifício ao seu redor</p>
-                        <div class="item-price mobcoins-price">
-                            <span class="price">75</span>
-                            <span class="coin-icon">🪙</span>
-                        </div>
-                        <button class="btn-buy">Comprar</button>
-                    </div>
-
-                    <div class="store-item">
-                        <div class="item-icon">🏷️</div>
-                        <h3>Tag Customizada</h3>
-                        <p class="item-desc">Crie sua própria tag no chat</p>
-                        <div class="item-price mobcoins-price">
-                            <span class="price">100</span>
-                            <span class="coin-icon">🪙</span>
-                        </div>
-                        <button class="btn-buy">Comprar</button>
-                    </div>
-
-                    <div class="store-item">
-                        <div class="item-icon">🏠</div>
-                        <h3>Home Extra</h3>
-                        <p class="item-desc">+1 ponto de teletransporte</p>
-                        <div class="item-price mobcoins-price">
-                            <span class="price">25</span>
-                            <span class="coin-icon">🪙</span>
-                        </div>
-                        <button class="btn-buy">Comprar</button>
+                        <div class="item-icon">🔮</div>
+                        <h3>Estrela do Nether</h3>
+                        <p class="item-desc">x1 Estrela do Nether</p>
+                        <div class="item-price mobcoins-price"><span class="price">50,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyMobCoinsItem('nether_star')">Comprar</button>
                     </div>
 
                     <div class="store-item">
                         <div class="item-icon">🎁</div>
-                        <h3>Caixa Misteriosa</h3>
-                        <p class="item-desc">Itens aleatórios raros!</p>
-                        <div class="item-price mobcoins-price">
-                            <span class="price">40</span>
-                            <span class="coin-icon">🪙</span>
-                        </div>
-                        <button class="btn-buy">Comprar</button>
+                        <h3>Núcleo Pesado</h3>
+                        <p class="item-desc">x1 Núcleo Pesado</p>
+                        <div class="item-price mobcoins-price"><span class="price">100,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyMobCoinsItem('heavy_core')">Comprar</button>
                     </div>
 
                     <div class="store-item">
-                        <div class="item-icon">⚡</div>
-                        <h3>Booster XP 1h</h3>
-                        <p class="item-desc">Dobro de XP por 1 hora</p>
-                        <div class="item-price mobcoins-price">
-                            <span class="price">30</span>
-                            <span class="coin-icon">🪙</span>
-                        </div>
-                        <button class="btn-buy">Comprar</button>
+                        <div class="item-icon">🛡️</div>
+                        <h3>Totem da Imortalidade</h3>
+                        <p class="item-desc">x1 Totem da Imortalidade</p>
+                        <div class="item-price mobcoins-price"><span class="price">50,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyMobCoinsItem('totem')">Comprar</button>
+                    </div>
+
+                    <div class="store-item">
+                        <div class="item-icon">🦋</div>
+                        <h3>Elytra</h3>
+                        <p class="item-desc">x1 Elytra</p>
+                        <div class="item-price mobcoins-price"><span class="price">5,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyMobCoinsItem('elytra')">Comprar</button>
+                    </div>
+
+                    <div class="store-item">
+                        <div class="item-icon">🔱</div>
+                        <h3>Tridente</h3>
+                        <p class="item-desc">x1 Tridente</p>
+                        <div class="item-price mobcoins-price"><span class="price">10,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyMobCoinsItem('trident')">Comprar</button>
+                    </div>
+
+                    <div class="store-item">
+                        <div class="item-icon">🍎</div>
+                        <h3>Maçã Dourada Encantada</h3>
+                        <p class="item-desc">x1 Maçã Dourada Encantada</p>
+                        <div class="item-price mobcoins-price"><span class="price">40,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyMobCoinsItem('enchanted_apple')">Comprar</button>
+                    </div>
+
+                    <div class="store-item">
+                        <div class="item-icon">🃏</div>
+                        <h3>Carta da Sorte</h3>
+                        <p class="item-desc">x1 Carta da Sorte ✪</p>
+                        <div class="item-price mobcoins-price"><span class="price">600</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyMobCoinsItem('lucky_card')">Comprar</button>
+                    </div>
+
+                    <div class="store-item">
+                        <div class="item-icon">💡</div>
+                        <h3>Bastão Super (64)</h3>
+                        <p class="item-desc">x64 Bastão Super</p>
+                        <div class="item-price mobcoins-price"><span class="price">12,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyMobCoinsItem('super_stick')">Comprar</button>
+                    </div>
+
+                    <!-- Ranks com MobCoins -->
+                    <div class="store-item rank-mobcoins">
+                        <div class="rank-badge">VIP</div>
+                        <div class="item-icon">⭐</div>
+                        <h3>Rank VIP (30 dias)</h3>
+                        <div class="item-price mobcoins-price"><span class="price">50,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyMobCoinsItem('vip_30d')">Comprar</button>
+                    </div>
+
+                    <div class="store-item rank-mobcoins">
+                        <div class="rank-badge elite">ELITE</div>
+                        <div class="item-icon">💎</div>
+                        <h3>Rank Elite (30 dias)</h3>
+                        <div class="item-price mobcoins-price"><span class="price">100,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyMobCoinsItem('elite_30d')">Comprar</button>
+                    </div>
+
+                    <div class="store-item rank-mobcoins">
+                        <div class="rank-badge ultra">ULTRA</div>
+                        <div class="item-icon">🔥</div>
+                        <h3>Rank Ultra (30 dias)</h3>
+                        <div class="item-price mobcoins-price"><span class="price">150,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyMobCoinsItem('ultra_30d')">Comprar</button>
+                    </div>
+
+                    <div class="store-item rank-mobcoins">
+                        <div class="rank-badge midia">MÍDIA</div>
+                        <div class="item-icon">🎬</div>
+                        <h3>Rank Mídia (30 dias)</h3>
+                        <div class="item-price mobcoins-price"><span class="price">200,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyMobCoinsItem('media_30d')">Comprar</button>
+                    </div>
+
+                    <div class="store-item rank-mobcoins">
+                        <div class="rank-badge famoso">FAMOSO</div>
+                        <div class="item-icon">👑</div>
+                        <h3>Rank Famoso (30 dias)</h3>
+                        <div class="item-price mobcoins-price"><span class="price">250,000</span><span class="coin-icon">🪙</span></div>
+                        <button class="btn-buy" onclick="buyMobCoinsItem('famous_30d')">Comprar</button>
                     </div>
                 </div>
 
                 <div class="mobcoins-earn">
                     <h3>📈 Como Ganhar MobCoins</h3>
                     <div class="earn-methods">
-                        <div class="earn-method">
-                            <span>⏱️</span>
-                            <p>Jogue 1 hora = 5 MobCoins</p>
-                        </div>
-                        <div class="earn-method">
-                            <span>🏆</span>
-                            <p>Ganhe uma partida = 10 MobCoins</p>
-                        </div>
-                        <div class="earn-method">
-                            <span>📅</span>
-                            <p>Login diário = 2 MobCoins</p>
-                        </div>
-                        <div class="earn-method">
-                            <span>🎉</span>
-                            <p>Eventos especiais = Até 50 MobCoins</p>
-                        </div>
+                        <div class="earn-method"><span>🕷️</span><p>Matando mobs (5-40% chance)</p></div>
+                        <div class="earn-method"><span>⚔️</span><p>PvP e eventos do servidor</p></div>
+                        <div class="earn-method"><span>📅</span><p>Login diário e missões</p></div>
+                        <div class="earn-method"><span>🎉</span><p>Eventos especiais</p></div>
                     </div>
                 </div>
             </div>
@@ -313,29 +535,39 @@
             <div class="discord-content">
                 <div class="discord-info">
                     <h3>Junte-se à nossa comunidade!</h3>
-                    <p>Entre no nosso Discord para ficar por dentro das novidades, participar de eventos exclusivos e conversar com outros jogadores.</p>
+                    <p>Entre no nosso Discord para ficar por dentro das novidades, participar de eventos exclusivos e comprar ranks via loja integrada.</p>
                     <ul class="discord-features">
                         <li>✅ Comunidade ativa</li>
                         <li>✅ Suporte rápido</li>
                         <li>✅ Eventos exclusivos</li>
                         <li>✅ Sorteios semanais</li>
+                        <li>✅ Loja de VIPs integrada</li>
                     </ul>
                     <a href="https://discord.gg/minepex" target="_blank" class="btn-discord-big">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
-                        </svg>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
                         Entrar no Discord
                     </a>
                 </div>
                 <div class="discord-widget">
                     <div class="widget-placeholder">
-                        <img src="https://images-ext-1.discordapp.net/external/IgdvU8AWENFQvxU80JjcWJ4M0Ka6U8OJuH93OXlFjCE/https/cdn.discordapp.com/icons/1375700384353484820/a66b5a142f5a32fdb1502785ca875a67.png?format=webp&quality=lossless&width=115&height=115" alt="Discord Server">
-                        <p>Invite: discord.gg/minepex</p>
+                        <img src="https://images-ext-1.discordapp.net/external/IgdvU8AWENFQvxU80JjcWJ4M0Ka6U8OJuH93OXlFjCE/https/cdn.discordapp.com/icons/1375700384353484820/a66b5a142f5a32fdb1502785ca875a67.png?format=webp&quality=lossless&width=115&height=115" alt="Discord">
+                        <p>discord.gg/minepex</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Pix Modal -->
+    <div class="modal-overlay" id="pixModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closePixModal()">✕</button>
+            <h2>💳 Pagamento via Pix</h2>
+            <div class="modal-content" id="pixModalBody">
+                <p style="text-align:center;color:var(--text-gray);">Carregando...</p>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -347,7 +579,8 @@
                 </div>
                 <div class="footer-links">
                     <a href="#home">Início</a>
-                    <a href="#server">Servidor</a>
+                    <a href="#features">Features</a>
+                    <a href="#ranks">Níveis</a>
                     <a href="#store">Loja</a>
                     <a href="#discord">Discord</a>
                 </div>
@@ -358,34 +591,8 @@
         </div>
     </footer>
 
-    <!-- Pix Modal -->
-    <div class="modal-overlay" id="pixModal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closePixModal()">×</button>
-            <h2>Pagamento via Pix</h2>
-            <div class="pix-info">
-                <div class="pix-qr">
-                    <div class="qr-placeholder">
-                        <span>📱</span>
-                        <p>Escaneie o QR Code</p>
-                    </div>
-                </div>
-                <div class="pix-details">
-                    <p class="pix-label">Chave Pix:</p>
-                    <p class="pix-key" id="pixKey">pagamentos@minepex.com</p>
-                    <button class="btn-copy-pix" onclick="copyPixKey()">📋 Copiar Chave</button>
-                    <p class="pix-instructions">1. Copie a chave Pix acima</p>
-                    <p class="pix-instructions">2. Abra o app do seu banco</p>
-                    <p class="pix-instructions">3. Faça a transferência</p>
-                    <p class="pix-instructions">4. Envie o comprovante no Discord</p>
-                </div>
-            </div>
-            <div class="pix-item-info" id="pixItemInfo"></div>
-        </div>
-    </div>
-
-    <!-- Toast Notification -->
-    <div class="toast" id="toast">IP copiado!</div>
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
 
     <script src="script.js"></script>
 </body>
