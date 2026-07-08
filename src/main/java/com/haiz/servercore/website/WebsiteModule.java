@@ -22,6 +22,7 @@ public final class WebsiteModule {
     private boolean running;
     private StoreStorage storeStorage;
     private RateLimiter purchaseLimiter;
+    private StorePoller storePoller;
 
     public WebsiteModule(HaizServerCore plugin) {
         this.plugin = plugin;
@@ -47,6 +48,13 @@ public final class WebsiteModule {
             // Initialize store
             this.storeStorage = new StoreStorage(plugin.sqliteDatabase());
             this.purchaseLimiter = new RateLimiter(10, 15 * 60 * 1000);
+
+            // Start store poller if API URL is configured
+            String storeApiUrl = config.storeApiUrl();
+            if (!storeApiUrl.isEmpty()) {
+                this.storePoller = new StorePoller(plugin, storeApiUrl);
+                storePoller.start();
+            }
 
             // Server API endpoints
             server.createContext("/api/server/status", new ServerStatusHandler(this));
@@ -89,6 +97,10 @@ public final class WebsiteModule {
     }
 
     public void stop() {
+        if (storePoller != null) {
+            storePoller.stop();
+            storePoller = null;
+        }
         if (server != null) {
             server.stop(0);
             server = null;

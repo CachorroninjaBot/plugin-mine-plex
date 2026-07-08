@@ -20,3 +20,7 @@ cors-enabled: true
 
 # Origem permitida pelo CORS
 cors-origin: "https://site-minepex.vercel.app"
+
+# URL da API de loja externa (Render) para polling de compras
+# Deixe vazio para desabilitar o polling
+store-api-url: "https://minepex-api.onrender.com"

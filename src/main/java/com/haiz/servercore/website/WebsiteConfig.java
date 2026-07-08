@@ -33,4 +33,8 @@ public final class WebsiteConfig {
     public String corsOrigin() {
         return config.getString("cors-origin", "*");
     }
+
+    public String storeApiUrl() {
+        return config.getString("store-api-url", "");
+    }
 }
