@@ -1,0 +1,22 @@
+# ============================================
+#  Website API Configuration
+# ============================================
+# API para integração com o site do servidor.
+
+# Habilitar a API do website
+enabled: true
+
+# Host da API (0.0.0.0 = aceita conexões externas)
+host: "0.0.0.0"
+
+# Porta da API
+port: 8080
+
+# Chave de autenticação da API (deixe vazio para desabilitar)
+api-key: ""
+
+# Habilitar CORS
+cors-enabled: true
+
+# Origem permitida pelo CORS
+cors-origin: "*"

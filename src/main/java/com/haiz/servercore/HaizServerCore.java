@@ -17,6 +17,7 @@ import com.haiz.servercore.discord.sync.NicknameSyncManager;
 import com.haiz.servercore.storage.SQLiteDatabase;
 import com.haiz.servercore.teams.TeamsModule;
 import com.haiz.servercore.vip.VipModule;
+import com.haiz.servercore.website.WebsiteModule;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
@@ -36,6 +37,7 @@ public final class HaizServerCore extends JavaPlugin {
     private VipModule vipModule;
     private TeamsModule teamsModule;
     private CommandLogModule commandLogModule;
+    private WebsiteModule websiteModule;
 
     private ChatBridgeListener chatBridgeListener;
     private GameChatListener gameChatListener;
@@ -46,10 +48,12 @@ public final class HaizServerCore extends JavaPlugin {
     private NicknameSyncManager nicknameSyncManager;
     private ConsoleChannelManager consoleChannelManager;
     private CannedResponseManager cannedResponseManager;
+    private long serverStartTime;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        this.serverStartTime = System.currentTimeMillis();
 
         this.configManager = new ConfigManager(this);
         this.configManager.reload();
@@ -70,6 +74,9 @@ public final class HaizServerCore extends JavaPlugin {
         this.teamsModule.start();
 
         this.commandLogModule = new CommandLogModule(this);
+
+        this.websiteModule = new WebsiteModule(this);
+        this.websiteModule.start();
 
         Bukkit.getScheduler().runTaskLater(this, this::startDiscordModules, 40L);
 
@@ -227,6 +234,9 @@ public final class HaizServerCore extends JavaPlugin {
         if (commandLogModule != null) {
             commandLogModule.stop();
         }
+        if (websiteModule != null) {
+            websiteModule.stop();
+        }
         if (discordBotManager != null) {
             discordBotManager.stop();
         }
@@ -252,6 +262,9 @@ public final class HaizServerCore extends JavaPlugin {
         if (commandLogModule != null) {
             commandLogModule.reload();
         }
+        if (websiteModule != null) {
+            websiteModule.reload();
+        }
         Bukkit.getScheduler().runTaskLater(this, this::startDiscordModules, 40L);
     }
 
@@ -260,7 +273,9 @@ public final class HaizServerCore extends JavaPlugin {
     public VipModule vip() { return vipModule; }
     public TeamsModule teams() { return teamsModule; }
     public CommandLogModule commandLog() { return commandLogModule; }
+    public WebsiteModule website() { return websiteModule; }
     public SQLiteDatabase sqliteDatabase() { return sqliteDatabase; }
     public GroupRoleSyncManager groupRoleSyncManager() { return groupRoleSyncManager; }
     public NicknameSyncManager nicknameSyncManager() { return nicknameSyncManager; }
+    public long getServerStartTime() { return serverStartTime; }
 }
