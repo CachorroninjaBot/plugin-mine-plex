@@ -20,6 +20,8 @@ public final class WebsiteModule {
     private final HaizServerCore plugin;
     private HttpServer server;
     private boolean running;
+    private StoreStorage storeStorage;
+    private RateLimiter purchaseLimiter;
 
     public WebsiteModule(HaizServerCore plugin) {
         this.plugin = plugin;
@@ -40,9 +42,13 @@ public final class WebsiteModule {
                     : new InetSocketAddress(host, port);
 
             server = HttpServer.create(addr, 0);
-            server.setExecutor(Executors.newFixedThreadPool(4));
+            server.setExecutor(Executors.newFixedThreadPool(8));
 
-            // API endpoints
+            // Initialize store
+            this.storeStorage = new StoreStorage(plugin.sqliteDatabase());
+            this.purchaseLimiter = new RateLimiter(10, 15 * 60 * 1000);
+
+            // Server API endpoints
             server.createContext("/api/server/status", new ServerStatusHandler(this));
             server.createContext("/api/server/players", new OnlinePlayersHandler(this));
             server.createContext("/api/server/top", new TopPlayersHandler(this));
@@ -50,10 +56,20 @@ public final class WebsiteModule {
             server.createContext("/api/store/mobcoins", new MobCoinsStoreHandler(this));
             server.createContext("/api/ranks", new RanksHandler(this));
 
+            // Store API endpoints
+            server.createContext("/api/store/items", new StoreItemsHandler(this));
+            server.createContext("/api/pix/create", new PixCreateHandler(this));
+            server.createContext("/api/pix/status", new PixStatusHandler(this));
+            server.createContext("/api/pix/confirm", new PixConfirmHandler(this));
+            server.createContext("/api/mobcoins/buy", new MobCoinsBuyHandler(this));
+            server.createContext("/api/mobcoins", new MobCoinsBalanceHandler(this));
+            server.createContext("/api/purchases", new PurchasesHandler(this));
+
             // CORS preflight
+            String corsOrigin = config.corsOrigin();
             server.createContext("/api/", exchange -> {
                 if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
-                    exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
+                    exchange.getResponseHeaders().set("Access-Control-Allow-Origin", corsOrigin);
                     exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
                     exchange.getResponseHeaders().set("Access-Control-Allow-Headers", "Content-Type");
                     exchange.sendResponseHeaders(204, -1);
@@ -88,6 +104,8 @@ public final class WebsiteModule {
 
     public boolean isRunning() { return running; }
     public HaizServerCore plugin() { return plugin; }
+    public StoreStorage getStoreStorage() { return storeStorage; }
+    public RateLimiter getPurchaseLimiter() { return purchaseLimiter; }
 
     public WebsiteConfig config() {
         return new WebsiteConfig(plugin.config().getModuleConfig("website"));
