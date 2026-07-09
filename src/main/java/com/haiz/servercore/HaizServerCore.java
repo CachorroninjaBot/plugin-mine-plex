@@ -17,6 +17,7 @@ import com.haiz.servercore.discord.sync.NicknameSyncManager;
 import com.haiz.servercore.storage.SQLiteDatabase;
 import com.haiz.servercore.teams.TeamsModule;
 import com.haiz.servercore.vip.VipModule;
+import com.haiz.servercore.website.LinkApiServer;
 import com.haiz.servercore.website.StorePoller;
 
 import net.dv8tion.jda.api.entities.Guild;
@@ -38,6 +39,7 @@ public final class HaizServerCore extends JavaPlugin {
     private TeamsModule teamsModule;
     private CommandLogModule commandLogModule;
     private StorePoller storePoller;
+    private LinkApiServer linkApiServer;
 
     private ChatBridgeListener chatBridgeListener;
     private GameChatListener gameChatListener;
@@ -79,6 +81,16 @@ public final class HaizServerCore extends JavaPlugin {
                 configManager.websiteStoreApiUrl(),
                 configManager.websitePluginSecret());
         this.storePoller.start();
+
+        // Servidor de vínculo (MC↔Discord) para a minepex-api consultar no login Discord
+        if (configManager.linkApiPort() > 0) {
+            this.linkApiServer = new LinkApiServer(this,
+                    new com.haiz.servercore.vip.LinkStorage(this, sqliteDatabase),
+                    configManager.linkApiHost(),
+                    configManager.linkApiPort(),
+                    configManager.websitePluginSecret());
+            this.linkApiServer.start();
+        }
 
         Bukkit.getScheduler().runTaskLater(this, this::startDiscordModules, 40L);
 
@@ -239,6 +251,9 @@ public final class HaizServerCore extends JavaPlugin {
         if (storePoller != null) {
             storePoller.stop();
         }
+        if (linkApiServer != null) {
+            linkApiServer.stop();
+        }
         if (discordBotManager != null) {
             discordBotManager.stop();
         }
@@ -267,10 +282,23 @@ public final class HaizServerCore extends JavaPlugin {
         if (storePoller != null) {
             storePoller.stop();
         }
+        if (linkApiServer != null) {
+            linkApiServer.stop();
+        }
         this.storePoller = new StorePoller(this,
                 configManager.websiteStoreApiUrl(),
                 configManager.websitePluginSecret());
         this.storePoller.start();
+
+        // Servidor de vínculo (MC↔Discord) para a minepex-api consultar no login Discord
+        if (configManager.linkApiPort() > 0) {
+            this.linkApiServer = new LinkApiServer(this,
+                    new com.haiz.servercore.vip.LinkStorage(this, sqliteDatabase),
+                    configManager.linkApiHost(),
+                    configManager.linkApiPort(),
+                    configManager.websitePluginSecret());
+            this.linkApiServer.start();
+        }
         Bukkit.getScheduler().runTaskLater(this, this::startDiscordModules, 40L);
     }
 

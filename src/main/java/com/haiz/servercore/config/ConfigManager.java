@@ -367,4 +367,15 @@ public final class ConfigManager {
     public String websitePluginSecret() {
         return getModuleConfig("website").getString("plugin-secret", "minepex-plugin-secret");
     }
+
+    // ── Link API (plugin expõe vínculo MC↔Discord para a minepex-api) ──────
+
+    public String linkApiHost() {
+        return getModuleConfig("website").getString("link-api-host", "0.0.0.0");
+    }
+
+    /** Porta 0 ou ≤0 desabilita o servidor de vínculo. */
+    public int linkApiPort() {
+        return getModuleConfig("website").getInt("link-api-port", 0);
+    }
 }

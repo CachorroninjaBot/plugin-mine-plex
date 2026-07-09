@@ -20,3 +20,15 @@ store-api-url: "https://minepex-api.onrender.com"
 # Segredo compartilhado com a minepex-api.
 # Deve ser IGUAL à variável PLUGIN_SECRET no Render.
 plugin-secret: "minepex-plugin-secret"
+
+# ── Link API (opcional) ───────────────────────────────────────
+# O plugin expõe, nesta porta, um endpoint mínimo que a minepex-api
+# consulta durante o login com Discord, para descobrir o Minecraft
+# vinculado a um discord_id (discord_links).
+#
+# Requer que a minepex-api (Render) consiga alcançar host:port
+# (VPS com IP público + firewall liberando a porta).
+# Porta 0 = desabilitado (login Discord ainda funciona, só não
+# traz o MC automaticamente).
+link-api-host: "0.0.0.0"
+link-api-port: 0
