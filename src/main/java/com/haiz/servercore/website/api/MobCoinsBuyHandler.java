@@ -47,7 +47,11 @@ public final class MobCoinsBuyHandler implements HttpHandler {
             return;
         }
 
-        String playerName = req.playerName().replaceAll("[^a-zA-Z0-9_]", "").substring(0, Math.min(req.playerName().length(), 16));
+        String playerName = req.playerName().replaceAll("[^a-zA-Z0-9_]", "");
+        if (playerName.isEmpty() || playerName.length() > 16) {
+            ApiUtils.sendError(exchange, 400, "Nome do jogador invalido");
+            return;
+        }
         String itemId = req.itemId().replaceAll("[^a-zA-Z0-9_]", "");
 
         StoreItems.Item item = StoreItems.getMobCoins(itemId);
@@ -56,46 +60,58 @@ public final class MobCoinsBuyHandler implements HttpHandler {
             return;
         }
 
-        var mobCoins = module.plugin().vip().mobCoins();
-        if (mobCoins == null || !mobCoins.isAvailable()) {
+        // Check balance from IridiumMobCoins database
+        double balance = 0;
+        if (module.getMobCoinsDb() != null) {
+            balance = module.getMobCoinsDb().getBalance(playerName);
+        } else {
             ApiUtils.sendError(exchange, 503, "Sistema de MobCoins indisponivel");
             return;
         }
 
-        var player = Bukkit.getOfflinePlayer(playerName);
-        double balance = mobCoins.getBalance(player.getUniqueId());
+        int cost = (int) item.price();
+        module.plugin().getLogger().info("[MobCoins] " + playerName + " tem " + balance + " MobCoins, custo: " + cost);
 
-        if (balance < item.price()) {
+        if (balance < cost) {
             Map<String, Object> err = new LinkedHashMap<>();
             err.put("error", "Saldo insuficiente");
             err.put("balance", balance);
-            err.put("cost", (int) item.price());
+            err.put("cost", cost);
             ApiUtils.sendJson(exchange, 400, err);
             return;
         }
 
-        boolean withdrawn = mobCoins.withdraw(player.getUniqueId(), item.price());
-        if (!withdrawn) {
-            ApiUtils.sendError(exchange, 400, "Erro ao debitar MobCoins");
-            return;
-        }
-
+        // Record purchase
         String purchaseId = UUID.randomUUID().toString();
-        module.getStoreStorage().createMobCoinsPurchase(purchaseId, playerName, player.getUniqueId().toString(), itemId, item.name(), (int) item.price());
+        module.getStoreStorage().createMobCoinsPurchase(purchaseId, playerName, null, itemId, item.name(), cost);
 
-        String command = item.command().replace("%player%", playerName);
+        // Execute commands on main thread
+        String removeCommand = "mc remove " + playerName + " " + cost;
+        String itemCommand = item.command().replace("%player%", playerName);
+
         Bukkit.getScheduler().runTask(module.plugin(), () -> {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-            module.getStoreStorage().updateMobCoinsPurchaseStatus(purchaseId, "delivered");
-            module.plugin().getLogger().info("[Store] Entregue " + item.name() + " (MobCoins) para " + playerName);
+            try {
+                // Deduct MobCoins
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), removeCommand);
+                module.plugin().getLogger().info("[MobCoins] Deduzido " + cost + " de " + playerName);
+
+                // Give item
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), itemCommand);
+                module.plugin().getLogger().info("[Store] Entregue " + item.name() + " (MobCoins) para " + playerName);
+
+                // Mark as delivered
+                module.getStoreStorage().updateMobCoinsPurchaseStatus(purchaseId, "delivered");
+            } catch (Exception e) {
+                module.plugin().getLogger().severe("[MobCoins] Erro ao processar compra: " + e.getMessage());
+            }
         });
 
         Map<String, Object> resp = new LinkedHashMap<>();
         resp.put("purchaseId", purchaseId);
         resp.put("item", item.name());
-        resp.put("cost", (int) item.price());
-        resp.put("status", "delivered");
-        resp.put("message", "Compra realizada com sucesso!");
+        resp.put("cost", cost);
+        resp.put("status", "processing");
+        resp.put("message", "Compra em processamento!");
 
         ApiUtils.sendJson(exchange, 200, resp);
     }

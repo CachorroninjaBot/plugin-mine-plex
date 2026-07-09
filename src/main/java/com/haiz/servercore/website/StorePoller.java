@@ -24,11 +24,16 @@ public final class StorePoller {
     private final String pluginSecret;
     private final Gson gson = new Gson();
     private int taskId = -1;
+    private MobCoinsDatabase mobCoinsDb;
 
     public StorePoller(JavaPlugin plugin, String apiUrl, String pluginSecret) {
         this.plugin = plugin;
         this.apiUrl = apiUrl;
         this.pluginSecret = pluginSecret;
+    }
+
+    public void setMobCoinsDb(MobCoinsDatabase mobCoinsDb) {
+        this.mobCoinsDb = mobCoinsDb;
     }
 
     public void start() {
@@ -93,6 +98,9 @@ public final class StorePoller {
                 JsonObject purchase = elem.getAsJsonObject();
                 processPurchase(purchase);
             }
+
+            // Also sync MobCoins balances
+            syncMobCoinsBalances();
 
         } catch (java.net.ConnectException e) {
             plugin.getLogger().warning("[Store] Não foi possível conectar à API: " + apiUrl);
@@ -163,6 +171,46 @@ public final class StorePoller {
             conn.disconnect();
         } catch (Exception e) {
             plugin.getLogger().log(Level.WARNING, "[Store] Erro ao marcar como entregue: " + e.getMessage());
+        }
+    }
+
+    private void syncMobCoinsBalances() {
+        if (mobCoinsDb == null) return;
+
+        try {
+            // Get all online players' balances
+            var onlinePlayers = Bukkit.getOnlinePlayers();
+            if (onlinePlayers.isEmpty()) return;
+
+            StringBuilder balancesJson = new StringBuilder("[");
+            boolean first = true;
+            for (var player : onlinePlayers) {
+                double balance = mobCoinsDb.getBalance(player.getName());
+                if (!first) balancesJson.append(",");
+                balancesJson.append("{\"name\":\"").append(player.getName()).append("\",\"balance\":").append(balance).append("}");
+                first = false;
+            }
+            balancesJson.append("]");
+
+            String url = apiUrl + "/api/mobcoins/sync";
+            HttpURLConnection conn = (HttpURLConnection) URI.create(url).toURL().openConnection();
+            conn.setRequestMethod("POST");
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(5000);
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("X-Plugin-Secret", pluginSecret);
+            conn.setDoOutput(true);
+
+            String body = "{\"balances\":" + balancesJson.toString() + "}";
+            conn.getOutputStream().write(body.getBytes(StandardCharsets.UTF_8));
+
+            int code = conn.getResponseCode();
+            if (code == 200) {
+                plugin.getLogger().fine("[MobCoins] Saldos sincronizados: " + onlinePlayers.size() + " jogadores");
+            }
+            conn.disconnect();
+        } catch (Exception e) {
+            plugin.getLogger().fine("[MobCoins] Erro ao sincronizar saldos: " + e.getMessage());
         }
     }
 }

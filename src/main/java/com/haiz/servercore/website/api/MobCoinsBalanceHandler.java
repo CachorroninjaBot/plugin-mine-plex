@@ -4,8 +4,6 @@ import com.haiz.servercore.website.WebsiteModule;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-import org.bukkit.Bukkit;
-
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -32,12 +30,9 @@ public final class MobCoinsBalanceHandler implements HttpHandler {
             return;
         }
 
-        var mobCoins = module.plugin().vip().mobCoins();
         double balance = 0;
-
-        if (mobCoins != null && mobCoins.isAvailable()) {
-            var player = Bukkit.getOfflinePlayer(playerName);
-            balance = mobCoins.getBalance(player.getUniqueId());
+        if (module.getMobCoinsDb() != null) {
+            balance = module.getMobCoinsDb().getBalance(playerName);
         }
 
         Map<String, Object> resp = new LinkedHashMap<>();

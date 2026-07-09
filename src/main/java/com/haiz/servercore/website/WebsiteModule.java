@@ -23,6 +23,7 @@ public final class WebsiteModule {
     private StoreStorage storeStorage;
     private RateLimiter purchaseLimiter;
     private StorePoller storePoller;
+    private MobCoinsDatabase mobCoinsDb;
 
     public WebsiteModule(HaizServerCore plugin) {
         this.plugin = plugin;
@@ -48,6 +49,7 @@ public final class WebsiteModule {
             // Initialize store
             this.storeStorage = new StoreStorage(plugin.sqliteDatabase());
             this.purchaseLimiter = new RateLimiter(10, 15 * 60 * 1000);
+            this.mobCoinsDb = new MobCoinsDatabase(plugin);
 
             // Start store poller if API URL is configured
             String storeApiUrl = config.storeApiUrl();
@@ -56,6 +58,7 @@ public final class WebsiteModule {
             if (!storeApiUrl.isEmpty()) {
                 plugin.getLogger().info("[Website] Iniciando StorePoller...");
                 this.storePoller = new StorePoller(plugin, storeApiUrl, pluginSecret);
+                storePoller.setMobCoinsDb(mobCoinsDb);
                 storePoller.start();
             } else {
                 plugin.getLogger().warning("[Website] StorePoller NÃO iniciado - store-api-url está vazio!");
@@ -107,6 +110,10 @@ public final class WebsiteModule {
             storePoller.stop();
             storePoller = null;
         }
+        if (mobCoinsDb != null) {
+            mobCoinsDb.close();
+            mobCoinsDb = null;
+        }
         if (server != null) {
             server.stop(0);
             server = null;
@@ -124,6 +131,7 @@ public final class WebsiteModule {
     public HaizServerCore plugin() { return plugin; }
     public StoreStorage getStoreStorage() { return storeStorage; }
     public RateLimiter getPurchaseLimiter() { return purchaseLimiter; }
+    public MobCoinsDatabase getMobCoinsDb() { return mobCoinsDb; }
 
     public WebsiteConfig config() {
         return new WebsiteConfig(plugin.config().getModuleConfig("website"));
