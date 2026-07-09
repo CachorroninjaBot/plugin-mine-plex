@@ -175,17 +175,26 @@ public final class StorePoller {
     }
 
     private void syncMobCoinsBalances() {
-        if (mobCoinsDb == null) return;
+        if (mobCoinsDb == null) {
+            plugin.getLogger().warning("[MobCoins] Database não disponível para sync");
+            return;
+        }
 
         try {
             // Get all online players' balances
             var onlinePlayers = Bukkit.getOnlinePlayers();
-            if (onlinePlayers.isEmpty()) return;
+            if (onlinePlayers.isEmpty()) {
+                plugin.getLogger().info("[MobCoins] Nenhum jogador online para sincronizar");
+                return;
+            }
+
+            plugin.getLogger().info("[MobCoins] Sincronizando saldos de " + onlinePlayers.size() + " jogadores...");
 
             StringBuilder balancesJson = new StringBuilder("[");
             boolean first = true;
             for (var player : onlinePlayers) {
                 double balance = mobCoinsDb.getBalance(player.getName());
+                plugin.getLogger().info("[MobCoins] " + player.getName() + ": " + balance + " MobCoins");
                 if (!first) balancesJson.append(",");
                 balancesJson.append("{\"name\":\"").append(player.getName()).append("\",\"balance\":").append(balance).append("}");
                 first = false;
@@ -193,10 +202,12 @@ public final class StorePoller {
             balancesJson.append("]");
 
             String url = apiUrl + "/api/mobcoins/sync";
+            plugin.getLogger().info("[MobCoins] Enviando para: " + url);
+
             HttpURLConnection conn = (HttpURLConnection) URI.create(url).toURL().openConnection();
             conn.setRequestMethod("POST");
-            conn.setConnectTimeout(5000);
-            conn.setReadTimeout(5000);
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(10000);
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestProperty("X-Plugin-Secret", pluginSecret);
             conn.setDoOutput(true);
@@ -205,12 +216,18 @@ public final class StorePoller {
             conn.getOutputStream().write(body.getBytes(StandardCharsets.UTF_8));
 
             int code = conn.getResponseCode();
+            plugin.getLogger().info("[MobCoins] Resposta da API: " + code);
+
             if (code == 200) {
-                plugin.getLogger().fine("[MobCoins] Saldos sincronizados: " + onlinePlayers.size() + " jogadores");
+                plugin.getLogger().info("[MobCoins] ✅ Saldos sincronizados com sucesso!");
+            } else {
+                plugin.getLogger().warning("[MobCoins] ❌ Erro ao sincronizar: código " + code);
             }
             conn.disconnect();
+        } catch (java.net.ConnectException e) {
+            plugin.getLogger().warning("[MobCoins] ❌ Não foi possível conectar à API: " + e.getMessage());
         } catch (Exception e) {
-            plugin.getLogger().fine("[MobCoins] Erro ao sincronizar saldos: " + e.getMessage());
+            plugin.getLogger().warning("[MobCoins] ❌ Erro ao sincronizar saldos: " + e.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 }
