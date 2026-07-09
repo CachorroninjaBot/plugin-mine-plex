@@ -24,3 +24,7 @@ cors-origin: "https://site-minepex.vercel.app"
 # URL da API de loja externa (Render) para polling de compras
 # Deixe vazio para desabilitar o polling
 store-api-url: "https://minepex-api.onrender.com"
+
+# Chave secreta para autenticar com a API externa
+# Deve ser igual a variavel PLUGIN_SECRET no Render
+plugin-secret: "minepex-plugin-secret"

@@ -21,12 +21,14 @@ public final class StorePoller {
 
     private final JavaPlugin plugin;
     private final String apiUrl;
+    private final String pluginSecret;
     private final Gson gson = new Gson();
     private int taskId = -1;
 
-    public StorePoller(JavaPlugin plugin, String apiUrl) {
+    public StorePoller(JavaPlugin plugin, String apiUrl, String pluginSecret) {
         this.plugin = plugin;
         this.apiUrl = apiUrl;
+        this.pluginSecret = pluginSecret;
     }
 
     public void start() {
@@ -64,6 +66,7 @@ public final class StorePoller {
             conn.setConnectTimeout(10000);
             conn.setReadTimeout(10000);
             conn.setRequestProperty("Accept", "application/json");
+            conn.setRequestProperty("X-Plugin-Secret", pluginSecret);
 
             int responseCode = conn.getResponseCode();
             plugin.getLogger().info("[Store] Resposta da API: " + responseCode);
@@ -150,6 +153,7 @@ public final class StorePoller {
             conn.setConnectTimeout(5000);
             conn.setReadTimeout(5000);
             conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("X-Plugin-Secret", pluginSecret);
             conn.setDoOutput(true);
 
             String body = "{\"type\":\"" + type + "\"}";

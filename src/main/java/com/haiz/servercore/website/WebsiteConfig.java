@@ -37,4 +37,8 @@ public final class WebsiteConfig {
     public String storeApiUrl() {
         return config.getString("store-api-url", "");
     }
+
+    public String pluginSecret() {
+        return config.getString("plugin-secret", "minepex-plugin-secret");
+    }
 }

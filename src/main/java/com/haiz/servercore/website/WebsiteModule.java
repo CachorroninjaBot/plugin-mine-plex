@@ -51,10 +51,11 @@ public final class WebsiteModule {
 
             // Start store poller if API URL is configured
             String storeApiUrl = config.storeApiUrl();
+            String pluginSecret = config.pluginSecret();
             plugin.getLogger().info("[Website] Store API URL configurada: '" + storeApiUrl + "'");
             if (!storeApiUrl.isEmpty()) {
                 plugin.getLogger().info("[Website] Iniciando StorePoller...");
-                this.storePoller = new StorePoller(plugin, storeApiUrl);
+                this.storePoller = new StorePoller(plugin, storeApiUrl, pluginSecret);
                 storePoller.start();
             } else {
                 plugin.getLogger().warning("[Website] StorePoller NÃO iniciado - store-api-url está vazio!");
