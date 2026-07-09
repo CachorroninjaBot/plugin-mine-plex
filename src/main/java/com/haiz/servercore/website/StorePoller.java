@@ -64,7 +64,6 @@ public final class StorePoller {
     private void pollPendingPurchases() {
         try {
             String url = apiUrl + "/api/pending";
-            plugin.getLogger().info("[Store] Verificando compras pendentes em: " + url);
 
             HttpURLConnection conn = (HttpURLConnection) URI.create(url).toURL().openConnection();
             conn.setRequestMethod("GET");
@@ -74,7 +73,6 @@ public final class StorePoller {
             conn.setRequestProperty("X-Plugin-Secret", pluginSecret);
 
             int responseCode = conn.getResponseCode();
-            plugin.getLogger().info("[Store] Resposta da API: " + responseCode);
 
             if (responseCode != 200) {
                 plugin.getLogger().warning("[Store] API retornou código: " + responseCode);
@@ -90,21 +88,20 @@ public final class StorePoller {
 
             JsonArray pending = response.getAsJsonArray("pending");
             int count = pending != null ? pending.size() : 0;
-            plugin.getLogger().info("[Store] Compras pendentes encontradas: " + count);
 
-            if (pending == null || pending.isEmpty()) return;
-
-            for (JsonElement elem : pending) {
-                JsonObject purchase = elem.getAsJsonObject();
-                processPurchase(purchase);
+            if (count > 0) {
+                plugin.getLogger().info("[Store] " + count + " compra(s) pendente(s) encontrada(s)");
+                for (JsonElement elem : pending) {
+                    JsonObject purchase = elem.getAsJsonObject();
+                    processPurchase(purchase);
+                }
             }
 
-            // Also sync MobCoins balances
+            // Sync MobCoins balances
             syncMobCoinsBalances();
 
         } catch (java.net.ConnectException e) {
             plugin.getLogger().warning("[Store] Não foi possível conectar à API: " + apiUrl);
-            plugin.getLogger().warning("[Store] Erro: " + e.getMessage());
         } catch (java.net.SocketTimeoutException e) {
             plugin.getLogger().warning("[Store] Timeout ao conectar à API: " + apiUrl);
         } catch (Exception e) {
@@ -175,26 +172,16 @@ public final class StorePoller {
     }
 
     private void syncMobCoinsBalances() {
-        if (mobCoinsDb == null) {
-            plugin.getLogger().warning("[MobCoins] Database não disponível para sync");
-            return;
-        }
+        if (mobCoinsDb == null) return;
 
         try {
-            // Get all online players' balances
             var onlinePlayers = Bukkit.getOnlinePlayers();
-            if (onlinePlayers.isEmpty()) {
-                plugin.getLogger().info("[MobCoins] Nenhum jogador online para sincronizar");
-                return;
-            }
-
-            plugin.getLogger().info("[MobCoins] Sincronizando saldos de " + onlinePlayers.size() + " jogadores...");
+            if (onlinePlayers.isEmpty()) return;
 
             StringBuilder balancesJson = new StringBuilder("[");
             boolean first = true;
             for (var player : onlinePlayers) {
                 double balance = mobCoinsDb.getBalance(player.getName());
-                plugin.getLogger().info("[MobCoins] " + player.getName() + ": " + balance + " MobCoins");
                 if (!first) balancesJson.append(",");
                 balancesJson.append("{\"name\":\"").append(player.getName()).append("\",\"balance\":").append(balance).append("}");
                 first = false;
@@ -202,8 +189,6 @@ public final class StorePoller {
             balancesJson.append("]");
 
             String url = apiUrl + "/api/mobcoins/sync";
-            plugin.getLogger().info("[MobCoins] Enviando para: " + url);
-
             HttpURLConnection conn = (HttpURLConnection) URI.create(url).toURL().openConnection();
             conn.setRequestMethod("POST");
             conn.setConnectTimeout(10000);
@@ -216,18 +201,12 @@ public final class StorePoller {
             conn.getOutputStream().write(body.getBytes(StandardCharsets.UTF_8));
 
             int code = conn.getResponseCode();
-            plugin.getLogger().info("[MobCoins] Resposta da API: " + code);
-
-            if (code == 200) {
-                plugin.getLogger().info("[MobCoins] ✅ Saldos sincronizados com sucesso!");
-            } else {
-                plugin.getLogger().warning("[MobCoins] ❌ Erro ao sincronizar: código " + code);
+            if (code != 200) {
+                plugin.getLogger().warning("[MobCoins] Erro ao sincronizar saldos: código " + code);
             }
             conn.disconnect();
-        } catch (java.net.ConnectException e) {
-            plugin.getLogger().warning("[MobCoins] ❌ Não foi possível conectar à API: " + e.getMessage());
         } catch (Exception e) {
-            plugin.getLogger().warning("[MobCoins] ❌ Erro ao sincronizar saldos: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+            // Silent fail - sync will retry next cycle
         }
     }
 }

@@ -94,15 +94,10 @@ public final class MobCoinsDatabase {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                double balance = rs.getDouble("mobcoins");
-                plugin.getLogger().info("[MobCoins] Saldo de " + playerName + ": " + balance);
-                return balance;
+                return rs.getDouble("mobcoins");
             }
-
-            plugin.getLogger().info("[MobCoins] Jogador não encontrado: " + playerName);
             return 0;
         } catch (Exception e) {
-            plugin.getLogger().log(Level.WARNING, "[MobCoins] Erro ao ler saldo: " + e.getMessage());
             return 0;
         }
     }
