@@ -1,8 +1,0 @@
-{
-    "rewrites": [
-        { "source": "/features", "destination": "/features.html" },
-        { "source": "/ranks", "destination": "/ranks.html" },
-        { "source": "/store", "destination": "/store.html" },
-        { "source": "/discord", "destination": "/discord.html" }
-    ]
-}

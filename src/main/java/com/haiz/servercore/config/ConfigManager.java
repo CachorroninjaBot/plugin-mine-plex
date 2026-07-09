@@ -355,4 +355,16 @@ public final class ConfigManager {
     public boolean isAutoRepairEnabled() {
         return getModuleConfig("repair").getBoolean("enabled", true);
     }
+
+    // ── Website / Store (integração com minepex-api) ─────────────
+
+    /** URL da API de loja externa (minepex-api) usada pelo StorePoller. */
+    public String websiteStoreApiUrl() {
+        return getModuleConfig("website").getString("store-api-url", "");
+    }
+
+    /** Segredo compartilhado com a minepex-api (deve bater com PLUGIN_SECRET no Render). */
+    public String websitePluginSecret() {
+        return getModuleConfig("website").getString("plugin-secret", "minepex-plugin-secret");
+    }
 }
