@@ -36,6 +36,7 @@ public final class StorePoller {
     private final Gson gson = new Gson();
     private final MobCoinsDatabase mobCoinsDb;
     private int taskId = -1;
+    private String lastCatalogSignature = "";
 
     public StorePoller(JavaPlugin plugin, String apiUrl, String pluginSecret) {
         this.plugin = plugin;
@@ -52,21 +53,25 @@ public final class StorePoller {
         plugin.getLogger().info("[Store] Iniciando Poller...");
         plugin.getLogger().info("[Store] API URL: " + apiUrl);
 
-        // Popula o catálogo imediatamente (e depois a cada ciclo)
+        // Catálogo: popula imediatamente e depois em timer separado (60s, raramente muda)
         refreshCatalog();
 
+        // Compras pendentes: polling rápido (5s)
         taskId = new BukkitRunnable() {
             @Override
             public void run() {
-                refreshCatalog();
                 pollPendingPurchases();
             }
         }.runTaskTimerAsynchronously(plugin, 20L * 5, 20L * 5).getTaskId(); // 5s
 
-        // Sync de saldos em timer separado (menos frequente) para não sobrecarregar a API
+        // Catálogo em timer separado (60s) para não inundar o log
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin,
+                this::refreshCatalog, 20L * 60, 20L * 60); // 60s
+
+        // Sync de saldos em timer separado (30s)
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> syncMobCoinsBalances(), 20L * 30, 20L * 30); // 30s
 
-        plugin.getLogger().info("[Store] Poller iniciado! Catálogo + compras a cada 5s, sync MobCoins a cada 30s.");
+        plugin.getLogger().info("[Store] Poller iniciado! Compras a cada 5s, catálogo a cada 60s, sync MobCoins a cada 30s.");
     }
 
     public void stop() {
@@ -79,20 +84,29 @@ public final class StorePoller {
     }
 
     // ── Catálogo (fonte única: minepex-api /api/store/items) ───────────────
+    // Só loga quando o catálogo realmente muda (evita spam a cada ciclo).
     @SuppressWarnings("unchecked")
     private void refreshCatalog() {
         try {
             JsonObject resp = getJson(apiUrl + "/api/store/items");
             if (resp == null) return;
 
+            String signature = resp.toString();
+            boolean changed = !signature.equals(lastCatalogSignature);
+            lastCatalogSignature = signature;
+
             Map<String, Map<String, Object>> pix = toMap(resp.get("pix"));
             Map<String, Map<String, Object>> mc = toMap(resp.get("mobcoins"));
             StoreItems.updateFromApi(pix, mc);
 
-            if (StoreItems.isLoaded()) {
-                plugin.getLogger().info("[Store] Catálogo atualizado: "
-                        + StoreItems.pixKeys().size() + " Pix / "
-                        + StoreItems.mobcoinsKeys().size() + " MobCoins");
+            if (changed) {
+                if (StoreItems.isLoaded()) {
+                    plugin.getLogger().info("[Store] Catálogo atualizado: "
+                            + StoreItems.pixKeys().size() + " Pix / "
+                            + StoreItems.mobcoinsKeys().size() + " MobCoins");
+                } else {
+                    plugin.getLogger().warning("[Store] Catálogo vazio recebido da API.");
+                }
             }
         } catch (Exception e) {
             plugin.getLogger().warning("[Store] Falha ao atualizar catálogo: " + e.getMessage());
